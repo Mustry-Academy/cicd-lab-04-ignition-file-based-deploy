@@ -1,0 +1,292 @@
+[
+  {
+    "name": "Compressor1",
+    "typeId": "Compressor",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor1/hoa",
+        "name": "hoa",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor1/lineVoltage",
+        "name": "lineVoltage",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor1/motorAmps",
+        "name": "motorAmps",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor1/percentLoaded",
+        "name": "percentLoaded",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor1/powerAvgUsage",
+        "name": "powerAvgUsage",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor1/powerDemand",
+        "name": "powerDemand",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor1/presSuctionSP",
+        "name": "presSuctionSP",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor1/pressureDischarge",
+        "name": "pressureDischarge",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor1/pressureInletOil",
+        "name": "pressureInletOil",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor1/pressureInletOilFilter",
+        "name": "pressureInletOilFilter",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor1/pressureSuction",
+        "name": "pressureSuction",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor1/tempDischarge",
+        "name": "tempDischarge",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor1/tempInletOil",
+        "name": "tempInletOil",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor1/tempOilSep",
+        "name": "tempOilSep",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor1/tempSuction",
+        "name": "tempSuction",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor1/tonnageCurrent",
+        "name": "tonnageCurrent",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor1/tonnageIdeal",
+        "name": "tonnageIdeal",
+        "tagType": "AtomicTag"
+      }
+    ]
+  },
+  {
+    "name": "Compressor2",
+    "typeId": "Compressor",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor2/hoa",
+        "name": "hoa",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor2/lineVoltage",
+        "name": "lineVoltage",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor2/motorAmps",
+        "name": "motorAmps",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor2/percentLoaded",
+        "name": "percentLoaded",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor2/powerAvgUsage",
+        "name": "powerAvgUsage",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor2/powerDemand",
+        "name": "powerDemand",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor2/presSuctionSP",
+        "name": "presSuctionSP",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor2/pressureDischarge",
+        "name": "pressureDischarge",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor2/pressureInletOil",
+        "name": "pressureInletOil",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor2/pressureInletOilFilter",
+        "name": "pressureInletOilFilter",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor2/pressureSuction",
+        "name": "pressureSuction",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor2/tempDischarge",
+        "name": "tempDischarge",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor2/tempInletOil",
+        "name": "tempInletOil",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor2/tempOilSep",
+        "name": "tempOilSep",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor2/tempSuction",
+        "name": "tempSuction",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor2/tonnageCurrent",
+        "name": "tonnageCurrent",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Compressor2/tonnageIdeal",
+        "name": "tonnageIdeal",
+        "tagType": "AtomicTag"
+      }
+    ]
+  },
+  {
+    "name": "Tower1",
+    "typeId": "Tower",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "name": "Pumps",
+        "tagType": "Folder",
+        "tags": [
+          {
+            "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Tower1/Pumps/chemHOA",
+            "name": "chemHOA",
+            "tagType": "AtomicTag"
+          },
+          {
+            "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Tower1/Pumps/bromineHOA",
+            "name": "bromineHOA",
+            "tagType": "AtomicTag"
+          },
+          {
+            "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Tower1/Pumps/circHOA",
+            "name": "circHOA",
+            "tagType": "AtomicTag"
+          }
+        ]
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Tower1/fanSpeed",
+        "name": "fanSpeed",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Tower1/makeup",
+        "name": "makeup",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Tower1/mmOH",
+        "name": "mmOH",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Tower1/pH",
+        "name": "pH",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Tower1/temp",
+        "name": "temp",
+        "tagType": "AtomicTag"
+      }
+    ]
+  },
+  {
+    "name": "Tower2",
+    "typeId": "Tower",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "name": "Pumps",
+        "tagType": "Folder",
+        "tags": [
+          {
+            "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Tower2/Pumps/bromineHOA",
+            "name": "bromineHOA",
+            "tagType": "AtomicTag"
+          },
+          {
+            "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Tower2/Pumps/chemHOA",
+            "name": "chemHOA",
+            "tagType": "AtomicTag"
+          },
+          {
+            "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Tower2/Pumps/circHOA",
+            "name": "circHOA",
+            "tagType": "AtomicTag"
+          }
+        ]
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Tower2/fanSpeed",
+        "name": "fanSpeed",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Tower2/makeup",
+        "name": "makeup",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Tower2/mmOH",
+        "name": "mmOH",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Tower2/pH",
+        "name": "pH",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Refrigeration/Tower2/temp",
+        "name": "temp",
+        "tagType": "AtomicTag"
+      }
+    ]
+  }
+]

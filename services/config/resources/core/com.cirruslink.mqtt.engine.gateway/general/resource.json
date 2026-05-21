@@ -4,13 +4,15 @@
   "restricted": false,
   "overridable": true,
   "files": [
-    "config.json"
+    "config.json",
+    "backupConfig.json"
   ],
   "attributes": {
     "lastModification": {
-      "actor": "default",
-      "timestamp": "2026-05-21T12:06:50Z"
+      "actor": "admin",
+      "timestamp": "2026-05-21T13:25:58Z"
     },
-    "lastModificationSignature": "46cfeebb23b020453e1d631d110a38cc1b4401e72da2cb5659c4d82454bef69e"
+    "lastModificationSignature": "250641d93f03ae5c3c12895001b3ae7af21cba1982730dd441c7d5e1cccb3ef6",
+    "enabled": true
   }
 }

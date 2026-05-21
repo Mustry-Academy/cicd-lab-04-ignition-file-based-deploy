@@ -1,0 +1,301 @@
+[
+  {
+    "name": "Motor 6",
+    "typeId": "Motor",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Motor 6/Amps",
+        "name": "Amps",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Motor 6/HOA",
+        "name": "HOA",
+        "tagType": "AtomicTag"
+      }
+    ]
+  },
+  {
+    "name": "Motor 2",
+    "typeId": "Motor",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Motor 2/Amps",
+        "name": "Amps",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Motor 2/HOA",
+        "name": "HOA",
+        "tagType": "AtomicTag"
+      }
+    ]
+  },
+  {
+    "name": "AU 1",
+    "typeId": "AirUnit",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/AU 1/Fan 1 HOA",
+        "name": "Fan 1 HOA",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/AU 1/Fan 2 HOA",
+        "name": "Fan 2 HOA",
+        "tagType": "AtomicTag"
+      }
+    ]
+  },
+  {
+    "name": "AU 2",
+    "typeId": "AirUnit",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/AU 2/Fan 1 HOA",
+        "name": "Fan 1 HOA",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/AU 2/Fan 2 HOA",
+        "name": "Fan 2 HOA",
+        "tagType": "AtomicTag"
+      }
+    ]
+  },
+  {
+    "name": "Motor 1",
+    "typeId": "Motor",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Motor 1/Amps",
+        "name": "Amps",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Motor 1/HOA",
+        "name": "HOA",
+        "tagType": "AtomicTag"
+      }
+    ]
+  },
+  {
+    "name": "Motor 5",
+    "typeId": "Motor",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Motor 5/Amps",
+        "name": "Amps",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Motor 5/HOA",
+        "name": "HOA",
+        "tagType": "AtomicTag"
+      }
+    ]
+  },
+  {
+    "name": "Palletizer 2",
+    "typeId": "Palletizer",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Palletizer 2/HOA",
+        "name": "HOA",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Palletizer 2/Pattern",
+        "name": "Pattern",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Palletizer 2/Type",
+        "name": "Type",
+        "tagType": "AtomicTag"
+      }
+    ]
+  },
+  {
+    "name": "Sensor 2",
+    "typeId": "Sensor",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Sensor 2/Humidity",
+        "name": "Humidity",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Sensor 2/Temperature",
+        "name": "Temperature",
+        "tagType": "AtomicTag"
+      }
+    ]
+  },
+  {
+    "name": "Motor 3",
+    "typeId": "Motor",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Motor 3/Amps",
+        "name": "Amps",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Motor 3/HOA",
+        "name": "HOA",
+        "tagType": "AtomicTag"
+      }
+    ]
+  },
+  {
+    "name": "Palletizer 1",
+    "typeId": "Palletizer",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Palletizer 1/HOA",
+        "name": "HOA",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Palletizer 1/Pattern",
+        "name": "Pattern",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Palletizer 1/Type",
+        "name": "Type",
+        "tagType": "AtomicTag"
+      }
+    ]
+  },
+  {
+    "name": "Sensor 1",
+    "typeId": "Sensor",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Sensor 1/Humidity",
+        "name": "Humidity",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Sensor 1/Temperature",
+        "name": "Temperature",
+        "tagType": "AtomicTag"
+      }
+    ]
+  },
+  {
+    "name": "Motor 4",
+    "typeId": "Motor",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Motor 4/Amps",
+        "name": "Amps",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Motor 4/HOA",
+        "name": "HOA",
+        "tagType": "AtomicTag"
+      }
+    ]
+  },
+  {
+    "name": "Motor 7",
+    "typeId": "Motor",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Motor 7/Amps",
+        "name": "Amps",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Motor 7/HOA",
+        "name": "HOA",
+        "tagType": "AtomicTag"
+      }
+    ]
+  },
+  {
+    "name": "Sensor 3",
+    "typeId": "Sensor",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Sensor 3/Humidity",
+        "name": "Humidity",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Sensor 3/Temperature",
+        "name": "Temperature",
+        "tagType": "AtomicTag"
+      }
+    ]
+  },
+  {
+    "name": "AU 3",
+    "typeId": "AirUnit",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/AU 3/Fan 1 HOA",
+        "name": "Fan 1 HOA",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/AU 3/Fan 2 HOA",
+        "name": "Fan 2 HOA",
+        "tagType": "AtomicTag"
+      }
+    ]
+  },
+  {
+    "name": "Motor 8",
+    "typeId": "Motor",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Motor 8/Amps",
+        "name": "Amps",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Motor 8/HOA",
+        "name": "HOA",
+        "tagType": "AtomicTag"
+      }
+    ]
+  },
+  {
+    "name": "Pallet Wrapper",
+    "typeId": "PalletWrapper",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Pallet Wrapper/HOA",
+        "name": "HOA",
+        "tagType": "AtomicTag"
+      },
+      {
+        "opcItemPath": "ns\u003d1;s\u003d[Simulator]Overview/Pallet Wrapper/Pattern",
+        "name": "Pattern",
+        "tagType": "AtomicTag"
+      }
+    ]
+  }
+]

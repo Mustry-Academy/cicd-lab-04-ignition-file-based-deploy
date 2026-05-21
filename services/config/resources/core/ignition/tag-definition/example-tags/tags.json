@@ -1,0 +1,271 @@
+[
+  {
+    "name": "Overview",
+    "tagType": "Folder",
+    "tags": [
+      {"name": "CaseCount", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server", "opcItemPath": "ns=1;s=[Simulator]Overview/CaseCount"},
+      {"name": "CurrentOrder", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Int2", "opcServer": "Ignition OPC UA Server", "opcItemPath": "ns=1;s=[Simulator]Overview/CurrentOrder"},
+      {"name": "CurrentRun", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Int2", "opcServer": "Ignition OPC UA Server", "opcItemPath": "ns=1;s=[Simulator]Overview/CurrentRun"},
+      {"name": "RunControl", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Int2", "opcServer": "Ignition OPC UA Server", "opcItemPath": "ns=1;s=[Simulator]Overview/RunControl"},
+      {
+        "name": "AU 1",
+        "typeId": "AirUnit",
+        "tagType": "UdtInstance",
+        "tags": [
+          {"name": "Fan 1 HOA", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/AU 1/Fan 1 HOA"},
+          {"name": "Fan 2 HOA", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/AU 1/Fan 2 HOA"}
+        ]
+      },
+      {
+        "name": "AU 2",
+        "typeId": "AirUnit",
+        "tagType": "UdtInstance",
+        "tags": [
+          {"name": "Fan 1 HOA", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/AU 2/Fan 1 HOA"},
+          {"name": "Fan 2 HOA", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/AU 2/Fan 2 HOA"}
+        ]
+      },
+      {
+        "name": "AU 3",
+        "typeId": "AirUnit",
+        "tagType": "UdtInstance",
+        "tags": [
+          {"name": "Fan 1 HOA", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/AU 3/Fan 1 HOA"},
+          {"name": "Fan 2 HOA", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/AU 3/Fan 2 HOA"}
+        ]
+      },
+      {
+        "name": "Motor 1",
+        "typeId": "Motor",
+        "tagType": "UdtInstance",
+        "tags": [
+          {"name": "Amps", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Motor 1/Amps"},
+          {"name": "HOA", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Motor 1/HOA"}
+        ]
+      },
+      {
+        "name": "Motor 2",
+        "typeId": "Motor",
+        "tagType": "UdtInstance",
+        "tags": [
+          {"name": "Amps", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Motor 2/Amps"},
+          {"name": "HOA", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Motor 2/HOA"}
+        ]
+      },
+      {
+        "name": "Motor 3",
+        "typeId": "Motor",
+        "tagType": "UdtInstance",
+        "tags": [
+          {"name": "Amps", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Motor 3/Amps"},
+          {"name": "HOA", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Motor 3/HOA"}
+        ]
+      },
+      {
+        "name": "Motor 4",
+        "typeId": "Motor",
+        "tagType": "UdtInstance",
+        "tags": [
+          {"name": "Amps", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Motor 4/Amps"},
+          {"name": "HOA", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Motor 4/HOA"}
+        ]
+      },
+      {
+        "name": "Motor 5",
+        "typeId": "Motor",
+        "tagType": "UdtInstance",
+        "tags": [
+          {"name": "Amps", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Motor 5/Amps"},
+          {"name": "HOA", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Motor 5/HOA"}
+        ]
+      },
+      {
+        "name": "Motor 6",
+        "typeId": "Motor",
+        "tagType": "UdtInstance",
+        "tags": [
+          {"name": "Amps", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Motor 6/Amps"},
+          {"name": "HOA", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Motor 6/HOA"}
+        ]
+      },
+      {
+        "name": "Motor 7",
+        "typeId": "Motor",
+        "tagType": "UdtInstance",
+        "tags": [
+          {"name": "Amps", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Motor 7/Amps"},
+          {"name": "HOA", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Motor 7/HOA"}
+        ]
+      },
+      {
+        "name": "Motor 8",
+        "typeId": "Motor",
+        "tagType": "UdtInstance",
+        "tags": [
+          {"name": "Amps", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Motor 8/Amps"},
+          {"name": "HOA", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Motor 8/HOA"}
+        ]
+      },
+      {
+        "name": "Sensor 1",
+        "typeId": "Sensor",
+        "tagType": "UdtInstance",
+        "tags": [
+          {"name": "Humidity", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Sensor 1/Humidity"},
+          {"name": "Temperature", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Sensor 1/Temperature"}
+        ]
+      },
+      {
+        "name": "Sensor 2",
+        "typeId": "Sensor",
+        "tagType": "UdtInstance",
+        "tags": [
+          {"name": "Humidity", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Sensor 2/Humidity"},
+          {"name": "Temperature", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Sensor 2/Temperature"}
+        ]
+      },
+      {
+        "name": "Sensor 3",
+        "typeId": "Sensor",
+        "tagType": "UdtInstance",
+        "tags": [
+          {"name": "Humidity", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Sensor 3/Humidity"},
+          {"name": "Temperature", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Sensor 3/Temperature"}
+        ]
+      },
+      {
+        "name": "Palletizer 1",
+        "typeId": "Palletizer",
+        "tagType": "UdtInstance",
+        "tags": [
+          {"name": "HOA", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Palletizer 1/HOA"},
+          {"name": "Pattern", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Palletizer 1/Pattern"},
+          {"name": "Type", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Palletizer 1/Type"}
+        ]
+      },
+      {
+        "name": "Palletizer 2",
+        "typeId": "Palletizer",
+        "tagType": "UdtInstance",
+        "tags": [
+          {"name": "HOA", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Palletizer 2/HOA"},
+          {"name": "Pattern", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Palletizer 2/Pattern"},
+          {"name": "Type", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Palletizer 2/Type"}
+        ]
+      },
+      {
+        "name": "Pallet Wrapper",
+        "typeId": "PalletWrapper",
+        "tagType": "UdtInstance",
+        "tags": [
+          {"name": "HOA", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Pallet Wrapper/HOA"},
+          {"name": "Pattern", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Overview/Pallet Wrapper/Pattern"}
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Refrigeration",
+    "tagType": "Folder",
+    "tags": [
+      {"name": "accumulatorLevel", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/accumulatorLevel"},
+      {"name": "ambientHum", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/ambientHum"},
+      {"name": "ambientTemp", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/ambientTemp"},
+      {"name": "dischargePressure", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/dischargePressure"},
+      {"name": "dischargeTemp", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/dischargeTemp"},
+      {"name": "receiverLevel", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/receiverLevel"},
+      {"name": "valveDischarge", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/valveDischarge"},
+      {"name": "valveKing", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/valveKing"},
+      {
+        "name": "Compressor1",
+        "typeId": "Compressor",
+        "tagType": "UdtInstance",
+        "tags": [
+          {"name": "hoa", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor1/hoa"},
+          {"name": "lineVoltage", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor1/lineVoltage"},
+          {"name": "motorAmps", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor1/motorAmps"},
+          {"name": "percentLoaded", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor1/percentLoaded"},
+          {"name": "powerAvgUsage", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor1/powerAvgUsage"},
+          {"name": "powerDemand", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor1/powerDemand"},
+          {"name": "presSuctionSP", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor1/presSuctionSP"},
+          {"name": "pressureDischarge", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor1/pressureDischarge"},
+          {"name": "pressureInletOil", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor1/pressureInletOil"},
+          {"name": "pressureInletOilFilter", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor1/pressureInletOilFilter"},
+          {"name": "pressureSuction", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor1/pressureSuction"},
+          {"name": "tempDischarge", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor1/tempDischarge"},
+          {"name": "tempInletOil", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor1/tempInletOil"},
+          {"name": "tempOilSep", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor1/tempOilSep"},
+          {"name": "tempSuction", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor1/tempSuction"},
+          {"name": "tonnageCurrent", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor1/tonnageCurrent"},
+          {"name": "tonnageIdeal", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor1/tonnageIdeal"}
+        ]
+      },
+      {
+        "name": "Compressor2",
+        "typeId": "Compressor",
+        "tagType": "UdtInstance",
+        "tags": [
+          {"name": "hoa", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor2/hoa"},
+          {"name": "lineVoltage", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor2/lineVoltage"},
+          {"name": "motorAmps", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor2/motorAmps"},
+          {"name": "percentLoaded", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor2/percentLoaded"},
+          {"name": "powerAvgUsage", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor2/powerAvgUsage"},
+          {"name": "powerDemand", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor2/powerDemand"},
+          {"name": "presSuctionSP", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor2/presSuctionSP"},
+          {"name": "pressureDischarge", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor2/pressureDischarge"},
+          {"name": "pressureInletOil", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor2/pressureInletOil"},
+          {"name": "pressureInletOilFilter", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor2/pressureInletOilFilter"},
+          {"name": "pressureSuction", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor2/pressureSuction"},
+          {"name": "tempDischarge", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor2/tempDischarge"},
+          {"name": "tempInletOil", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor2/tempInletOil"},
+          {"name": "tempOilSep", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor2/tempOilSep"},
+          {"name": "tempSuction", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor2/tempSuction"},
+          {"name": "tonnageCurrent", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor2/tonnageCurrent"},
+          {"name": "tonnageIdeal", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Compressor2/tonnageIdeal"}
+        ]
+      },
+      {
+        "name": "Tower1",
+        "typeId": "Tower",
+        "tagType": "UdtInstance",
+        "tags": [
+          {"name": "fanSpeed", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Tower1/fanSpeed"},
+          {"name": "makeup", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Tower1/makeup"},
+          {"name": "mmOH", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Tower1/mmOH"},
+          {"name": "pH", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Tower1/pH"},
+          {"name": "temp", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Tower1/temp"},
+          {
+            "name": "Pumps",
+            "tagType": "Folder",
+            "tags": [
+              {"name": "bromineHOA", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Tower1/Pumps/bromineHOA"},
+              {"name": "chemHOA", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Tower1/Pumps/chemHOA"},
+              {"name": "circHOA", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Tower1/Pumps/circHOA"}
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Tower2",
+        "typeId": "Tower",
+        "tagType": "UdtInstance",
+        "tags": [
+          {"name": "fanSpeed", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Tower2/fanSpeed"},
+          {"name": "makeup", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Tower2/makeup"},
+          {"name": "mmOH", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Tower2/mmOH"},
+          {"name": "pH", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Tower2/pH"},
+          {"name": "temp", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Tower2/temp"},
+          {
+            "name": "Pumps",
+            "tagType": "Folder",
+            "tags": [
+              {"name": "bromineHOA", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Tower2/Pumps/bromineHOA"},
+              {"name": "chemHOA", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Tower2/Pumps/chemHOA"},
+              {"name": "circHOA", "tagType": "AtomicTag", "opcItemPath": "ns=1;s=[Simulator]Refrigeration/Tower2/Pumps/circHOA"}
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

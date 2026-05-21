@@ -6,7 +6,7 @@
   "customProperties": "{}",
   "enableAlarmEventPublishing": true,
   "enableBdSeqChecking": true,
-  "enableEngine": true,
+  "enableEngine": false,
   "enableLatching": false,
   "h2dbDirectory": "/usr/local/bin/ignition/data",
   "h2dbPort": 9098,

@@ -1,0 +1,93 @@
+[
+  {
+    "name": "AirUnit",
+    "typeId": null,
+    "tagType": "UdtType",
+    "tags": [
+      {"name": "Fan 1 HOA", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Int2", "opcServer": "Ignition OPC UA Server"},
+      {"name": "Fan 2 HOA", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Int2", "opcServer": "Ignition OPC UA Server"}
+    ]
+  },
+  {
+    "name": "Motor",
+    "typeId": null,
+    "tagType": "UdtType",
+    "tags": [
+      {"name": "Amps", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+      {"name": "HOA", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Int2", "opcServer": "Ignition OPC UA Server"}
+    ]
+  },
+  {
+    "name": "Sensor",
+    "typeId": null,
+    "tagType": "UdtType",
+    "tags": [
+      {"name": "Humidity", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+      {"name": "Temperature", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"}
+    ]
+  },
+  {
+    "name": "Palletizer",
+    "typeId": null,
+    "tagType": "UdtType",
+    "tags": [
+      {"name": "HOA", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Int4", "opcServer": "Ignition OPC UA Server"},
+      {"name": "Pattern", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Int4", "opcServer": "Ignition OPC UA Server"},
+      {"name": "Type", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Int4", "opcServer": "Ignition OPC UA Server"}
+    ]
+  },
+  {
+    "name": "PalletWrapper",
+    "typeId": null,
+    "tagType": "UdtType",
+    "tags": [
+      {"name": "HOA", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Int2", "opcServer": "Ignition OPC UA Server"},
+      {"name": "Pattern", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Int8", "opcServer": "Ignition OPC UA Server"}
+    ]
+  },
+  {
+    "name": "Compressor",
+    "typeId": null,
+    "tagType": "UdtType",
+    "tags": [
+      {"name": "hoa", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+      {"name": "lineVoltage", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+      {"name": "motorAmps", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+      {"name": "percentLoaded", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+      {"name": "powerAvgUsage", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+      {"name": "powerDemand", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+      {"name": "presSuctionSP", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+      {"name": "pressureDischarge", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+      {"name": "pressureInletOil", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+      {"name": "pressureInletOilFilter", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+      {"name": "pressureSuction", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+      {"name": "tempDischarge", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+      {"name": "tempInletOil", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+      {"name": "tempOilSep", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+      {"name": "tempSuction", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+      {"name": "tonnageCurrent", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+      {"name": "tonnageIdeal", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"}
+    ]
+  },
+  {
+    "name": "Tower",
+    "typeId": null,
+    "tagType": "UdtType",
+    "tags": [
+      {"name": "fanSpeed", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+      {"name": "makeup", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+      {"name": "mmOH", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+      {"name": "pH", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+      {"name": "temp", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+      {
+        "name": "Pumps",
+        "tagType": "Folder",
+        "tags": [
+          {"name": "bromineHOA", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+          {"name": "chemHOA", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"},
+          {"name": "circHOA", "tagType": "AtomicTag", "valueSource": "opc", "dataType": "Float8", "opcServer": "Ignition OPC UA Server"}
+        ]
+      }
+    ]
+  }
+]

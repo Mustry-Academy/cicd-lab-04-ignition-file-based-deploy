@@ -1,0 +1,35 @@
+{
+  "pages": {
+    "/": {
+      "title": "Overview",
+      "viewPath": "pages/overview"
+    },
+    "/overview": {
+      "title": "Overview",
+      "viewPath": "pages/overview"
+    },
+    "/refrigeration": {
+      "title": "Refrigeration",
+      "viewPath": "pages/refrigeration"
+    }
+  },
+  "sharedDocks": {
+    "cornerPriority": "top-bottom",
+    "top": [
+      {
+        "anchor": "fixed",
+        "autoBreakpoint": 480,
+        "content": "push",
+        "handle": "hide",
+        "iconUrl": "",
+        "id": "",
+        "modal": false,
+        "resizable": false,
+        "show": "visible",
+        "size": 50,
+        "viewParams": {},
+        "viewPath": "common/dock/header"
+      }
+    ]
+  }
+}

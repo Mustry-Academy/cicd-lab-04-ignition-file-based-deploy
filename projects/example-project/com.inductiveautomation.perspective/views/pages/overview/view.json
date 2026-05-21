@@ -1,0 +1,847 @@
+{
+  "custom": {},
+  "params": {},
+  "props": {
+    "defaultSize": {
+      "width": 1280
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "L"
+                },
+                "position": {
+                  "basis": "18px",
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "color": "#555555",
+                    "fontSize": "11px",
+                    "fontWeight": 600
+                  },
+                  "text": "CASE COUNT"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Accent"
+                },
+                "position": {
+                  "basis": "3px",
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "backgroundColor": "#1F77B4"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "meta": {
+                  "name": "Value"
+                },
+                "position": {
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "expression": "tag(\u0027[]Overview/CaseCount\u0027)"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "alignSelf": "flex-end",
+                    "color": "#1A1A1A",
+                    "fontSize": "24px",
+                    "fontWeight": 600,
+                    "textAlign": "right"
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "KPI_CaseCount"
+            },
+            "position": {
+              "basis": "0",
+              "grow": 1
+            },
+            "props": {
+              "direction": "column",
+              "style": {
+                "backgroundColor": "#EDEDED",
+                "borderColor": "#999999",
+                "borderStyle": "solid",
+                "borderWidth": "1px",
+                "padding": "8px 12px"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "L"
+                },
+                "position": {
+                  "basis": "18px",
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "color": "#555555",
+                    "fontSize": "11px",
+                    "fontWeight": 600
+                  },
+                  "text": "CURRENT ORDER"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Value"
+                },
+                "position": {
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "expression": "tag(\u0027[]Overview/CurrentOrder\u0027)"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "alignSelf": "flex-end",
+                    "color": "#1A1A1A",
+                    "fontSize": "24px",
+                    "fontWeight": 600,
+                    "textAlign": "right"
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "KPI_CurrentOrder"
+            },
+            "position": {
+              "basis": "0",
+              "grow": 1
+            },
+            "props": {
+              "direction": "column",
+              "style": {
+                "backgroundColor": "#EDEDED",
+                "borderColor": "#999999",
+                "borderStyle": "solid",
+                "borderWidth": "1px",
+                "padding": "8px 12px"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "L"
+                },
+                "position": {
+                  "basis": "18px",
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "color": "#555555",
+                    "fontSize": "11px",
+                    "fontWeight": 600
+                  },
+                  "text": "CURRENT RUN"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Value"
+                },
+                "position": {
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "expression": "tag(\u0027[]Overview/CurrentRun\u0027)"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "alignSelf": "flex-end",
+                    "color": "#1A1A1A",
+                    "fontSize": "24px",
+                    "fontWeight": 600,
+                    "textAlign": "right"
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "KPI_CurrentRun"
+            },
+            "position": {
+              "basis": "0",
+              "grow": 1
+            },
+            "props": {
+              "direction": "column",
+              "style": {
+                "backgroundColor": "#EDEDED",
+                "borderColor": "#999999",
+                "borderStyle": "solid",
+                "borderWidth": "1px",
+                "padding": "8px 12px"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "L"
+                },
+                "position": {
+                  "basis": "18px",
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "color": "#555555",
+                    "fontSize": "11px",
+                    "fontWeight": 600
+                  },
+                  "text": "RUN CONTROL"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Value"
+                },
+                "position": {
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "expression": "tag(\u0027[]Overview/RunControl\u0027)"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "alignSelf": "flex-end",
+                    "color": "#1A1A1A",
+                    "fontSize": "24px",
+                    "fontWeight": 600,
+                    "textAlign": "right"
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "KPI_RunControl"
+            },
+            "position": {
+              "basis": "0",
+              "grow": 1
+            },
+            "props": {
+              "direction": "column",
+              "style": {
+                "backgroundColor": "#EDEDED",
+                "borderColor": "#999999",
+                "borderStyle": "solid",
+                "borderWidth": "1px",
+                "padding": "8px 12px"
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "KPIStrip"
+        },
+        "position": {
+          "basis": "84px",
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "gap": "10px"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Title"
+            },
+            "position": {
+              "basis": "24px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "backgroundColor": "#5A5A5A",
+                "color": "#FFFFFF",
+                "fontSize": "12px",
+                "fontWeight": 600,
+                "letterSpacing": "1.5px",
+                "padding": "5px 10px"
+              },
+              "text": "AIR UNITS"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Repeater"
+                },
+                "position": {
+                  "grow": 1
+                },
+                "props": {
+                  "elementPosition": {
+                    "basis": "0"
+                  },
+                  "instances": [
+                    {
+                      "instanceName": "AU 1",
+                      "instancePosition": {
+                        "basis": "0",
+                        "grow": 1,
+                        "shrink": 1
+                      },
+                      "instanceStyle": {}
+                    },
+                    {
+                      "instanceName": "AU 2",
+                      "instancePosition": {
+                        "basis": "0",
+                        "grow": 1,
+                        "shrink": 1
+                      },
+                      "instanceStyle": {}
+                    },
+                    {
+                      "instanceName": "AU 3",
+                      "instancePosition": {
+                        "basis": "0",
+                        "grow": 1,
+                        "shrink": 1
+                      },
+                      "instanceStyle": {}
+                    }
+                  ],
+                  "path": "templates/units/AirUnit",
+                  "style": {
+                    "gap": "10px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
+                },
+                "type": "ia.display.flex-repeater"
+              }
+            ],
+            "meta": {
+              "name": "Body"
+            },
+            "position": {
+              "grow": 1
+            },
+            "props": {
+              "direction": "column",
+              "style": {
+                "padding": "10px 0 0 0"
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "AirUnitsSection"
+        },
+        "position": {
+          "basis": "130px",
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "gap": "0px"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Title"
+            },
+            "position": {
+              "basis": "24px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "backgroundColor": "#5A5A5A",
+                "color": "#FFFFFF",
+                "fontSize": "12px",
+                "fontWeight": 600,
+                "letterSpacing": "1.5px",
+                "padding": "5px 10px"
+              },
+              "text": "MOTORS"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Repeater"
+                },
+                "position": {
+                  "grow": 1
+                },
+                "props": {
+                  "elementPosition": {
+                    "basis": "0"
+                  },
+                  "instances": [
+                    {
+                      "instanceName": "Motor 1",
+                      "instancePosition": {
+                        "basis": "0",
+                        "grow": 1,
+                        "shrink": 1
+                      },
+                      "instanceStyle": {}
+                    },
+                    {
+                      "instanceName": "Motor 2",
+                      "instancePosition": {
+                        "basis": "0",
+                        "grow": 1,
+                        "shrink": 1
+                      },
+                      "instanceStyle": {}
+                    },
+                    {
+                      "instanceName": "Motor 3",
+                      "instancePosition": {
+                        "basis": "0",
+                        "grow": 1,
+                        "shrink": 1
+                      },
+                      "instanceStyle": {}
+                    },
+                    {
+                      "instanceName": "Motor 4",
+                      "instancePosition": {
+                        "basis": "0",
+                        "grow": 1,
+                        "shrink": 1
+                      },
+                      "instanceStyle": {}
+                    },
+                    {
+                      "instanceName": "Motor 5",
+                      "instancePosition": {
+                        "basis": "0",
+                        "grow": 1,
+                        "shrink": 1
+                      },
+                      "instanceStyle": {}
+                    },
+                    {
+                      "instanceName": "Motor 6",
+                      "instancePosition": {
+                        "basis": "0",
+                        "grow": 1,
+                        "shrink": 1
+                      },
+                      "instanceStyle": {}
+                    },
+                    {
+                      "instanceName": "Motor 7",
+                      "instancePosition": {
+                        "basis": "0",
+                        "grow": 1,
+                        "shrink": 1
+                      },
+                      "instanceStyle": {}
+                    },
+                    {
+                      "instanceName": "Motor 8",
+                      "instancePosition": {
+                        "basis": "0",
+                        "grow": 1,
+                        "shrink": 1
+                      },
+                      "instanceStyle": {}
+                    }
+                  ],
+                  "path": "templates/units/Motor",
+                  "style": {
+                    "gap": "10px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
+                },
+                "type": "ia.display.flex-repeater"
+              }
+            ],
+            "meta": {
+              "name": "Body"
+            },
+            "position": {
+              "grow": 1
+            },
+            "props": {
+              "direction": "column",
+              "style": {
+                "padding": "10px 0 0 0"
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "MotorsSection"
+        },
+        "position": {
+          "basis": "150px",
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "gap": "0px"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Title"
+            },
+            "position": {
+              "basis": "24px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "backgroundColor": "#5A5A5A",
+                "color": "#FFFFFF",
+                "fontSize": "12px",
+                "fontWeight": 600,
+                "letterSpacing": "1.5px",
+                "padding": "5px 10px"
+              },
+              "text": "SENSORS"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Repeater"
+                },
+                "position": {
+                  "grow": 1
+                },
+                "props": {
+                  "elementPosition": {
+                    "basis": "0"
+                  },
+                  "instances": [
+                    {
+                      "instanceName": "Sensor 1",
+                      "instancePosition": {
+                        "basis": "0",
+                        "grow": 1,
+                        "shrink": 1
+                      },
+                      "instanceStyle": {}
+                    },
+                    {
+                      "instanceName": "Sensor 2",
+                      "instancePosition": {
+                        "basis": "0",
+                        "grow": 1,
+                        "shrink": 1
+                      },
+                      "instanceStyle": {}
+                    },
+                    {
+                      "instanceName": "Sensor 3",
+                      "instancePosition": {
+                        "basis": "0",
+                        "grow": 1,
+                        "shrink": 1
+                      },
+                      "instanceStyle": {}
+                    }
+                  ],
+                  "path": "templates/units/Sensor",
+                  "style": {
+                    "gap": "10px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
+                },
+                "type": "ia.display.flex-repeater"
+              }
+            ],
+            "meta": {
+              "name": "Body"
+            },
+            "position": {
+              "grow": 1
+            },
+            "props": {
+              "direction": "column",
+              "style": {
+                "padding": "10px 0 0 0"
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "SensorsSection"
+        },
+        "position": {
+          "basis": "130px",
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "gap": "0px"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Title"
+            },
+            "position": {
+              "basis": "24px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "backgroundColor": "#5A5A5A",
+                "color": "#FFFFFF",
+                "fontSize": "12px",
+                "fontWeight": 600,
+                "letterSpacing": "1.5px",
+                "padding": "5px 10px"
+              },
+              "text": "PACKAGING"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Repeater"
+                    },
+                    "position": {
+                      "grow": 1
+                    },
+                    "props": {
+                      "elementPosition": {
+                        "basis": "0"
+                      },
+                      "instances": [
+                        {
+                          "instanceName": "Palletizer 1",
+                          "instancePosition": {
+                            "basis": "0",
+                            "grow": 1,
+                            "shrink": 1
+                          },
+                          "instanceStyle": {}
+                        },
+                        {
+                          "instanceName": "Palletizer 2",
+                          "instancePosition": {
+                            "basis": "0",
+                            "grow": 1,
+                            "shrink": 1
+                          },
+                          "instanceStyle": {}
+                        }
+                      ],
+                      "path": "templates/units/Palletizer",
+                      "style": {
+                        "gap": "10px"
+                      },
+                      "useDefaultViewHeight": false,
+                      "useDefaultViewWidth": false
+                    },
+                    "type": "ia.display.flex-repeater"
+                  }
+                ],
+                "meta": {
+                  "name": "PalletizersWrap"
+                },
+                "position": {
+                  "basis": "0",
+                  "grow": 2
+                },
+                "props": {
+                  "direction": "column"
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Repeater"
+                    },
+                    "position": {
+                      "grow": 1
+                    },
+                    "props": {
+                      "elementPosition": {
+                        "basis": "0"
+                      },
+                      "instances": [
+                        {
+                          "instanceName": "Pallet Wrapper",
+                          "instancePosition": {
+                            "basis": "0",
+                            "grow": 1,
+                            "shrink": 1
+                          },
+                          "instanceStyle": {}
+                        }
+                      ],
+                      "path": "templates/units/PalletWrapper",
+                      "style": {
+                        "gap": "10px"
+                      },
+                      "useDefaultViewHeight": false,
+                      "useDefaultViewWidth": false
+                    },
+                    "type": "ia.display.flex-repeater"
+                  }
+                ],
+                "meta": {
+                  "name": "WrapperWrap"
+                },
+                "position": {
+                  "basis": "0",
+                  "grow": 1
+                },
+                "props": {
+                  "direction": "column"
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "Body"
+            },
+            "position": {
+              "grow": 1
+            },
+            "props": {
+              "style": {
+                "gap": "10px",
+                "padding": "10px 0 0 0"
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "PackagingSection"
+        },
+        "position": {
+          "basis": "0",
+          "grow": 1
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "gap": "0px"
+          }
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "backgroundColor": "#CCCCCC",
+        "gap": "10px",
+        "overflow": "hidden",
+        "padding": "10px"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}
