@@ -1,0 +1,36 @@
+{
+  "connectURL": "jdbc:postgresql://timescaledb:5432/ignition_loc",
+  "connectionProps": "",
+  "connectionResetParams": "",
+  "defaultTransactionLevel": "DEFAULT",
+  "driver": "PostgreSQL",
+  "evictionRate": -1,
+  "evictionTests": 3,
+  "evictionTime": 1800000,
+  "failoverMode": "STANDARD",
+  "failoverProfile": "",
+  "includeSchemaInTableName": false,
+  "password": {
+    "data": {
+      "ciphertext": "Rgw2TmQNDdH7Sg",
+      "encrypted_key": "OL9hJuTfriaFfegPga209ublCU-C5fixTMJ-SLQ1-jOkvCTMnUkFLg",
+      "iv": "MDcR6Vgk_QCXNGas",
+      "protected": "eyJhbGciOiJBMjU2S1ciLCJlbmMiOiJBMjU2R0NNIiwiaWF0IjoxNzc5MzY1Nzk0LCJ6aXAiOiJERUYifQ",
+      "tag": "rqRlAtKqvUGGRBQanRJ9oA"
+    },
+    "type": "Embedded"
+  },
+  "poolInitSize": 0,
+  "poolMaxActive": 8,
+  "poolMaxIdle": 8,
+  "poolMaxWait": 5000,
+  "poolMinIdle": 0,
+  "slowQueryLogThreshold": 60000,
+  "testOnBorrow": true,
+  "testOnReturn": false,
+  "testWhileIdle": false,
+  "translator": "POSTGRES",
+  "username": "ignition",
+  "validationQuery": "SELECT 1",
+  "validationSleepTime": 10000
+}

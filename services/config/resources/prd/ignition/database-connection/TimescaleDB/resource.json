@@ -1,0 +1,19 @@
+{
+  "scope": "A",
+  "description": "Connection to local TimescaleDB",
+  "version": 1,
+  "restricted": false,
+  "overridable": true,
+  "files": [
+    "config.json"
+  ],
+  "attributes": {
+    "lastModification": {
+      "actor": "admin",
+      "timestamp": "2026-05-22T09:07:51Z"
+    },
+    "uuid": "3d464517-6da2-4f3f-a8c8-59348e719cc2",
+    "lastModificationSignature": "19026bb0182fe812972eeb433c9be4307e7db6b826d91c9a38e393cc3b753bf5",
+    "enabled": true
+  }
+}
