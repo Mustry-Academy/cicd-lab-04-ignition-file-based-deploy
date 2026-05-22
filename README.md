@@ -75,6 +75,7 @@ cicd-lab-04-ignition-file-based-deploy/
 ├── exercises/
 │   ├── block-a.md
 │   └── block-b.md
+├── db-init/                            ← timescaledb initialisation: create ignition_dev and ignition_prd databases
 ├── docs/                               ← reference reading
 │   ├── ignition-file-structure.md
 │   └── file-based-deploy-pattern.md
@@ -92,7 +93,6 @@ cicd-lab-04-ignition-file-based-deploy/
 └── services/
     ├── config/                         ← gateway-level config (bind-mounted into `local`)
     ├── modules.json                    ← module enablement (shared by all three gateways)
-    └── timescaledb-init/               ← creates ignition_dev + ignition_prd databases
 ```
 
 ## The Compose stack

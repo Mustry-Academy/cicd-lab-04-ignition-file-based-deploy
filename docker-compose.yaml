@@ -196,7 +196,7 @@ services:
       - "5432:5432"
     volumes:
       - timescaledb-data:/var/lib/postgresql/data
-      - ./services/timescaledb-init:/docker-entrypoint-initdb.d:ro
+      - ./db-init:/docker-entrypoint-initdb.d:ro
     logging:
       driver: "json-file"
       options:
