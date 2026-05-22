@@ -1,18 +1,57 @@
 {
-  "custom": {},
+  "custom": {
+    "data": {
+      "hoa": 2,
+      "lineVoltage": 98.26636508616095,
+      "motorAmps": 99.48341003056046,
+      "percentLoaded": 101.04811993040585,
+      "powerAvgUsage": 101.54241811932773,
+      "powerDemand": 100.07828865290102,
+      "presSuctionSP": 67.06840905993425,
+      "pressureDischarge": 44.73170271587735,
+      "pressureInletOil": 99.41329240753599,
+      "pressureInletOilFilter": 78.64270945827735,
+      "pressureSuction": 107.4478727570219,
+      "tempDischarge": 100.92398395718145,
+      "tempInletOil": 102.42023593074228,
+      "tempOilSep": 98.69870122494922,
+      "tempSuction": 100.24049223464796,
+      "tonnageCurrent": 94.88162743755852,
+      "tonnageIdeal": 103.59189368229012
+    }
+  },
   "params": {
-    "instanceName": "Compressor1"
+    "displayName": "",
+    "tagPath": "[example-tags]Refrigeration/Compressor1"
   },
   "propConfig": {
-    "params.instanceName": {
+    "custom.data": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "indirect",
+          "references": {
+            "tagPath": "{view.params.tagPath}"
+          },
+          "tagPath": "{tagPath}"
+        },
+        "type": "tag"
+      },
+      "persistent": true
+    },
+    "params.displayName": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.tagPath": {
       "paramDirection": "input",
       "persistent": true
     }
   },
   "props": {
     "defaultSize": {
-      "height": 300,
-      "width": 560
+      "height": 420,
+      "width": 700
     }
   },
   "root": {
@@ -21,34 +60,7 @@
         "children": [
           {
             "meta": {
-              "name": "Status"
-            },
-            "position": {
-              "basis": "14px",
-              "shrink": 0
-            },
-            "propConfig": {
-              "props.fill.paint": {
-                "binding": {
-                  "config": {
-                    "expression": "if(tag(\u0027[]Refrigeration/\u0027 + {view.params.instanceName} + \u0027/hoa\u0027) \u003d 2, \u0027#1E8449\u0027, if(tag(\u0027[]Refrigeration/\u0027 + {view.params.instanceName} + \u0027/hoa\u0027) \u003d 1, \u0027#D4AC0D\u0027, if(tag(\u0027[]Refrigeration/\u0027 + {view.params.instanceName} + \u0027/hoa\u0027) \u003d 0, \u0027#8E8E8E\u0027, \u0027#CCCCCC\u0027)))"
-                  },
-                  "type": "expr"
-                }
-              }
-            },
-            "props": {
-              "fill": {},
-              "stroke": {
-                "paint": "#777777",
-                "width": 1
-              }
-            },
-            "type": "ia.shapes.ellipse"
-          },
-          {
-            "meta": {
-              "name": "Name"
+              "name": "Title"
             },
             "position": {
               "grow": 1
@@ -57,17 +69,44 @@
               "props.text": {
                 "binding": {
                   "config": {
-                    "path": "view.params.instanceName"
+                    "expression": "replace({view.params.displayName}, \u0027CMP-0\u0027, \u0027COMPRESSOR \u0027)"
                   },
-                  "type": "property"
+                  "type": "expr"
                 }
               }
             },
             "props": {
               "style": {
-                "color": "#1A1A1A",
-                "fontSize": "14px",
-                "fontWeight": 600
+                "color": "#111111",
+                "fontSize": "11px",
+                "fontWeight": 600,
+                "letterSpacing": "1.6px",
+                "textTransform": "uppercase"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Tag"
+            },
+            "propConfig": {
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "expression": "replace({view.params.displayName}, \u0027-\u0027, \u0027.\u0027)"
+                  },
+                  "type": "expr"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "color": "#5f5f5c",
+                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                "fontSize": "10px",
+                "fontWeight": 500,
+                "letterSpacing": "1px"
               }
             },
             "type": "ia.display.label"
@@ -77,13 +116,16 @@
           "name": "Header"
         },
         "position": {
-          "basis": "22px",
+          "basis": "26px",
           "shrink": 0
         },
         "props": {
           "alignItems": "center",
           "style": {
-            "gap": "8px"
+            "backgroundColor": "#a3a3a0",
+            "borderBottom": "1px solid #6e6e6c",
+            "gap": "8px",
+            "padding": "0 10px"
           }
         },
         "type": "ia.container.flex"
@@ -91,770 +133,2227 @@
       {
         "children": [
           {
+            "children": [
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Id"
+                    },
+                    "position": {
+                      "grow": 1
+                    },
+                    "propConfig": {
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "path": "view.params.displayName"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "color": "#111111",
+                        "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                        "fontSize": "14px",
+                        "fontWeight": 700,
+                        "letterSpacing": "2px"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "HOA"
+                    },
+                    "position": {
+                      "basis": "150px",
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.controlValue": {
+                        "binding": {
+                          "config": {
+                            "expression": "tag({view.params.tagPath} + \u0027/hoa\u0027)"
+                          },
+                          "type": "expr"
+                        }
+                      },
+                      "props.indicatorValue": {
+                        "binding": {
+                          "config": {
+                            "expression": "tag({view.params.tagPath} + \u0027/hoa\u0027)"
+                          },
+                          "type": "expr"
+                        }
+                      }
+                    },
+                    "props": {
+                      "orientation": "row",
+                      "states": [
+                        {
+                          "selectedStyle": {
+                            "backgroundColor": "#4a4a47",
+                            "border": "0",
+                            "borderRadius": "0",
+                            "classes": "",
+                            "color": "#ffffff",
+                            "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                            "fontSize": "10px",
+                            "fontWeight": 700,
+                            "letterSpacing": "1px"
+                          },
+                          "text": "OFF",
+                          "unselectedStyle": {
+                            "backgroundColor": "#a3a3a0",
+                            "border": "1px solid #6e6e6c",
+                            "borderRadius": "0",
+                            "classes": "",
+                            "color": "#5f5f5c",
+                            "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                            "fontSize": "10px",
+                            "letterSpacing": "1px"
+                          },
+                          "value": 0
+                        },
+                        {
+                          "selectedStyle": {
+                            "backgroundColor": "#d49a1f",
+                            "border": "0",
+                            "borderRadius": "0",
+                            "color": "#1a1a18",
+                            "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                            "fontSize": "10px",
+                            "fontWeight": 700,
+                            "letterSpacing": "1px"
+                          },
+                          "text": "HAND",
+                          "unselectedStyle": {
+                            "backgroundColor": "#a3a3a0",
+                            "border": "1px solid #6e6e6c",
+                            "borderRadius": "0",
+                            "color": "#5f5f5c",
+                            "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                            "fontSize": "10px",
+                            "letterSpacing": "1px"
+                          },
+                          "value": 1
+                        },
+                        {
+                          "selectedStyle": {
+                            "backgroundColor": "#1f7a7a",
+                            "border": "0",
+                            "borderRadius": "0",
+                            "color": "#ffffff",
+                            "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                            "fontSize": "10px",
+                            "fontWeight": 700,
+                            "letterSpacing": "1px"
+                          },
+                          "text": "AUTO",
+                          "unselectedStyle": {
+                            "backgroundColor": "#a3a3a0",
+                            "border": "1px solid #6e6e6c",
+                            "borderRadius": "0",
+                            "color": "#5f5f5c",
+                            "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                            "fontSize": "10px",
+                            "letterSpacing": "1px"
+                          },
+                          "value": 2
+                        }
+                      ]
+                    },
+                    "type": "ia.input.multi-state-button"
+                  }
+                ],
+                "meta": {
+                  "name": "Hdr"
+                },
+                "position": {
+                  "basis": "34px"
+                },
+                "props": {
+                  "alignItems": "center",
+                  "style": {
+                    "borderBottom": "1px solid #6e6e6c",
+                    "gap": "8px",
+                    "paddingBottom": "6px"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "L"
+                    },
+                    "position": {
+                      "basis": "14px"
+                    },
+                    "props": {
+                      "style": {
+                        "color": "#5f5f5c",
+                        "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                        "fontSize": "9px",
+                        "letterSpacing": "1px",
+                        "textAlign": "center",
+                        "textTransform": "uppercase"
+                      },
+                      "text": "PERCENT LOADED"
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Gauge"
+                    },
+                    "position": {
+                      "grow": 1
+                    },
+                    "propConfig": {
+                      "props.value": {
+                        "binding": {
+                          "config": {
+                            "expression": "tag({view.params.tagPath} + \u0027/percentLoaded\u0027)"
+                          },
+                          "type": "expr"
+                        }
+                      }
+                    },
+                    "props": {
+                      "backgroundColor": "transparent",
+                      "innerAxis": {
+                        "data": "secondaryValue",
+                        "percentRadius": 85,
+                        "show": false,
+                        "width": 0
+                      },
+                      "outerAxis": {
+                        "data": "value",
+                        "maxValue": 150,
+                        "minValue": 50,
+                        "percentRadius": 100,
+                        "ranges": [
+                          {
+                            "color": "#1f7a7a",
+                            "end": 90,
+                            "start": 50,
+                            "width": 10
+                          },
+                          {
+                            "color": "#d49a1f",
+                            "end": 110,
+                            "start": 90,
+                            "width": 13
+                          },
+                          {
+                            "color": "#c8362a",
+                            "end": 150,
+                            "start": 110,
+                            "width": 16
+                          }
+                        ],
+                        "show": true,
+                        "width": 1
+                      }
+                    },
+                    "type": "ia.chart.gauge"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "V"
+                        },
+                        "position": {
+                          "grow": 1
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "numberFormat(tag({view.params.tagPath} + \u0027/percentLoaded\u0027), \u00270.0\u0027)"
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "color": "#111111",
+                            "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                            "fontSize": "22px",
+                            "fontWeight": 700,
+                            "lineHeight": "1.0",
+                            "textAlign": "center"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "U"
+                        },
+                        "props": {
+                          "style": {
+                            "alignSelf": "flex-end",
+                            "color": "#5f5f5c",
+                            "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                            "fontSize": "11px",
+                            "marginLeft": "3px"
+                          },
+                          "text": "%"
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "meta": {
+                      "name": "ValCenter"
+                    },
+                    "position": {
+                      "basis": "24px"
+                    },
+                    "props": {
+                      "alignItems": "baseline",
+                      "justifyContent": "center",
+                      "style": {
+                        "overflow": "hidden"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  }
+                ],
+                "meta": {
+                  "name": "GaugeBlock"
+                },
+                "position": {
+                  "grow": 1
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "gap": "0px",
+                    "padding": "4px 0"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "L"
+                        },
+                        "position": {
+                          "grow": 1
+                        },
+                        "props": {
+                          "style": {
+                            "color": "#5f5f5c",
+                            "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                            "fontSize": "9px",
+                            "letterSpacing": "1px",
+                            "textTransform": "uppercase"
+                          },
+                          "text": "TONNAGE"
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "V"
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "numberFormat(tag({view.params.tagPath} + \u0027/tonnageCurrent\u0027), \u00270\u0027) + \u0027 ton\u0027"
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "color": "#111111",
+                            "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                            "fontSize": "12px",
+                            "fontWeight": 600
+                          }
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "meta": {
+                      "name": "S"
+                    },
+                    "position": {
+                      "basis": "18px"
+                    },
+                    "props": {
+                      "alignItems": "baseline",
+                      "style": {
+                        "gap": "6px"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "L"
+                        },
+                        "position": {
+                          "grow": 1
+                        },
+                        "props": {
+                          "style": {
+                            "color": "#5f5f5c",
+                            "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                            "fontSize": "9px",
+                            "letterSpacing": "1px",
+                            "textTransform": "uppercase"
+                          },
+                          "text": "IDEAL"
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "V"
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "numberFormat(tag({view.params.tagPath} + \u0027/tonnageIdeal\u0027), \u00270\u0027) + \u0027 ton\u0027"
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "color": "#111111",
+                            "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                            "fontSize": "12px",
+                            "fontWeight": 600
+                          }
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "meta": {
+                      "name": "S_0"
+                    },
+                    "position": {
+                      "basis": "18px"
+                    },
+                    "props": {
+                      "alignItems": "baseline",
+                      "style": {
+                        "gap": "6px"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "L"
+                        },
+                        "position": {
+                          "grow": 1
+                        },
+                        "props": {
+                          "style": {
+                            "color": "#5f5f5c",
+                            "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                            "fontSize": "9px",
+                            "letterSpacing": "1px",
+                            "textTransform": "uppercase"
+                          },
+                          "text": "KW DEMAND"
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "V"
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "numberFormat(tag({view.params.tagPath} + \u0027/powerDemand\u0027), \u00270\u0027) + \u0027 kW\u0027"
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "color": "#111111",
+                            "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                            "fontSize": "12px",
+                            "fontWeight": 600
+                          }
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "meta": {
+                      "name": "S_1"
+                    },
+                    "position": {
+                      "basis": "18px"
+                    },
+                    "props": {
+                      "alignItems": "baseline",
+                      "style": {
+                        "gap": "6px"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  }
+                ],
+                "meta": {
+                  "name": "Stats"
+                },
+                "position": {
+                  "basis": "60px"
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "gap": "3px"
+                  }
+                },
+                "type": "ia.container.flex"
+              }
+            ],
             "meta": {
-              "name": "LoadedTank"
+              "name": "Summary"
             },
             "position": {
-              "basis": "20px",
+              "basis": "260px",
               "shrink": 0
             },
-            "propConfig": {
-              "props.value": {
-                "binding": {
-                  "config": {
-                    "expression": "tag(\u0027[]Refrigeration/\u0027 + {view.params.instanceName} + \u0027/percentLoaded\u0027)"
-                  },
-                  "type": "expr"
-                }
+            "props": {
+              "direction": "column",
+              "style": {
+                "backgroundColor": "#a3a3a0",
+                "border": "1px solid #6e6e6c",
+                "gap": "6px",
+                "padding": "10px"
               }
             },
-            "props": {
-              "max": 200,
-              "min": 0,
-              "tank": {
-                "fill": {
-                  "color": "#1F77B4"
-                },
-                "stroke": {
-                  "color": "#999999"
-                }
-              },
-              "valueRendering": "none"
-            },
-            "type": "ia.display.cylindrical-tank"
+            "type": "ia.container.flex"
           },
           {
             "children": [
               {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "L"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontSize": "12px"
+                              },
+                              "text": "Suction Pressure"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "V"
+                            },
+                            "position": {
+                              "basis": "60px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.style.color": {
+                                "binding": {
+                                  "config": {
+                                    "expression": "if((tag({view.params.tagPath} + \u0027/pressureSuction\u0027)) \u003e\u003d 60, \u0027#c8362a\u0027, if((tag({view.params.tagPath} + \u0027/pressureSuction\u0027)) \u003e\u003d 50, \u0027#d49a1f\u0027, \u0027#111111\u0027))"
+                                  },
+                                  "type": "expr"
+                                }
+                              },
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "expression": "numberFormat(tag({view.params.tagPath} + \u0027/pressureSuction\u0027), \u00270.0\u0027)"
+                                  },
+                                  "type": "expr"
+                                }
+                              }
+                            },
+                            "props": {
+                              "style": {
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "13px",
+                                "fontWeight": 600,
+                                "textAlign": "right"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "U"
+                            },
+                            "position": {
+                              "basis": "36px",
+                              "shrink": 0
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#5f5f5c",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "10px",
+                                "paddingLeft": "4px",
+                                "textAlign": "left"
+                              },
+                              "text": "psig"
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "Row"
+                        },
+                        "position": {
+                          "basis": "20px",
+                          "shrink": 0
+                        },
+                        "props": {
+                          "alignItems": "baseline",
+                          "style": {
+                            "gap": "8px",
+                            "overflow": "hidden"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "meta": {
+                          "name": "Bar"
+                        },
+                        "position": {
+                          "basis": "4px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.color": {
+                            "binding": {
+                              "config": {
+                                "expression": "if((tag({view.params.tagPath} + \u0027/pressureSuction\u0027)) \u003e\u003d 60, \u0027#c8362a\u0027, if((tag({view.params.tagPath} + \u0027/pressureSuction\u0027)) \u003e\u003d 50, \u0027#d49a1f\u0027, \u0027#2c2c2a\u0027))"
+                              },
+                              "type": "expr"
+                            }
+                          },
+                          "props.value": {
+                            "binding": {
+                              "config": {
+                                "expression": "if((tag({view.params.tagPath} + \u0027/pressureSuction\u0027)) \u003e 80, 100, if((tag({view.params.tagPath} + \u0027/pressureSuction\u0027)) \u003c 0, 0, (tag({view.params.tagPath} + \u0027/pressureSuction\u0027)) / 80 * 100))"
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "bgColor": "#9a9a97",
+                          "maximum": 100,
+                          "style": {
+                            "borderRadius": "0",
+                            "height": "4px"
+                          }
+                        },
+                        "type": "ia.display.progress"
+                      }
+                    ],
+                    "meta": {
+                      "name": "SuctionP"
+                    },
+                    "position": {
+                      "basis": "28px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "borderBottom": "1px dotted #8c8c89",
+                        "gap": "3px",
+                        "overflow": "hidden",
+                        "padding": "3px 0"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "L"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontSize": "12px"
+                              },
+                              "text": "Suction SP"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "V"
+                            },
+                            "position": {
+                              "basis": "60px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "expression": "numberFormat(tag({view.params.tagPath} + \u0027/presSuctionSP\u0027), \u00270.0\u0027)"
+                                  },
+                                  "type": "expr"
+                                }
+                              }
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#111111",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "13px",
+                                "fontWeight": 600,
+                                "textAlign": "right"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "U"
+                            },
+                            "position": {
+                              "basis": "36px",
+                              "shrink": 0
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#5f5f5c",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "10px",
+                                "paddingLeft": "4px",
+                                "textAlign": "left"
+                              },
+                              "text": "psig"
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "Row"
+                        },
+                        "position": {
+                          "basis": "20px",
+                          "shrink": 0
+                        },
+                        "props": {
+                          "alignItems": "baseline",
+                          "style": {
+                            "gap": "8px",
+                            "overflow": "hidden"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      }
+                    ],
+                    "meta": {
+                      "name": "SuctionSP"
+                    },
+                    "position": {
+                      "basis": "22px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "borderBottom": "1px dotted #8c8c89",
+                        "overflow": "hidden",
+                        "padding": "2px 0"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "L"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontSize": "12px"
+                              },
+                              "text": "Discharge Pressure"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "V"
+                            },
+                            "position": {
+                              "basis": "60px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.style.color": {
+                                "binding": {
+                                  "config": {
+                                    "expression": "if((tag({view.params.tagPath} + \u0027/pressureDischarge\u0027)) \u003e\u003d 240, \u0027#c8362a\u0027, if((tag({view.params.tagPath} + \u0027/pressureDischarge\u0027)) \u003e\u003d 215, \u0027#d49a1f\u0027, \u0027#111111\u0027))"
+                                  },
+                                  "type": "expr"
+                                }
+                              },
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "expression": "numberFormat(tag({view.params.tagPath} + \u0027/pressureDischarge\u0027), \u00270.0\u0027)"
+                                  },
+                                  "type": "expr"
+                                }
+                              }
+                            },
+                            "props": {
+                              "style": {
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "13px",
+                                "fontWeight": 600,
+                                "textAlign": "right"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "U"
+                            },
+                            "position": {
+                              "basis": "36px",
+                              "shrink": 0
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#5f5f5c",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "10px",
+                                "paddingLeft": "4px",
+                                "textAlign": "left"
+                              },
+                              "text": "psig"
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "Row"
+                        },
+                        "position": {
+                          "basis": "20px",
+                          "shrink": 0
+                        },
+                        "props": {
+                          "alignItems": "baseline",
+                          "style": {
+                            "gap": "8px",
+                            "overflow": "hidden"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "meta": {
+                          "name": "Bar"
+                        },
+                        "position": {
+                          "basis": "4px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.color": {
+                            "binding": {
+                              "config": {
+                                "expression": "if((tag({view.params.tagPath} + \u0027/pressureDischarge\u0027)) \u003e\u003d 240, \u0027#c8362a\u0027, if((tag({view.params.tagPath} + \u0027/pressureDischarge\u0027)) \u003e\u003d 215, \u0027#d49a1f\u0027, \u0027#2c2c2a\u0027))"
+                              },
+                              "type": "expr"
+                            }
+                          },
+                          "props.value": {
+                            "binding": {
+                              "config": {
+                                "expression": "if((tag({view.params.tagPath} + \u0027/pressureDischarge\u0027)) \u003e 300, 100, if((tag({view.params.tagPath} + \u0027/pressureDischarge\u0027)) \u003c 0, 0, (tag({view.params.tagPath} + \u0027/pressureDischarge\u0027)) / 300 * 100))"
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "bgColor": "#9a9a97",
+                          "maximum": 100,
+                          "style": {
+                            "borderRadius": "0",
+                            "height": "4px"
+                          }
+                        },
+                        "type": "ia.display.progress"
+                      }
+                    ],
+                    "meta": {
+                      "name": "DischP"
+                    },
+                    "position": {
+                      "basis": "28px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "borderBottom": "1px dotted #8c8c89",
+                        "gap": "3px",
+                        "overflow": "hidden",
+                        "padding": "3px 0"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "L"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontSize": "12px"
+                              },
+                              "text": "Suction Temp"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "V"
+                            },
+                            "position": {
+                              "basis": "60px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "expression": "numberFormat(tag({view.params.tagPath} + \u0027/tempSuction\u0027), \u00270.0\u0027)"
+                                  },
+                                  "type": "expr"
+                                }
+                              }
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#111111",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "13px",
+                                "fontWeight": 600,
+                                "textAlign": "right"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "U"
+                            },
+                            "position": {
+                              "basis": "36px",
+                              "shrink": 0
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#5f5f5c",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "10px",
+                                "paddingLeft": "4px",
+                                "textAlign": "left"
+                              },
+                              "text": "°F"
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "Row"
+                        },
+                        "position": {
+                          "basis": "20px",
+                          "shrink": 0
+                        },
+                        "props": {
+                          "alignItems": "baseline",
+                          "style": {
+                            "gap": "8px",
+                            "overflow": "hidden"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "meta": {
+                          "name": "Bar"
+                        },
+                        "position": {
+                          "basis": "4px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.value": {
+                            "binding": {
+                              "config": {
+                                "expression": "if((tag({view.params.tagPath} + \u0027/tempSuction\u0027)) \u003e 60, 100, if((tag({view.params.tagPath} + \u0027/tempSuction\u0027)) \u003c 0, 0, (tag({view.params.tagPath} + \u0027/tempSuction\u0027)) / 60 * 100))"
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "bgColor": "#9a9a97",
+                          "color": "#2c2c2a",
+                          "maximum": 100,
+                          "style": {
+                            "borderRadius": "0",
+                            "height": "4px"
+                          }
+                        },
+                        "type": "ia.display.progress"
+                      }
+                    ],
+                    "meta": {
+                      "name": "SuctionT"
+                    },
+                    "position": {
+                      "basis": "28px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "borderBottom": "1px dotted #8c8c89",
+                        "gap": "3px",
+                        "overflow": "hidden",
+                        "padding": "3px 0"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "L"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontSize": "12px"
+                              },
+                              "text": "Discharge Temp"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "V"
+                            },
+                            "position": {
+                              "basis": "60px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.style.color": {
+                                "binding": {
+                                  "config": {
+                                    "expression": "if((tag({view.params.tagPath} + \u0027/tempDischarge\u0027)) \u003e\u003d 215, \u0027#c8362a\u0027, if((tag({view.params.tagPath} + \u0027/tempDischarge\u0027)) \u003e\u003d 205, \u0027#d49a1f\u0027, \u0027#111111\u0027))"
+                                  },
+                                  "type": "expr"
+                                }
+                              },
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "expression": "numberFormat(tag({view.params.tagPath} + \u0027/tempDischarge\u0027), \u00270.0\u0027)"
+                                  },
+                                  "type": "expr"
+                                }
+                              }
+                            },
+                            "props": {
+                              "style": {
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "13px",
+                                "fontWeight": 600,
+                                "textAlign": "right"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "U"
+                            },
+                            "position": {
+                              "basis": "36px",
+                              "shrink": 0
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#5f5f5c",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "10px",
+                                "paddingLeft": "4px",
+                                "textAlign": "left"
+                              },
+                              "text": "°F"
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "Row"
+                        },
+                        "position": {
+                          "basis": "20px",
+                          "shrink": 0
+                        },
+                        "props": {
+                          "alignItems": "baseline",
+                          "style": {
+                            "gap": "8px",
+                            "overflow": "hidden"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "meta": {
+                          "name": "Bar"
+                        },
+                        "position": {
+                          "basis": "4px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.color": {
+                            "binding": {
+                              "config": {
+                                "expression": "if((tag({view.params.tagPath} + \u0027/tempDischarge\u0027)) \u003e\u003d 215, \u0027#c8362a\u0027, if((tag({view.params.tagPath} + \u0027/tempDischarge\u0027)) \u003e\u003d 205, \u0027#d49a1f\u0027, \u0027#2c2c2a\u0027))"
+                              },
+                              "type": "expr"
+                            }
+                          },
+                          "props.value": {
+                            "binding": {
+                              "config": {
+                                "expression": "if((tag({view.params.tagPath} + \u0027/tempDischarge\u0027)) \u003e 300, 100, if((tag({view.params.tagPath} + \u0027/tempDischarge\u0027)) \u003c 0, 0, (tag({view.params.tagPath} + \u0027/tempDischarge\u0027)) / 300 * 100))"
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "bgColor": "#9a9a97",
+                          "maximum": 100,
+                          "style": {
+                            "borderRadius": "0",
+                            "height": "4px"
+                          }
+                        },
+                        "type": "ia.display.progress"
+                      }
+                    ],
+                    "meta": {
+                      "name": "DischT"
+                    },
+                    "position": {
+                      "basis": "28px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "borderBottom": "1px dotted #8c8c89",
+                        "gap": "3px",
+                        "overflow": "hidden",
+                        "padding": "3px 0"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "L"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontSize": "12px"
+                              },
+                              "text": "Oil Sep Temp"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "V"
+                            },
+                            "position": {
+                              "basis": "60px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "expression": "numberFormat(tag({view.params.tagPath} + \u0027/tempOilSep\u0027), \u00270.0\u0027)"
+                                  },
+                                  "type": "expr"
+                                }
+                              }
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#111111",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "13px",
+                                "fontWeight": 600,
+                                "textAlign": "right"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "U"
+                            },
+                            "position": {
+                              "basis": "36px",
+                              "shrink": 0
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#5f5f5c",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "10px",
+                                "paddingLeft": "4px",
+                                "textAlign": "left"
+                              },
+                              "text": "°F"
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "Row"
+                        },
+                        "position": {
+                          "basis": "20px",
+                          "shrink": 0
+                        },
+                        "props": {
+                          "alignItems": "baseline",
+                          "style": {
+                            "gap": "8px",
+                            "overflow": "hidden"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "meta": {
+                          "name": "Bar"
+                        },
+                        "position": {
+                          "basis": "4px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.value": {
+                            "binding": {
+                              "config": {
+                                "expression": "if((tag({view.params.tagPath} + \u0027/tempOilSep\u0027)) \u003e 250, 100, if((tag({view.params.tagPath} + \u0027/tempOilSep\u0027)) \u003c 0, 0, (tag({view.params.tagPath} + \u0027/tempOilSep\u0027)) / 250 * 100))"
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "bgColor": "#9a9a97",
+                          "color": "#2c2c2a",
+                          "maximum": 100,
+                          "style": {
+                            "borderRadius": "0",
+                            "height": "4px"
+                          }
+                        },
+                        "type": "ia.display.progress"
+                      }
+                    ],
+                    "meta": {
+                      "name": "OilSepT"
+                    },
+                    "position": {
+                      "basis": "28px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "borderBottom": "1px dotted #8c8c89",
+                        "gap": "3px",
+                        "overflow": "hidden",
+                        "padding": "3px 0"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  }
+                ],
                 "meta": {
-                  "name": "L"
+                  "name": "ColA"
                 },
                 "position": {
-                  "basis": "16px",
-                  "shrink": 0
+                  "grow": 1
                 },
                 "props": {
+                  "direction": "column",
                   "style": {
-                    "color": "#555555",
-                    "fontSize": "11px",
-                    "fontWeight": 600
-                  },
-                  "text": "% Loaded"
+                    "gap": "0px"
+                  }
                 },
-                "type": "ia.display.label"
+                "type": "ia.container.flex"
               },
               {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "L"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontSize": "12px"
+                              },
+                              "text": "Inlet Oil Temp"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "V"
+                            },
+                            "position": {
+                              "basis": "60px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "expression": "numberFormat(tag({view.params.tagPath} + \u0027/tempInletOil\u0027), \u00270.0\u0027)"
+                                  },
+                                  "type": "expr"
+                                }
+                              }
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#111111",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "13px",
+                                "fontWeight": 600,
+                                "textAlign": "right"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "U"
+                            },
+                            "position": {
+                              "basis": "36px",
+                              "shrink": 0
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#5f5f5c",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "10px",
+                                "paddingLeft": "4px",
+                                "textAlign": "left"
+                              },
+                              "text": "°F"
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "Row"
+                        },
+                        "position": {
+                          "basis": "20px",
+                          "shrink": 0
+                        },
+                        "props": {
+                          "alignItems": "baseline",
+                          "style": {
+                            "gap": "8px",
+                            "overflow": "hidden"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "meta": {
+                          "name": "Bar"
+                        },
+                        "position": {
+                          "basis": "4px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.value": {
+                            "binding": {
+                              "config": {
+                                "expression": "if((tag({view.params.tagPath} + \u0027/tempInletOil\u0027)) \u003e 250, 100, if((tag({view.params.tagPath} + \u0027/tempInletOil\u0027)) \u003c 0, 0, (tag({view.params.tagPath} + \u0027/tempInletOil\u0027)) / 250 * 100))"
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "bgColor": "#9a9a97",
+                          "color": "#2c2c2a",
+                          "maximum": 100,
+                          "style": {
+                            "borderRadius": "0",
+                            "height": "4px"
+                          }
+                        },
+                        "type": "ia.display.progress"
+                      }
+                    ],
+                    "meta": {
+                      "name": "InletOilT"
+                    },
+                    "position": {
+                      "basis": "28px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "borderBottom": "1px dotted #8c8c89",
+                        "gap": "3px",
+                        "overflow": "hidden",
+                        "padding": "3px 0"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "L"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontSize": "12px"
+                              },
+                              "text": "Inlet Oil Press"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "V"
+                            },
+                            "position": {
+                              "basis": "60px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "expression": "numberFormat(tag({view.params.tagPath} + \u0027/pressureInletOil\u0027), \u00270.0\u0027)"
+                                  },
+                                  "type": "expr"
+                                }
+                              }
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#111111",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "13px",
+                                "fontWeight": 600,
+                                "textAlign": "right"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "U"
+                            },
+                            "position": {
+                              "basis": "36px",
+                              "shrink": 0
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#5f5f5c",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "10px",
+                                "paddingLeft": "4px",
+                                "textAlign": "left"
+                              },
+                              "text": "psig"
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "Row"
+                        },
+                        "position": {
+                          "basis": "20px",
+                          "shrink": 0
+                        },
+                        "props": {
+                          "alignItems": "baseline",
+                          "style": {
+                            "gap": "8px",
+                            "overflow": "hidden"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "meta": {
+                          "name": "Bar"
+                        },
+                        "position": {
+                          "basis": "4px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.value": {
+                            "binding": {
+                              "config": {
+                                "expression": "if((tag({view.params.tagPath} + \u0027/pressureInletOil\u0027)) \u003e 120, 100, if((tag({view.params.tagPath} + \u0027/pressureInletOil\u0027)) \u003c 0, 0, (tag({view.params.tagPath} + \u0027/pressureInletOil\u0027)) / 120 * 100))"
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "bgColor": "#9a9a97",
+                          "color": "#2c2c2a",
+                          "maximum": 100,
+                          "style": {
+                            "borderRadius": "0",
+                            "height": "4px"
+                          }
+                        },
+                        "type": "ia.display.progress"
+                      }
+                    ],
+                    "meta": {
+                      "name": "InletOilP"
+                    },
+                    "position": {
+                      "basis": "28px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "borderBottom": "1px dotted #8c8c89",
+                        "gap": "3px",
+                        "overflow": "hidden",
+                        "padding": "3px 0"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "L"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontSize": "12px"
+                              },
+                              "text": "Oil Filter Press"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "V"
+                            },
+                            "position": {
+                              "basis": "60px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.style.color": {
+                                "binding": {
+                                  "config": {
+                                    "expression": "if((tag({view.params.tagPath} + \u0027/pressureInletOilFilter\u0027)) \u003e\u003d 20, \u0027#c8362a\u0027, if((tag({view.params.tagPath} + \u0027/pressureInletOilFilter\u0027)) \u003e\u003d 14, \u0027#d49a1f\u0027, \u0027#111111\u0027))"
+                                  },
+                                  "type": "expr"
+                                }
+                              },
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "expression": "numberFormat(tag({view.params.tagPath} + \u0027/pressureInletOilFilter\u0027), \u00270.0\u0027)"
+                                  },
+                                  "type": "expr"
+                                }
+                              }
+                            },
+                            "props": {
+                              "style": {
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "13px",
+                                "fontWeight": 600,
+                                "textAlign": "right"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "U"
+                            },
+                            "position": {
+                              "basis": "36px",
+                              "shrink": 0
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#5f5f5c",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "10px",
+                                "paddingLeft": "4px",
+                                "textAlign": "left"
+                              },
+                              "text": "psig"
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "Row"
+                        },
+                        "position": {
+                          "basis": "20px",
+                          "shrink": 0
+                        },
+                        "props": {
+                          "alignItems": "baseline",
+                          "style": {
+                            "gap": "8px",
+                            "overflow": "hidden"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "meta": {
+                          "name": "Bar"
+                        },
+                        "position": {
+                          "basis": "4px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.color": {
+                            "binding": {
+                              "config": {
+                                "expression": "if((tag({view.params.tagPath} + \u0027/pressureInletOilFilter\u0027)) \u003e\u003d 20, \u0027#c8362a\u0027, if((tag({view.params.tagPath} + \u0027/pressureInletOilFilter\u0027)) \u003e\u003d 14, \u0027#d49a1f\u0027, \u0027#2c2c2a\u0027))"
+                              },
+                              "type": "expr"
+                            }
+                          },
+                          "props.value": {
+                            "binding": {
+                              "config": {
+                                "expression": "if((tag({view.params.tagPath} + \u0027/pressureInletOilFilter\u0027)) \u003e 40, 100, if((tag({view.params.tagPath} + \u0027/pressureInletOilFilter\u0027)) \u003c 0, 0, (tag({view.params.tagPath} + \u0027/pressureInletOilFilter\u0027)) / 40 * 100))"
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "bgColor": "#9a9a97",
+                          "maximum": 100,
+                          "style": {
+                            "borderRadius": "0",
+                            "height": "4px"
+                          }
+                        },
+                        "type": "ia.display.progress"
+                      }
+                    ],
+                    "meta": {
+                      "name": "OilFiltP"
+                    },
+                    "position": {
+                      "basis": "28px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "borderBottom": "1px dotted #8c8c89",
+                        "gap": "3px",
+                        "overflow": "hidden",
+                        "padding": "3px 0"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "L"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontSize": "12px"
+                              },
+                              "text": "Motor Current"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "V"
+                            },
+                            "position": {
+                              "basis": "60px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "expression": "numberFormat(tag({view.params.tagPath} + \u0027/motorAmps\u0027), \u00270\u0027)"
+                                  },
+                                  "type": "expr"
+                                }
+                              }
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#111111",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "13px",
+                                "fontWeight": 600,
+                                "textAlign": "right"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "U"
+                            },
+                            "position": {
+                              "basis": "36px",
+                              "shrink": 0
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#5f5f5c",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "10px",
+                                "paddingLeft": "4px",
+                                "textAlign": "left"
+                              },
+                              "text": "A"
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "Row"
+                        },
+                        "position": {
+                          "basis": "20px",
+                          "shrink": 0
+                        },
+                        "props": {
+                          "alignItems": "baseline",
+                          "style": {
+                            "gap": "8px",
+                            "overflow": "hidden"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "meta": {
+                          "name": "Bar"
+                        },
+                        "position": {
+                          "basis": "4px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.value": {
+                            "binding": {
+                              "config": {
+                                "expression": "if((tag({view.params.tagPath} + \u0027/motorAmps\u0027)) \u003e 500, 100, if((tag({view.params.tagPath} + \u0027/motorAmps\u0027)) \u003c 0, 0, (tag({view.params.tagPath} + \u0027/motorAmps\u0027)) / 500 * 100))"
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "bgColor": "#9a9a97",
+                          "color": "#2c2c2a",
+                          "maximum": 100,
+                          "style": {
+                            "borderRadius": "0",
+                            "height": "4px"
+                          }
+                        },
+                        "type": "ia.display.progress"
+                      }
+                    ],
+                    "meta": {
+                      "name": "Amps"
+                    },
+                    "position": {
+                      "basis": "28px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "borderBottom": "1px dotted #8c8c89",
+                        "gap": "3px",
+                        "overflow": "hidden",
+                        "padding": "3px 0"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "L"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontSize": "12px"
+                              },
+                              "text": "Line Voltage"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "V"
+                            },
+                            "position": {
+                              "basis": "60px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "expression": "numberFormat(tag({view.params.tagPath} + \u0027/lineVoltage\u0027), \u00270\u0027)"
+                                  },
+                                  "type": "expr"
+                                }
+                              }
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#111111",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "13px",
+                                "fontWeight": 600,
+                                "textAlign": "right"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "U"
+                            },
+                            "position": {
+                              "basis": "36px",
+                              "shrink": 0
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#5f5f5c",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "10px",
+                                "paddingLeft": "4px",
+                                "textAlign": "left"
+                              },
+                              "text": "V"
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "Row"
+                        },
+                        "position": {
+                          "basis": "20px",
+                          "shrink": 0
+                        },
+                        "props": {
+                          "alignItems": "baseline",
+                          "style": {
+                            "gap": "8px",
+                            "overflow": "hidden"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "meta": {
+                          "name": "Bar"
+                        },
+                        "position": {
+                          "basis": "4px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.value": {
+                            "binding": {
+                              "config": {
+                                "expression": "if((tag({view.params.tagPath} + \u0027/lineVoltage\u0027)) \u003e 520, 100, if((tag({view.params.tagPath} + \u0027/lineVoltage\u0027)) \u003c 0, 0, (tag({view.params.tagPath} + \u0027/lineVoltage\u0027)) / 520 * 100))"
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "bgColor": "#9a9a97",
+                          "color": "#2c2c2a",
+                          "maximum": 100,
+                          "style": {
+                            "borderRadius": "0",
+                            "height": "4px"
+                          }
+                        },
+                        "type": "ia.display.progress"
+                      }
+                    ],
+                    "meta": {
+                      "name": "Volts"
+                    },
+                    "position": {
+                      "basis": "28px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "borderBottom": "1px dotted #8c8c89",
+                        "gap": "3px",
+                        "overflow": "hidden",
+                        "padding": "3px 0"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "L"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontSize": "12px"
+                              },
+                              "text": "Avg Power"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "V"
+                            },
+                            "position": {
+                              "basis": "60px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "expression": "numberFormat(tag({view.params.tagPath} + \u0027/powerAvgUsage\u0027), \u00270\u0027)"
+                                  },
+                                  "type": "expr"
+                                }
+                              }
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#111111",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "13px",
+                                "fontWeight": 600,
+                                "textAlign": "right"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "U"
+                            },
+                            "position": {
+                              "basis": "36px",
+                              "shrink": 0
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#5f5f5c",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "10px",
+                                "paddingLeft": "4px",
+                                "textAlign": "left"
+                              },
+                              "text": "kW"
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "Row"
+                        },
+                        "position": {
+                          "basis": "20px",
+                          "shrink": 0
+                        },
+                        "props": {
+                          "alignItems": "baseline",
+                          "style": {
+                            "gap": "8px",
+                            "overflow": "hidden"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "meta": {
+                          "name": "Bar"
+                        },
+                        "position": {
+                          "basis": "4px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "props.value": {
+                            "binding": {
+                              "config": {
+                                "expression": "if((tag({view.params.tagPath} + \u0027/powerAvgUsage\u0027)) \u003e 400, 100, if((tag({view.params.tagPath} + \u0027/powerAvgUsage\u0027)) \u003c 0, 0, (tag({view.params.tagPath} + \u0027/powerAvgUsage\u0027)) / 400 * 100))"
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "bgColor": "#9a9a97",
+                          "color": "#2c2c2a",
+                          "maximum": 100,
+                          "style": {
+                            "borderRadius": "0",
+                            "height": "4px"
+                          }
+                        },
+                        "type": "ia.display.progress"
+                      }
+                    ],
+                    "meta": {
+                      "name": "Power"
+                    },
+                    "position": {
+                      "basis": "28px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "borderBottom": "1px dotted #8c8c89",
+                        "gap": "3px",
+                        "overflow": "hidden",
+                        "padding": "3px 0"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  }
+                ],
                 "meta": {
-                  "name": "V"
+                  "name": "ColB"
                 },
                 "position": {
-                  "basis": "22px",
-                  "shrink": 0
-                },
-                "propConfig": {
-                  "props.text": {
-                    "binding": {
-                      "config": {
-                        "expression": "numberFormat(tag(\u0027[]Refrigeration/\u0027 + {view.params.instanceName} + \u0027/percentLoaded\u0027), \u00270.##\u0027)"
-                      },
-                      "type": "expr"
-                    }
-                  }
+                  "grow": 1
                 },
                 "props": {
+                  "direction": "column",
                   "style": {
-                    "color": "#1A1A1A",
-                    "fontSize": "18px",
-                    "fontWeight": 600,
-                    "textAlign": "left"
+                    "gap": "0px"
                   }
                 },
-                "type": "ia.display.label"
+                "type": "ia.container.flex"
               }
             ],
             "meta": {
-              "name": "LoadedInfo"
+              "name": "Readouts"
             },
             "position": {
               "grow": 1
             },
             "props": {
-              "direction": "column"
-            },
-            "type": "ia.container.flex"
-          }
-        ],
-        "meta": {
-          "name": "TopRow"
-        },
-        "position": {
-          "basis": "60px",
-          "shrink": 0
-        },
-        "props": {
-          "alignItems": "center",
-          "style": {
-            "gap": "10px"
-          }
-        },
-        "type": "ia.container.flex"
-      },
-      {
-        "children": [
-          {
-            "children": [
-              {
-                "meta": {
-                  "name": "L"
-                },
-                "position": {
-                  "basis": "0",
-                  "grow": 1,
-                  "shrink": 0
-                },
-                "props": {
-                  "style": {
-                    "color": "#555555",
-                    "fontSize": "12px"
-                  },
-                  "text": "Motor Amps"
-                },
-                "type": "ia.display.label"
-              },
-              {
-                "meta": {
-                  "name": "V"
-                },
-                "position": {
-                  "basis": "70px",
-                  "shrink": 0
-                },
-                "propConfig": {
-                  "props.text": {
-                    "binding": {
-                      "config": {
-                        "expression": "numberFormat(tag(\u0027[]Refrigeration/\u0027 + {view.params.instanceName} + \u0027/motorAmps\u0027), \u00270.##\u0027)"
-                      },
-                      "type": "expr"
-                    }
-                  }
-                },
-                "props": {
-                  "style": {
-                    "color": "#1A1A1A",
-                    "fontSize": "12px",
-                    "fontWeight": 600,
-                    "textAlign": "right"
-                  }
-                },
-                "type": "ia.display.label"
-              }
-            ],
-            "meta": {
-              "name": "motorAmpsRow"
-            },
-            "position": {
-              "basis": "calc(50% - 8px)",
-              "shrink": 0
-            },
-            "props": {
-              "alignItems": "center",
               "style": {
-                "gap": "8px"
-              }
-            },
-            "type": "ia.container.flex"
-          },
-          {
-            "children": [
-              {
-                "meta": {
-                  "name": "L"
-                },
-                "position": {
-                  "basis": "0",
-                  "grow": 1,
-                  "shrink": 0
-                },
-                "props": {
-                  "style": {
-                    "color": "#555555",
-                    "fontSize": "12px"
-                  },
-                  "text": "Line Voltage"
-                },
-                "type": "ia.display.label"
-              },
-              {
-                "meta": {
-                  "name": "V"
-                },
-                "position": {
-                  "basis": "70px",
-                  "shrink": 0
-                },
-                "propConfig": {
-                  "props.text": {
-                    "binding": {
-                      "config": {
-                        "expression": "numberFormat(tag(\u0027[]Refrigeration/\u0027 + {view.params.instanceName} + \u0027/lineVoltage\u0027), \u00270.##\u0027)"
-                      },
-                      "type": "expr"
-                    }
-                  }
-                },
-                "props": {
-                  "style": {
-                    "color": "#1A1A1A",
-                    "fontSize": "12px",
-                    "fontWeight": 600,
-                    "textAlign": "right"
-                  }
-                },
-                "type": "ia.display.label"
-              }
-            ],
-            "meta": {
-              "name": "lineVoltageRow"
-            },
-            "position": {
-              "basis": "calc(50% - 8px)",
-              "shrink": 0
-            },
-            "props": {
-              "alignItems": "center",
-              "style": {
-                "gap": "8px"
-              }
-            },
-            "type": "ia.container.flex"
-          },
-          {
-            "children": [
-              {
-                "meta": {
-                  "name": "L"
-                },
-                "position": {
-                  "basis": "0",
-                  "grow": 1,
-                  "shrink": 0
-                },
-                "props": {
-                  "style": {
-                    "color": "#555555",
-                    "fontSize": "12px"
-                  },
-                  "text": "Power Demand"
-                },
-                "type": "ia.display.label"
-              },
-              {
-                "meta": {
-                  "name": "V"
-                },
-                "position": {
-                  "basis": "70px",
-                  "shrink": 0
-                },
-                "propConfig": {
-                  "props.text": {
-                    "binding": {
-                      "config": {
-                        "expression": "numberFormat(tag(\u0027[]Refrigeration/\u0027 + {view.params.instanceName} + \u0027/powerDemand\u0027), \u00270.##\u0027)"
-                      },
-                      "type": "expr"
-                    }
-                  }
-                },
-                "props": {
-                  "style": {
-                    "color": "#1A1A1A",
-                    "fontSize": "12px",
-                    "fontWeight": 600,
-                    "textAlign": "right"
-                  }
-                },
-                "type": "ia.display.label"
-              }
-            ],
-            "meta": {
-              "name": "powerDemandRow"
-            },
-            "position": {
-              "basis": "calc(50% - 8px)",
-              "shrink": 0
-            },
-            "props": {
-              "alignItems": "center",
-              "style": {
-                "gap": "8px"
-              }
-            },
-            "type": "ia.container.flex"
-          },
-          {
-            "children": [
-              {
-                "meta": {
-                  "name": "L"
-                },
-                "position": {
-                  "basis": "0",
-                  "grow": 1,
-                  "shrink": 0
-                },
-                "props": {
-                  "style": {
-                    "color": "#555555",
-                    "fontSize": "12px"
-                  },
-                  "text": "Power Avg"
-                },
-                "type": "ia.display.label"
-              },
-              {
-                "meta": {
-                  "name": "V"
-                },
-                "position": {
-                  "basis": "70px",
-                  "shrink": 0
-                },
-                "propConfig": {
-                  "props.text": {
-                    "binding": {
-                      "config": {
-                        "expression": "numberFormat(tag(\u0027[]Refrigeration/\u0027 + {view.params.instanceName} + \u0027/powerAvgUsage\u0027), \u00270.##\u0027)"
-                      },
-                      "type": "expr"
-                    }
-                  }
-                },
-                "props": {
-                  "style": {
-                    "color": "#1A1A1A",
-                    "fontSize": "12px",
-                    "fontWeight": 600,
-                    "textAlign": "right"
-                  }
-                },
-                "type": "ia.display.label"
-              }
-            ],
-            "meta": {
-              "name": "powerAvgUsageRow"
-            },
-            "position": {
-              "basis": "calc(50% - 8px)",
-              "shrink": 0
-            },
-            "props": {
-              "alignItems": "center",
-              "style": {
-                "gap": "8px"
-              }
-            },
-            "type": "ia.container.flex"
-          },
-          {
-            "children": [
-              {
-                "meta": {
-                  "name": "L"
-                },
-                "position": {
-                  "basis": "0",
-                  "grow": 1,
-                  "shrink": 0
-                },
-                "props": {
-                  "style": {
-                    "color": "#555555",
-                    "fontSize": "12px"
-                  },
-                  "text": "Pres Discharge"
-                },
-                "type": "ia.display.label"
-              },
-              {
-                "meta": {
-                  "name": "V"
-                },
-                "position": {
-                  "basis": "70px",
-                  "shrink": 0
-                },
-                "propConfig": {
-                  "props.text": {
-                    "binding": {
-                      "config": {
-                        "expression": "numberFormat(tag(\u0027[]Refrigeration/\u0027 + {view.params.instanceName} + \u0027/pressureDischarge\u0027), \u00270.##\u0027)"
-                      },
-                      "type": "expr"
-                    }
-                  }
-                },
-                "props": {
-                  "style": {
-                    "color": "#1A1A1A",
-                    "fontSize": "12px",
-                    "fontWeight": 600,
-                    "textAlign": "right"
-                  }
-                },
-                "type": "ia.display.label"
-              }
-            ],
-            "meta": {
-              "name": "pressureDischargeRow"
-            },
-            "position": {
-              "basis": "calc(50% - 8px)",
-              "shrink": 0
-            },
-            "props": {
-              "alignItems": "center",
-              "style": {
-                "gap": "8px"
-              }
-            },
-            "type": "ia.container.flex"
-          },
-          {
-            "children": [
-              {
-                "meta": {
-                  "name": "L"
-                },
-                "position": {
-                  "basis": "0",
-                  "grow": 1,
-                  "shrink": 0
-                },
-                "props": {
-                  "style": {
-                    "color": "#555555",
-                    "fontSize": "12px"
-                  },
-                  "text": "Pres Suction"
-                },
-                "type": "ia.display.label"
-              },
-              {
-                "meta": {
-                  "name": "V"
-                },
-                "position": {
-                  "basis": "70px",
-                  "shrink": 0
-                },
-                "propConfig": {
-                  "props.text": {
-                    "binding": {
-                      "config": {
-                        "expression": "numberFormat(tag(\u0027[]Refrigeration/\u0027 + {view.params.instanceName} + \u0027/pressureSuction\u0027), \u00270.##\u0027)"
-                      },
-                      "type": "expr"
-                    }
-                  }
-                },
-                "props": {
-                  "style": {
-                    "color": "#1A1A1A",
-                    "fontSize": "12px",
-                    "fontWeight": 600,
-                    "textAlign": "right"
-                  }
-                },
-                "type": "ia.display.label"
-              }
-            ],
-            "meta": {
-              "name": "pressureSuctionRow"
-            },
-            "position": {
-              "basis": "calc(50% - 8px)",
-              "shrink": 0
-            },
-            "props": {
-              "alignItems": "center",
-              "style": {
-                "gap": "8px"
-              }
-            },
-            "type": "ia.container.flex"
-          },
-          {
-            "children": [
-              {
-                "meta": {
-                  "name": "L"
-                },
-                "position": {
-                  "basis": "0",
-                  "grow": 1,
-                  "shrink": 0
-                },
-                "props": {
-                  "style": {
-                    "color": "#555555",
-                    "fontSize": "12px"
-                  },
-                  "text": "Temp Discharge"
-                },
-                "type": "ia.display.label"
-              },
-              {
-                "meta": {
-                  "name": "V"
-                },
-                "position": {
-                  "basis": "70px",
-                  "shrink": 0
-                },
-                "propConfig": {
-                  "props.text": {
-                    "binding": {
-                      "config": {
-                        "expression": "numberFormat(tag(\u0027[]Refrigeration/\u0027 + {view.params.instanceName} + \u0027/tempDischarge\u0027), \u00270.##\u0027)"
-                      },
-                      "type": "expr"
-                    }
-                  }
-                },
-                "props": {
-                  "style": {
-                    "color": "#1A1A1A",
-                    "fontSize": "12px",
-                    "fontWeight": 600,
-                    "textAlign": "right"
-                  }
-                },
-                "type": "ia.display.label"
-              }
-            ],
-            "meta": {
-              "name": "tempDischargeRow"
-            },
-            "position": {
-              "basis": "calc(50% - 8px)",
-              "shrink": 0
-            },
-            "props": {
-              "alignItems": "center",
-              "style": {
-                "gap": "8px"
-              }
-            },
-            "type": "ia.container.flex"
-          },
-          {
-            "children": [
-              {
-                "meta": {
-                  "name": "L"
-                },
-                "position": {
-                  "basis": "0",
-                  "grow": 1,
-                  "shrink": 0
-                },
-                "props": {
-                  "style": {
-                    "color": "#555555",
-                    "fontSize": "12px"
-                  },
-                  "text": "Temp Suction"
-                },
-                "type": "ia.display.label"
-              },
-              {
-                "meta": {
-                  "name": "V"
-                },
-                "position": {
-                  "basis": "70px",
-                  "shrink": 0
-                },
-                "propConfig": {
-                  "props.text": {
-                    "binding": {
-                      "config": {
-                        "expression": "numberFormat(tag(\u0027[]Refrigeration/\u0027 + {view.params.instanceName} + \u0027/tempSuction\u0027), \u00270.##\u0027)"
-                      },
-                      "type": "expr"
-                    }
-                  }
-                },
-                "props": {
-                  "style": {
-                    "color": "#1A1A1A",
-                    "fontSize": "12px",
-                    "fontWeight": 600,
-                    "textAlign": "right"
-                  }
-                },
-                "type": "ia.display.label"
-              }
-            ],
-            "meta": {
-              "name": "tempSuctionRow"
-            },
-            "position": {
-              "basis": "calc(50% - 8px)",
-              "shrink": 0
-            },
-            "props": {
-              "alignItems": "center",
-              "style": {
-                "gap": "8px"
-              }
-            },
-            "type": "ia.container.flex"
-          },
-          {
-            "children": [
-              {
-                "meta": {
-                  "name": "L"
-                },
-                "position": {
-                  "basis": "0",
-                  "grow": 1,
-                  "shrink": 0
-                },
-                "props": {
-                  "style": {
-                    "color": "#555555",
-                    "fontSize": "12px"
-                  },
-                  "text": "Tonnage Cur"
-                },
-                "type": "ia.display.label"
-              },
-              {
-                "meta": {
-                  "name": "V"
-                },
-                "position": {
-                  "basis": "70px",
-                  "shrink": 0
-                },
-                "propConfig": {
-                  "props.text": {
-                    "binding": {
-                      "config": {
-                        "expression": "numberFormat(tag(\u0027[]Refrigeration/\u0027 + {view.params.instanceName} + \u0027/tonnageCurrent\u0027), \u00270.##\u0027)"
-                      },
-                      "type": "expr"
-                    }
-                  }
-                },
-                "props": {
-                  "style": {
-                    "color": "#1A1A1A",
-                    "fontSize": "12px",
-                    "fontWeight": 600,
-                    "textAlign": "right"
-                  }
-                },
-                "type": "ia.display.label"
-              }
-            ],
-            "meta": {
-              "name": "tonnageCurrentRow"
-            },
-            "position": {
-              "basis": "calc(50% - 8px)",
-              "shrink": 0
-            },
-            "props": {
-              "alignItems": "center",
-              "style": {
-                "gap": "8px"
-              }
-            },
-            "type": "ia.container.flex"
-          },
-          {
-            "children": [
-              {
-                "meta": {
-                  "name": "L"
-                },
-                "position": {
-                  "basis": "0",
-                  "grow": 1,
-                  "shrink": 0
-                },
-                "props": {
-                  "style": {
-                    "color": "#555555",
-                    "fontSize": "12px"
-                  },
-                  "text": "Tonnage Ideal"
-                },
-                "type": "ia.display.label"
-              },
-              {
-                "meta": {
-                  "name": "V"
-                },
-                "position": {
-                  "basis": "70px",
-                  "shrink": 0
-                },
-                "propConfig": {
-                  "props.text": {
-                    "binding": {
-                      "config": {
-                        "expression": "numberFormat(tag(\u0027[]Refrigeration/\u0027 + {view.params.instanceName} + \u0027/tonnageIdeal\u0027), \u00270.##\u0027)"
-                      },
-                      "type": "expr"
-                    }
-                  }
-                },
-                "props": {
-                  "style": {
-                    "color": "#1A1A1A",
-                    "fontSize": "12px",
-                    "fontWeight": 600,
-                    "textAlign": "right"
-                  }
-                },
-                "type": "ia.display.label"
-              }
-            ],
-            "meta": {
-              "name": "tonnageIdealRow"
-            },
-            "position": {
-              "basis": "calc(50% - 8px)",
-              "shrink": 0
-            },
-            "props": {
-              "alignItems": "center",
-              "style": {
-                "gap": "8px"
+                "gap": "14px"
               }
             },
             "type": "ia.container.flex"
           }
         ],
         "meta": {
-          "name": "Grid"
+          "name": "Body"
         },
         "position": {
           "grow": 1
         },
         "props": {
-          "alignContent": "flex-start",
           "style": {
-            "gap": "2px 16px",
-            "padding": "6px 0 0 0"
-          },
-          "wrap": "wrap"
+            "gap": "12px",
+            "padding": "10px"
+          }
         },
         "type": "ia.container.flex"
       }
@@ -865,12 +2364,11 @@
     "props": {
       "direction": "column",
       "style": {
-        "backgroundColor": "#EDEDED",
-        "borderColor": "#999999",
-        "borderStyle": "solid",
-        "borderWidth": "1px",
-        "gap": "4px",
-        "padding": "8px 12px"
+        "backgroundColor": "#c9c9c6",
+        "border": "1px solid #6e6e6c",
+        "gap": "0px",
+        "overflow": "hidden",
+        "padding": "0"
       }
     },
     "type": "ia.container.flex"

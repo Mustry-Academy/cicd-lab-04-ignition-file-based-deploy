@@ -1,17 +1,22 @@
 {
   "custom": {},
   "params": {
-    "instanceName": "Palletizer 1"
+    "displayName": "",
+    "tagPath": ""
   },
   "propConfig": {
-    "params.instanceName": {
+    "params.displayName": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.tagPath": {
       "paramDirection": "input",
       "persistent": true
     }
   },
   "props": {
     "defaultSize": {
-      "height": 130,
+      "height": 140,
       "width": 300
     }
   },
@@ -20,270 +25,354 @@
       {
         "children": [
           {
+            "children": [
+              {
+                "meta": {
+                  "name": "N"
+                },
+                "position": {
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.displayName"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "color": "#111111",
+                    "fontSize": "12px",
+                    "fontWeight": 700,
+                    "letterSpacing": "1px",
+                    "textTransform": "uppercase"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "HOA"
+                },
+                "position": {
+                  "basis": "150px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.controlValue": {
+                    "binding": {
+                      "config": {
+                        "expression": "tag({view.params.tagPath} + \u0027/HOA\u0027)"
+                      },
+                      "type": "expr"
+                    }
+                  },
+                  "props.indicatorValue": {
+                    "binding": {
+                      "config": {
+                        "expression": "tag({view.params.tagPath} + \u0027/HOA\u0027)"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "orientation": "row",
+                  "states": [
+                    {
+                      "selectedStyle": {
+                        "backgroundColor": "#4a4a47",
+                        "border": "0",
+                        "borderRadius": "0",
+                        "classes": "",
+                        "color": "#ffffff",
+                        "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                        "fontSize": "10px",
+                        "fontWeight": 700,
+                        "letterSpacing": "1px"
+                      },
+                      "text": "OFF",
+                      "unselectedStyle": {
+                        "backgroundColor": "#a3a3a0",
+                        "border": "1px solid #6e6e6c",
+                        "borderRadius": "0",
+                        "classes": "",
+                        "color": "#5f5f5c",
+                        "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                        "fontSize": "10px",
+                        "letterSpacing": "1px"
+                      },
+                      "value": 0
+                    },
+                    {
+                      "selectedStyle": {
+                        "backgroundColor": "#d49a1f",
+                        "border": "0",
+                        "borderRadius": "0",
+                        "color": "#1a1a18",
+                        "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                        "fontSize": "10px",
+                        "fontWeight": 700,
+                        "letterSpacing": "1px"
+                      },
+                      "text": "HAND",
+                      "unselectedStyle": {
+                        "backgroundColor": "#a3a3a0",
+                        "border": "1px solid #6e6e6c",
+                        "borderRadius": "0",
+                        "color": "#5f5f5c",
+                        "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                        "fontSize": "10px",
+                        "letterSpacing": "1px"
+                      },
+                      "value": 1
+                    },
+                    {
+                      "selectedStyle": {
+                        "backgroundColor": "#1f7a7a",
+                        "border": "0",
+                        "borderRadius": "0",
+                        "color": "#ffffff",
+                        "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                        "fontSize": "10px",
+                        "fontWeight": 700,
+                        "letterSpacing": "1px"
+                      },
+                      "text": "AUTO",
+                      "unselectedStyle": {
+                        "backgroundColor": "#a3a3a0",
+                        "border": "1px solid #6e6e6c",
+                        "borderRadius": "0",
+                        "color": "#5f5f5c",
+                        "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                        "fontSize": "10px",
+                        "letterSpacing": "1px"
+                      },
+                      "value": 2
+                    }
+                  ]
+                },
+                "type": "ia.input.multi-state-button"
+              }
+            ],
             "meta": {
-              "name": "Status"
+              "name": "Hdr"
             },
             "position": {
-              "basis": "14px",
-              "shrink": 0
-            },
-            "propConfig": {
-              "props.fill.paint": {
-                "binding": {
-                  "config": {
-                    "expression": "if(tag(\u0027[]Overview/\u0027 + {view.params.instanceName} + \u0027/HOA\u0027) \u003d 2, \u0027#1E8449\u0027, if(tag(\u0027[]Overview/\u0027 + {view.params.instanceName} + \u0027/HOA\u0027) \u003d 1, \u0027#D4AC0D\u0027, if(tag(\u0027[]Overview/\u0027 + {view.params.instanceName} + \u0027/HOA\u0027) \u003d 0, \u0027#8E8E8E\u0027, \u0027#CCCCCC\u0027)))"
-                  },
-                  "type": "expr"
-                }
-              }
+              "basis": "24px"
             },
             "props": {
-              "fill": {
-                "paint": "#CCCCCC"
-              },
-              "stroke": {
-                "paint": "#777777",
-                "width": 1
-              }
+              "alignItems": "center"
             },
-            "type": "ia.shapes.ellipse"
+            "type": "ia.container.flex"
           },
           {
+            "children": [
+              {
+                "meta": {
+                  "name": "L"
+                },
+                "position": {
+                  "grow": 1
+                },
+                "props": {
+                  "style": {
+                    "color": "#5f5f5c",
+                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                    "fontSize": "10px",
+                    "letterSpacing": "1px"
+                  },
+                  "text": "TYPE"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "V"
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "fallbackDelay": 2.5,
+                        "mode": "indirect",
+                        "references": {
+                          "tagPath": "{view.params.tagPath}"
+                        },
+                        "tagPath": "{tagPath}/Type"
+                      },
+                      "type": "tag"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "color": "#111111",
+                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                    "fontSize": "11px",
+                    "fontWeight": 600
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
             "meta": {
-              "name": "Name"
+              "name": "Typ"
             },
             "position": {
-              "grow": 1,
-              "shrink": 1
-            },
-            "propConfig": {
-              "props.text": {
-                "binding": {
-                  "config": {
-                    "path": "view.params.instanceName"
-                  },
-                  "type": "property"
-                }
-              }
+              "basis": "18px"
             },
             "props": {
               "style": {
-                "color": "#1A1A1A",
-                "fontSize": "14px",
-                "fontWeight": 600
-              },
-              "text": "--"
+                "borderBottom": "1px dotted #8c8c89",
+                "gap": "6px",
+                "padding": "2px 0"
+              }
             },
-            "type": "ia.display.label"
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "L"
+                },
+                "position": {
+                  "grow": 1
+                },
+                "props": {
+                  "style": {
+                    "color": "#5f5f5c",
+                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                    "fontSize": "10px",
+                    "letterSpacing": "1px"
+                  },
+                  "text": "PATTERN"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "V"
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "fallbackDelay": 2.5,
+                        "mode": "indirect",
+                        "references": {
+                          "tagPath": "{view.params.tagPath}"
+                        },
+                        "tagPath": "{tagPath}/Pattern"
+                      },
+                      "type": "tag"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "color": "#111111",
+                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                    "fontSize": "11px",
+                    "fontWeight": 600
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "Pat"
+            },
+            "position": {
+              "basis": "18px"
+            },
+            "props": {
+              "style": {
+                "borderBottom": "1px dotted #8c8c89",
+                "gap": "6px",
+                "padding": "2px 0"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "L"
+                },
+                "position": {
+                  "grow": 1
+                },
+                "props": {
+                  "style": {
+                    "color": "#5f5f5c",
+                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                    "fontSize": "10px",
+                    "letterSpacing": "1px"
+                  },
+                  "text": "STATE"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "V"
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "expression": "numberFormat(tag({view.params.tagPath} + \u0027/HOA\u0027), \u00270\u0027)"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "color": "#111111",
+                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                    "fontSize": "11px",
+                    "fontWeight": 600
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "Hoa"
+            },
+            "position": {
+              "basis": "18px"
+            },
+            "props": {
+              "style": {
+                "borderBottom": "1px dotted #8c8c89",
+                "gap": "6px",
+                "padding": "2px 0"
+              }
+            },
+            "type": "ia.container.flex"
           }
         ],
         "meta": {
-          "name": "Header"
+          "name": "Card"
         },
         "position": {
-          "basis": "22px",
-          "shrink": 0
+          "grow": 1
         },
         "props": {
-          "alignItems": "center",
-          "direction": "row",
+          "direction": "column",
           "style": {
-            "gap": "8px"
-          }
-        },
-        "type": "ia.container.flex"
-      },
-      {
-        "children": [
-          {
-            "meta": {
-              "name": "L"
-            },
-            "position": {
-              "basis": "0",
-              "grow": 1,
-              "shrink": 0
-            },
-            "props": {
-              "style": {
-                "color": "#555555",
-                "fontSize": "12px"
-              },
-              "text": "HOA"
-            },
-            "type": "ia.display.label"
-          },
-          {
-            "meta": {
-              "name": "V"
-            },
-            "position": {
-              "basis": "60px",
-              "shrink": 0
-            },
-            "propConfig": {
-              "props.text": {
-                "binding": {
-                  "config": {
-                    "expression": "numberFormat(tag(\u0027[]Overview/\u0027 + {view.params.instanceName} + \u0027/HOA\u0027), \u00270.##\u0027)"
-                  },
-                  "type": "expr"
-                }
-              }
-            },
-            "props": {
-              "style": {
-                "color": "#1A1A1A",
-                "fontSize": "12px",
-                "fontWeight": 600,
-                "textAlign": "right"
-              },
-              "text": "--"
-            },
-            "type": "ia.display.label"
-          }
-        ],
-        "meta": {
-          "name": "HOARow"
-        },
-        "position": {
-          "basis": "20px",
-          "shrink": 0
-        },
-        "props": {
-          "direction": "row",
-          "style": {
-            "gap": "8px"
-          }
-        },
-        "type": "ia.container.flex"
-      },
-      {
-        "children": [
-          {
-            "meta": {
-              "name": "L"
-            },
-            "position": {
-              "basis": "0",
-              "grow": 1,
-              "shrink": 0
-            },
-            "props": {
-              "style": {
-                "color": "#555555",
-                "fontSize": "12px"
-              },
-              "text": "Pattern"
-            },
-            "type": "ia.display.label"
-          },
-          {
-            "meta": {
-              "name": "V"
-            },
-            "position": {
-              "basis": "60px",
-              "shrink": 0
-            },
-            "propConfig": {
-              "props.text": {
-                "binding": {
-                  "config": {
-                    "expression": "numberFormat(tag(\u0027[]Overview/\u0027 + {view.params.instanceName} + \u0027/Pattern\u0027), \u00270.##\u0027)"
-                  },
-                  "type": "expr"
-                }
-              }
-            },
-            "props": {
-              "style": {
-                "color": "#1A1A1A",
-                "fontSize": "12px",
-                "fontWeight": 600,
-                "textAlign": "right"
-              },
-              "text": "--"
-            },
-            "type": "ia.display.label"
-          }
-        ],
-        "meta": {
-          "name": "PatRow"
-        },
-        "position": {
-          "basis": "20px",
-          "shrink": 0
-        },
-        "props": {
-          "direction": "row",
-          "style": {
-            "gap": "8px"
-          }
-        },
-        "type": "ia.container.flex"
-      },
-      {
-        "children": [
-          {
-            "meta": {
-              "name": "L"
-            },
-            "position": {
-              "basis": "0",
-              "grow": 1,
-              "shrink": 0
-            },
-            "props": {
-              "style": {
-                "color": "#555555",
-                "fontSize": "12px"
-              },
-              "text": "Type"
-            },
-            "type": "ia.display.label"
-          },
-          {
-            "meta": {
-              "name": "V"
-            },
-            "position": {
-              "basis": "60px",
-              "shrink": 0
-            },
-            "propConfig": {
-              "props.text": {
-                "binding": {
-                  "config": {
-                    "expression": "numberFormat(tag(\u0027[]Overview/\u0027 + {view.params.instanceName} + \u0027/Type\u0027), \u00270.##\u0027)"
-                  },
-                  "type": "expr"
-                }
-              }
-            },
-            "props": {
-              "style": {
-                "color": "#1A1A1A",
-                "fontSize": "12px",
-                "fontWeight": 600,
-                "textAlign": "right"
-              },
-              "text": "--"
-            },
-            "type": "ia.display.label"
-          }
-        ],
-        "meta": {
-          "name": "TypeRow"
-        },
-        "position": {
-          "basis": "20px",
-          "shrink": 0
-        },
-        "props": {
-          "direction": "row",
-          "style": {
-            "gap": "8px"
+            "backgroundColor": "#c9c9c6",
+            "gap": "4px",
+            "padding": "10px 12px"
           }
         },
         "type": "ia.container.flex"
@@ -295,12 +384,10 @@
     "props": {
       "direction": "column",
       "style": {
-        "backgroundColor": "#EDEDED",
-        "borderColor": "#999999",
-        "borderStyle": "solid",
-        "borderWidth": "1px",
-        "gap": "6px",
-        "padding": "8px 12px"
+        "backgroundColor": "#c9c9c6",
+        "gap": "0px",
+        "overflow": "hidden",
+        "padding": "0"
       }
     },
     "type": "ia.container.flex"

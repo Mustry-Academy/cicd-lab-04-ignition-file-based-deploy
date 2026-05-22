@@ -3,7 +3,8 @@
   "params": {},
   "props": {
     "defaultSize": {
-      "width": 1280
+      "height": 920,
+      "width": 1440
     }
   },
   "root": {
@@ -13,818 +14,3214 @@
           {
             "children": [
               {
-                "meta": {
-                  "name": "L"
-                },
-                "position": {
-                  "basis": "18px",
-                  "shrink": 0
-                },
-                "props": {
-                  "style": {
-                    "color": "#555555",
-                    "fontSize": "11px",
-                    "fontWeight": 600
-                  },
-                  "text": "CASE COUNT"
-                },
-                "type": "ia.display.label"
-              },
-              {
-                "meta": {
-                  "name": "Accent"
-                },
-                "position": {
-                  "basis": "3px",
-                  "shrink": 0
-                },
-                "props": {
-                  "style": {
-                    "backgroundColor": "#1F77B4"
-                  }
-                },
-                "type": "ia.container.flex"
-              },
-              {
-                "meta": {
-                  "name": "Value"
-                },
-                "position": {
-                  "grow": 1
-                },
-                "propConfig": {
-                  "props.text": {
-                    "binding": {
-                      "config": {
-                        "expression": "tag(\u0027[]Overview/CaseCount\u0027)"
-                      },
-                      "type": "expr"
-                    }
-                  }
-                },
-                "props": {
-                  "style": {
-                    "alignSelf": "flex-end",
-                    "color": "#1A1A1A",
-                    "fontSize": "24px",
-                    "fontWeight": 600,
-                    "textAlign": "right"
-                  }
-                },
-                "type": "ia.display.label"
-              }
-            ],
-            "meta": {
-              "name": "KPI_CaseCount"
-            },
-            "position": {
-              "basis": "0",
-              "grow": 1
-            },
-            "props": {
-              "direction": "column",
-              "style": {
-                "backgroundColor": "#EDEDED",
-                "borderColor": "#999999",
-                "borderStyle": "solid",
-                "borderWidth": "1px",
-                "padding": "8px 12px"
-              }
-            },
-            "type": "ia.container.flex"
-          },
-          {
-            "children": [
-              {
-                "meta": {
-                  "name": "L"
-                },
-                "position": {
-                  "basis": "18px",
-                  "shrink": 0
-                },
-                "props": {
-                  "style": {
-                    "color": "#555555",
-                    "fontSize": "11px",
-                    "fontWeight": 600
-                  },
-                  "text": "CURRENT ORDER"
-                },
-                "type": "ia.display.label"
-              },
-              {
-                "meta": {
-                  "name": "Value"
-                },
-                "position": {
-                  "grow": 1
-                },
-                "propConfig": {
-                  "props.text": {
-                    "binding": {
-                      "config": {
-                        "expression": "tag(\u0027[]Overview/CurrentOrder\u0027)"
-                      },
-                      "type": "expr"
-                    }
-                  }
-                },
-                "props": {
-                  "style": {
-                    "alignSelf": "flex-end",
-                    "color": "#1A1A1A",
-                    "fontSize": "24px",
-                    "fontWeight": 600,
-                    "textAlign": "right"
-                  }
-                },
-                "type": "ia.display.label"
-              }
-            ],
-            "meta": {
-              "name": "KPI_CurrentOrder"
-            },
-            "position": {
-              "basis": "0",
-              "grow": 1
-            },
-            "props": {
-              "direction": "column",
-              "style": {
-                "backgroundColor": "#EDEDED",
-                "borderColor": "#999999",
-                "borderStyle": "solid",
-                "borderWidth": "1px",
-                "padding": "8px 12px"
-              }
-            },
-            "type": "ia.container.flex"
-          },
-          {
-            "children": [
-              {
-                "meta": {
-                  "name": "L"
-                },
-                "position": {
-                  "basis": "18px",
-                  "shrink": 0
-                },
-                "props": {
-                  "style": {
-                    "color": "#555555",
-                    "fontSize": "11px",
-                    "fontWeight": 600
-                  },
-                  "text": "CURRENT RUN"
-                },
-                "type": "ia.display.label"
-              },
-              {
-                "meta": {
-                  "name": "Value"
-                },
-                "position": {
-                  "grow": 1
-                },
-                "propConfig": {
-                  "props.text": {
-                    "binding": {
-                      "config": {
-                        "expression": "tag(\u0027[]Overview/CurrentRun\u0027)"
-                      },
-                      "type": "expr"
-                    }
-                  }
-                },
-                "props": {
-                  "style": {
-                    "alignSelf": "flex-end",
-                    "color": "#1A1A1A",
-                    "fontSize": "24px",
-                    "fontWeight": 600,
-                    "textAlign": "right"
-                  }
-                },
-                "type": "ia.display.label"
-              }
-            ],
-            "meta": {
-              "name": "KPI_CurrentRun"
-            },
-            "position": {
-              "basis": "0",
-              "grow": 1
-            },
-            "props": {
-              "direction": "column",
-              "style": {
-                "backgroundColor": "#EDEDED",
-                "borderColor": "#999999",
-                "borderStyle": "solid",
-                "borderWidth": "1px",
-                "padding": "8px 12px"
-              }
-            },
-            "type": "ia.container.flex"
-          },
-          {
-            "children": [
-              {
-                "meta": {
-                  "name": "L"
-                },
-                "position": {
-                  "basis": "18px",
-                  "shrink": 0
-                },
-                "props": {
-                  "style": {
-                    "color": "#555555",
-                    "fontSize": "11px",
-                    "fontWeight": 600
-                  },
-                  "text": "RUN CONTROL"
-                },
-                "type": "ia.display.label"
-              },
-              {
-                "meta": {
-                  "name": "Value"
-                },
-                "position": {
-                  "grow": 1
-                },
-                "propConfig": {
-                  "props.text": {
-                    "binding": {
-                      "config": {
-                        "expression": "tag(\u0027[]Overview/RunControl\u0027)"
-                      },
-                      "type": "expr"
-                    }
-                  }
-                },
-                "props": {
-                  "style": {
-                    "alignSelf": "flex-end",
-                    "color": "#1A1A1A",
-                    "fontSize": "24px",
-                    "fontWeight": 600,
-                    "textAlign": "right"
-                  }
-                },
-                "type": "ia.display.label"
-              }
-            ],
-            "meta": {
-              "name": "KPI_RunControl"
-            },
-            "position": {
-              "basis": "0",
-              "grow": 1
-            },
-            "props": {
-              "direction": "column",
-              "style": {
-                "backgroundColor": "#EDEDED",
-                "borderColor": "#999999",
-                "borderStyle": "solid",
-                "borderWidth": "1px",
-                "padding": "8px 12px"
-              }
-            },
-            "type": "ia.container.flex"
-          }
-        ],
-        "meta": {
-          "name": "KPIStrip"
-        },
-        "position": {
-          "basis": "84px",
-          "shrink": 0
-        },
-        "props": {
-          "style": {
-            "gap": "10px"
-          }
-        },
-        "type": "ia.container.flex"
-      },
-      {
-        "children": [
-          {
-            "meta": {
-              "name": "Title"
-            },
-            "position": {
-              "basis": "24px",
-              "shrink": 0
-            },
-            "props": {
-              "style": {
-                "backgroundColor": "#5A5A5A",
-                "color": "#FFFFFF",
-                "fontSize": "12px",
-                "fontWeight": 600,
-                "letterSpacing": "1.5px",
-                "padding": "5px 10px"
-              },
-              "text": "AIR UNITS"
-            },
-            "type": "ia.display.label"
-          },
-          {
-            "children": [
-              {
-                "meta": {
-                  "name": "Repeater"
-                },
-                "position": {
-                  "grow": 1
-                },
-                "props": {
-                  "elementPosition": {
-                    "basis": "0"
-                  },
-                  "instances": [
-                    {
-                      "instanceName": "AU 1",
-                      "instancePosition": {
-                        "basis": "0",
-                        "grow": 1,
-                        "shrink": 1
-                      },
-                      "instanceStyle": {}
-                    },
-                    {
-                      "instanceName": "AU 2",
-                      "instancePosition": {
-                        "basis": "0",
-                        "grow": 1,
-                        "shrink": 1
-                      },
-                      "instanceStyle": {}
-                    },
-                    {
-                      "instanceName": "AU 3",
-                      "instancePosition": {
-                        "basis": "0",
-                        "grow": 1,
-                        "shrink": 1
-                      },
-                      "instanceStyle": {}
-                    }
-                  ],
-                  "path": "templates/units/AirUnit",
-                  "style": {
-                    "gap": "10px"
-                  },
-                  "useDefaultViewHeight": false,
-                  "useDefaultViewWidth": false
-                },
-                "type": "ia.display.flex-repeater"
-              }
-            ],
-            "meta": {
-              "name": "Body"
-            },
-            "position": {
-              "grow": 1
-            },
-            "props": {
-              "direction": "column",
-              "style": {
-                "padding": "10px 0 0 0"
-              }
-            },
-            "type": "ia.container.flex"
-          }
-        ],
-        "meta": {
-          "name": "AirUnitsSection"
-        },
-        "position": {
-          "basis": "130px",
-          "shrink": 0
-        },
-        "props": {
-          "direction": "column",
-          "style": {
-            "gap": "0px"
-          }
-        },
-        "type": "ia.container.flex"
-      },
-      {
-        "children": [
-          {
-            "meta": {
-              "name": "Title"
-            },
-            "position": {
-              "basis": "24px",
-              "shrink": 0
-            },
-            "props": {
-              "style": {
-                "backgroundColor": "#5A5A5A",
-                "color": "#FFFFFF",
-                "fontSize": "12px",
-                "fontWeight": 600,
-                "letterSpacing": "1.5px",
-                "padding": "5px 10px"
-              },
-              "text": "MOTORS"
-            },
-            "type": "ia.display.label"
-          },
-          {
-            "children": [
-              {
-                "meta": {
-                  "name": "Repeater"
-                },
-                "position": {
-                  "grow": 1
-                },
-                "props": {
-                  "elementPosition": {
-                    "basis": "0"
-                  },
-                  "instances": [
-                    {
-                      "instanceName": "Motor 1",
-                      "instancePosition": {
-                        "basis": "0",
-                        "grow": 1,
-                        "shrink": 1
-                      },
-                      "instanceStyle": {}
-                    },
-                    {
-                      "instanceName": "Motor 2",
-                      "instancePosition": {
-                        "basis": "0",
-                        "grow": 1,
-                        "shrink": 1
-                      },
-                      "instanceStyle": {}
-                    },
-                    {
-                      "instanceName": "Motor 3",
-                      "instancePosition": {
-                        "basis": "0",
-                        "grow": 1,
-                        "shrink": 1
-                      },
-                      "instanceStyle": {}
-                    },
-                    {
-                      "instanceName": "Motor 4",
-                      "instancePosition": {
-                        "basis": "0",
-                        "grow": 1,
-                        "shrink": 1
-                      },
-                      "instanceStyle": {}
-                    },
-                    {
-                      "instanceName": "Motor 5",
-                      "instancePosition": {
-                        "basis": "0",
-                        "grow": 1,
-                        "shrink": 1
-                      },
-                      "instanceStyle": {}
-                    },
-                    {
-                      "instanceName": "Motor 6",
-                      "instancePosition": {
-                        "basis": "0",
-                        "grow": 1,
-                        "shrink": 1
-                      },
-                      "instanceStyle": {}
-                    },
-                    {
-                      "instanceName": "Motor 7",
-                      "instancePosition": {
-                        "basis": "0",
-                        "grow": 1,
-                        "shrink": 1
-                      },
-                      "instanceStyle": {}
-                    },
-                    {
-                      "instanceName": "Motor 8",
-                      "instancePosition": {
-                        "basis": "0",
-                        "grow": 1,
-                        "shrink": 1
-                      },
-                      "instanceStyle": {}
-                    }
-                  ],
-                  "path": "templates/units/Motor",
-                  "style": {
-                    "gap": "10px"
-                  },
-                  "useDefaultViewHeight": false,
-                  "useDefaultViewWidth": false
-                },
-                "type": "ia.display.flex-repeater"
-              }
-            ],
-            "meta": {
-              "name": "Body"
-            },
-            "position": {
-              "grow": 1
-            },
-            "props": {
-              "direction": "column",
-              "style": {
-                "padding": "10px 0 0 0"
-              }
-            },
-            "type": "ia.container.flex"
-          }
-        ],
-        "meta": {
-          "name": "MotorsSection"
-        },
-        "position": {
-          "basis": "150px",
-          "shrink": 0
-        },
-        "props": {
-          "direction": "column",
-          "style": {
-            "gap": "0px"
-          }
-        },
-        "type": "ia.container.flex"
-      },
-      {
-        "children": [
-          {
-            "meta": {
-              "name": "Title"
-            },
-            "position": {
-              "basis": "24px",
-              "shrink": 0
-            },
-            "props": {
-              "style": {
-                "backgroundColor": "#5A5A5A",
-                "color": "#FFFFFF",
-                "fontSize": "12px",
-                "fontWeight": 600,
-                "letterSpacing": "1.5px",
-                "padding": "5px 10px"
-              },
-              "text": "SENSORS"
-            },
-            "type": "ia.display.label"
-          },
-          {
-            "children": [
-              {
-                "meta": {
-                  "name": "Repeater"
-                },
-                "position": {
-                  "grow": 1
-                },
-                "props": {
-                  "elementPosition": {
-                    "basis": "0"
-                  },
-                  "instances": [
-                    {
-                      "instanceName": "Sensor 1",
-                      "instancePosition": {
-                        "basis": "0",
-                        "grow": 1,
-                        "shrink": 1
-                      },
-                      "instanceStyle": {}
-                    },
-                    {
-                      "instanceName": "Sensor 2",
-                      "instancePosition": {
-                        "basis": "0",
-                        "grow": 1,
-                        "shrink": 1
-                      },
-                      "instanceStyle": {}
-                    },
-                    {
-                      "instanceName": "Sensor 3",
-                      "instancePosition": {
-                        "basis": "0",
-                        "grow": 1,
-                        "shrink": 1
-                      },
-                      "instanceStyle": {}
-                    }
-                  ],
-                  "path": "templates/units/Sensor",
-                  "style": {
-                    "gap": "10px"
-                  },
-                  "useDefaultViewHeight": false,
-                  "useDefaultViewWidth": false
-                },
-                "type": "ia.display.flex-repeater"
-              }
-            ],
-            "meta": {
-              "name": "Body"
-            },
-            "position": {
-              "grow": 1
-            },
-            "props": {
-              "direction": "column",
-              "style": {
-                "padding": "10px 0 0 0"
-              }
-            },
-            "type": "ia.container.flex"
-          }
-        ],
-        "meta": {
-          "name": "SensorsSection"
-        },
-        "position": {
-          "basis": "130px",
-          "shrink": 0
-        },
-        "props": {
-          "direction": "column",
-          "style": {
-            "gap": "0px"
-          }
-        },
-        "type": "ia.container.flex"
-      },
-      {
-        "children": [
-          {
-            "meta": {
-              "name": "Title"
-            },
-            "position": {
-              "basis": "24px",
-              "shrink": 0
-            },
-            "props": {
-              "style": {
-                "backgroundColor": "#5A5A5A",
-                "color": "#FFFFFF",
-                "fontSize": "12px",
-                "fontWeight": 600,
-                "letterSpacing": "1.5px",
-                "padding": "5px 10px"
-              },
-              "text": "PACKAGING"
-            },
-            "type": "ia.display.label"
-          },
-          {
-            "children": [
-              {
                 "children": [
                   {
-                    "meta": {
-                      "name": "Repeater"
-                    },
-                    "position": {
-                      "grow": 1
-                    },
-                    "props": {
-                      "elementPosition": {
-                        "basis": "0"
-                      },
-                      "instances": [
-                        {
-                          "instanceName": "Palletizer 1",
-                          "instancePosition": {
-                            "basis": "0",
-                            "grow": 1,
-                            "shrink": 1
-                          },
-                          "instanceStyle": {}
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Title"
                         },
-                        {
-                          "instanceName": "Palletizer 2",
-                          "instancePosition": {
-                            "basis": "0",
-                            "grow": 1,
-                            "shrink": 1
+                        "position": {
+                          "grow": 1,
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "color": "#111111",
+                            "fontSize": "11px",
+                            "fontWeight": 600,
+                            "letterSpacing": "1.6px",
+                            "textTransform": "uppercase"
                           },
-                          "instanceStyle": {}
-                        }
-                      ],
-                      "path": "templates/units/Palletizer",
-                      "style": {
-                        "gap": "10px"
+                          "text": "Run Control"
+                        },
+                        "type": "ia.display.label"
                       },
-                      "useDefaultViewHeight": false,
-                      "useDefaultViewWidth": false
+                      {
+                        "meta": {
+                          "name": "Tag"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "color": "#5f5f5c",
+                            "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                            "fontSize": "10px",
+                            "fontWeight": 500,
+                            "letterSpacing": "1px"
+                          },
+                          "text": "RUN.CTL"
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "meta": {
+                      "name": "Header"
                     },
-                    "type": "ia.display.flex-repeater"
+                    "position": {
+                      "basis": "26px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "alignItems": "center",
+                      "style": {
+                        "backgroundColor": "#a3a3a0",
+                        "borderBottom": "1px solid #6e6e6c",
+                        "gap": "8px",
+                        "padding": "0 10px"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                                "meta": {
+                                  "name": "L"
+                                },
+                                "position": {
+                                  "basis": "12px"
+                                },
+                                "props": {
+                                  "style": {
+                                    "color": "#5f5f5c",
+                                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                    "fontSize": "9px",
+                                    "letterSpacing": "1px",
+                                    "textTransform": "uppercase"
+                                  },
+                                  "text": "CURRENT ORDER"
+                                },
+                                "type": "ia.display.label"
+                              },
+                              {
+                                "meta": {
+                                  "name": "V"
+                                },
+                                "position": {
+                                  "grow": 1
+                                },
+                                "propConfig": {
+                                  "props.text": {
+                                    "binding": {
+                                      "config": {
+                                        "expression": "tag(\u0027[]Overview/CurrentOrder\u0027)"
+                                      },
+                                      "type": "expr"
+                                    }
+                                  }
+                                },
+                                "props": {
+                                  "style": {
+                                    "color": "#111111",
+                                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                    "fontSize": "22px",
+                                    "fontWeight": 600,
+                                    "lineHeight": "1.1"
+                                  }
+                                },
+                                "type": "ia.display.label"
+                              },
+                              {
+                                "meta": {
+                                  "name": "Sub"
+                                },
+                                "position": {
+                                  "basis": "14px"
+                                },
+                                "props": {
+                                  "style": {
+                                    "color": "#5f5f5c",
+                                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                    "fontSize": "10px"
+                                  },
+                                  "text": "SKU-A22"
+                                },
+                                "type": "ia.display.label"
+                              }
+                            ],
+                            "meta": {
+                              "name": "Order"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "direction": "column",
+                              "style": {
+                                "backgroundColor": "#c9c9c6",
+                                "borderRight": "1px solid #6e6e6c",
+                                "padding": "10px 12px"
+                              }
+                            },
+                            "type": "ia.container.flex"
+                          },
+                          {
+                            "children": [
+                              {
+                                "meta": {
+                                  "name": "L"
+                                },
+                                "position": {
+                                  "basis": "12px"
+                                },
+                                "props": {
+                                  "style": {
+                                    "color": "#5f5f5c",
+                                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                    "fontSize": "9px",
+                                    "letterSpacing": "1px",
+                                    "textTransform": "uppercase"
+                                  },
+                                  "text": "CURRENT RUN"
+                                },
+                                "type": "ia.display.label"
+                              },
+                              {
+                                "meta": {
+                                  "name": "V"
+                                },
+                                "position": {
+                                  "grow": 1
+                                },
+                                "propConfig": {
+                                  "props.text": {
+                                    "binding": {
+                                      "config": {
+                                        "expression": "tag(\u0027[]Overview/CurrentRun\u0027)"
+                                      },
+                                      "type": "expr"
+                                    }
+                                  }
+                                },
+                                "props": {
+                                  "style": {
+                                    "color": "#111111",
+                                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                    "fontSize": "22px",
+                                    "fontWeight": 600,
+                                    "lineHeight": "1.1"
+                                  }
+                                },
+                                "type": "ia.display.label"
+                              },
+                              {
+                                "meta": {
+                                  "name": "Sub"
+                                },
+                                "position": {
+                                  "basis": "14px"
+                                },
+                                "props": {
+                                  "style": {
+                                    "color": "#5f5f5c",
+                                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                    "fontSize": "10px"
+                                  },
+                                  "text": "of 12"
+                                },
+                                "type": "ia.display.label"
+                              }
+                            ],
+                            "meta": {
+                              "name": "Run"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "direction": "column",
+                              "style": {
+                                "backgroundColor": "#c9c9c6",
+                                "padding": "10px 12px"
+                              }
+                            },
+                            "type": "ia.container.flex"
+                          }
+                        ],
+                        "meta": {
+                          "name": "OrderRunRow"
+                        },
+                        "position": {
+                          "basis": "76px"
+                        },
+                        "props": {
+                          "style": {
+                            "borderBottom": "1px solid #6e6e6c"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "L"
+                            },
+                            "position": {
+                              "basis": "12px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#5f5f5c",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "9px",
+                                "letterSpacing": "1px",
+                                "textTransform": "uppercase"
+                              },
+                              "text": "CASE COUNT"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "V"
+                            },
+                            "position": {
+                              "basis": "32px"
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "expression": "numberFormat(tag(\u0027[]Overview/CaseCount\u0027), \u0027#,##0\u0027)"
+                                  },
+                                  "type": "expr"
+                                }
+                              }
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#111111",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "26px",
+                                "fontWeight": 600,
+                                "lineHeight": "1.0"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Sub"
+                            },
+                            "position": {
+                              "basis": "14px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#5f5f5c",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "10px"
+                              },
+                              "text": "cases · shift"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "CountBar"
+                            },
+                            "position": {
+                              "basis": "4px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.value": {
+                                "binding": {
+                                  "config": {
+                                    "expression": "if((tag(\u0027[]Overview/CaseCount\u0027)) \u003e 6000, 100, if((tag(\u0027[]Overview/CaseCount\u0027)) \u003c 0, 0, (tag(\u0027[]Overview/CaseCount\u0027)) / 6000 * 100))"
+                                  },
+                                  "type": "expr"
+                                }
+                              }
+                            },
+                            "props": {
+                              "bgColor": "#9a9a97",
+                              "color": "#2c2c2a",
+                              "maximum": 100,
+                              "style": {
+                                "borderRadius": "0",
+                                "height": "4px"
+                              }
+                            },
+                            "type": "ia.display.progress"
+                          }
+                        ],
+                        "meta": {
+                          "name": "CaseCount"
+                        },
+                        "position": {
+                          "basis": "100px"
+                        },
+                        "props": {
+                          "direction": "column",
+                          "style": {
+                            "backgroundColor": "#c9c9c6",
+                            "borderBottom": "1px solid #6e6e6c",
+                            "gap": "4px",
+                            "padding": "10px 12px"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "S"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#1f7a7a",
+                                "fontSize": "12px",
+                                "fontWeight": 700,
+                                "letterSpacing": "2px",
+                                "textTransform": "uppercase"
+                              },
+                              "text": "RUNNING"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "RunHOA"
+                            },
+                            "position": {
+                              "basis": "150px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.controlValue": {
+                                "binding": {
+                                  "config": {
+                                    "expression": "tag(\u0027[]Overview/RunControl\u0027)"
+                                  },
+                                  "type": "expr"
+                                }
+                              },
+                              "props.indicatorValue": {
+                                "binding": {
+                                  "config": {
+                                    "expression": "tag(\u0027[]Overview/RunControl\u0027)"
+                                  },
+                                  "type": "expr"
+                                }
+                              }
+                            },
+                            "props": {
+                              "orientation": "row",
+                              "states": [
+                                {
+                                  "selectedStyle": {
+                                    "backgroundColor": "#4a4a47",
+                                    "border": "0",
+                                    "borderRadius": "0",
+                                    "classes": "",
+                                    "color": "#ffffff",
+                                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                    "fontSize": "10px",
+                                    "fontWeight": 700,
+                                    "letterSpacing": "1px"
+                                  },
+                                  "text": "OFF",
+                                  "unselectedStyle": {
+                                    "backgroundColor": "#a3a3a0",
+                                    "border": "1px solid #6e6e6c",
+                                    "borderRadius": "0",
+                                    "classes": "",
+                                    "color": "#5f5f5c",
+                                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                    "fontSize": "10px",
+                                    "letterSpacing": "1px"
+                                  },
+                                  "value": 0
+                                },
+                                {
+                                  "selectedStyle": {
+                                    "backgroundColor": "#d49a1f",
+                                    "border": "0",
+                                    "borderRadius": "0",
+                                    "color": "#1a1a18",
+                                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                    "fontSize": "10px",
+                                    "fontWeight": 700,
+                                    "letterSpacing": "1px"
+                                  },
+                                  "text": "HAND",
+                                  "unselectedStyle": {
+                                    "backgroundColor": "#a3a3a0",
+                                    "border": "1px solid #6e6e6c",
+                                    "borderRadius": "0",
+                                    "color": "#5f5f5c",
+                                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                    "fontSize": "10px",
+                                    "letterSpacing": "1px"
+                                  },
+                                  "value": 1
+                                },
+                                {
+                                  "selectedStyle": {
+                                    "backgroundColor": "#1f7a7a",
+                                    "border": "0",
+                                    "borderRadius": "0",
+                                    "color": "#ffffff",
+                                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                    "fontSize": "10px",
+                                    "fontWeight": 700,
+                                    "letterSpacing": "1px"
+                                  },
+                                  "text": "AUTO",
+                                  "unselectedStyle": {
+                                    "backgroundColor": "#a3a3a0",
+                                    "border": "1px solid #6e6e6c",
+                                    "borderRadius": "0",
+                                    "color": "#5f5f5c",
+                                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                    "fontSize": "10px",
+                                    "letterSpacing": "1px"
+                                  },
+                                  "value": 2
+                                }
+                              ]
+                            },
+                            "type": "ia.input.multi-state-button"
+                          }
+                        ],
+                        "meta": {
+                          "name": "State"
+                        },
+                        "position": {
+                          "basis": "50px"
+                        },
+                        "props": {
+                          "alignItems": "center",
+                          "style": {
+                            "backgroundColor": "#c9c9c6",
+                            "padding": "6px 12px"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      }
+                    ],
+                    "meta": {
+                      "name": "Body"
+                    },
+                    "position": {
+                      "grow": 1
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "gap": "0",
+                        "overflow": "hidden",
+                        "padding": "0"
+                      }
+                    },
+                    "type": "ia.container.flex"
                   }
                 ],
                 "meta": {
-                  "name": "PalletizersWrap"
+                  "name": "RunControl"
                 },
                 "position": {
-                  "basis": "0",
-                  "grow": 2
+                  "basis": "232px"
                 },
                 "props": {
-                  "direction": "column"
+                  "direction": "column",
+                  "style": {
+                    "backgroundColor": "#c9c9c6",
+                    "border": "1px solid #6e6e6c",
+                    "overflow": "hidden"
+                  }
                 },
                 "type": "ia.container.flex"
               },
               {
                 "children": [
                   {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Title"
+                        },
+                        "position": {
+                          "grow": 1,
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "color": "#111111",
+                            "fontSize": "11px",
+                            "fontWeight": 600,
+                            "letterSpacing": "1.6px",
+                            "textTransform": "uppercase"
+                          },
+                          "text": "Air Units"
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Tag"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "color": "#5f5f5c",
+                            "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                            "fontSize": "10px",
+                            "fontWeight": 500,
+                            "letterSpacing": "1px"
+                          },
+                          "text": "AU.1-3"
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
                     "meta": {
-                      "name": "Repeater"
+                      "name": "Header"
+                    },
+                    "position": {
+                      "basis": "26px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "alignItems": "center",
+                      "style": {
+                        "backgroundColor": "#a3a3a0",
+                        "borderBottom": "1px solid #6e6e6c",
+                        "gap": "8px",
+                        "padding": "0 10px"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Repeater"
+                        },
+                        "position": {
+                          "grow": 1
+                        },
+                        "props": {
+                          "direction": "column",
+                          "elementPosition": {
+                            "basis": "auto"
+                          },
+                          "instances": [
+                            {
+                              "displayName": "AU 1",
+                              "instancePosition": {
+                                "basis": "0",
+                                "grow": 1,
+                                "shrink": 1
+                              },
+                              "instanceStyle": {},
+                              "tagPath": "[]Overview/AU 1"
+                            },
+                            {
+                              "displayName": "AU 2",
+                              "instancePosition": {
+                                "basis": "0",
+                                "grow": 1,
+                                "shrink": 1
+                              },
+                              "instanceStyle": {},
+                              "tagPath": "[]Overview/AU 2"
+                            },
+                            {
+                              "displayName": "AU 3",
+                              "instancePosition": {
+                                "basis": "0",
+                                "grow": 1,
+                                "shrink": 1
+                              },
+                              "instanceStyle": {},
+                              "tagPath": "[]Overview/AU 3"
+                            }
+                          ],
+                          "path": "templates/units/AirUnit",
+                          "style": {
+                            "backgroundColor": "#6e6e6c"
+                          },
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
+                        },
+                        "type": "ia.display.flex-repeater"
+                      }
+                    ],
+                    "meta": {
+                      "name": "Body"
                     },
                     "position": {
                       "grow": 1
                     },
                     "props": {
-                      "elementPosition": {
-                        "basis": "0"
-                      },
-                      "instances": [
-                        {
-                          "instanceName": "Pallet Wrapper",
-                          "instancePosition": {
-                            "basis": "0",
-                            "grow": 1,
-                            "shrink": 1
-                          },
-                          "instanceStyle": {}
-                        }
-                      ],
-                      "path": "templates/units/PalletWrapper",
+                      "direction": "column",
                       "style": {
-                        "gap": "10px"
-                      },
-                      "useDefaultViewHeight": false,
-                      "useDefaultViewWidth": false
+                        "gap": "0px",
+                        "overflow": "hidden",
+                        "padding": "0"
+                      }
                     },
-                    "type": "ia.display.flex-repeater"
+                    "type": "ia.container.flex"
                   }
                 ],
                 "meta": {
-                  "name": "WrapperWrap"
+                  "name": "AirUnits"
                 },
                 "position": {
-                  "basis": "0",
-                  "grow": 1
+                  "basis": "244px"
                 },
                 "props": {
-                  "direction": "column"
+                  "direction": "column",
+                  "style": {
+                    "backgroundColor": "#c9c9c6",
+                    "border": "1px solid #6e6e6c",
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Title"
+                        },
+                        "position": {
+                          "grow": 1,
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "color": "#111111",
+                            "fontSize": "11px",
+                            "fontWeight": 600,
+                            "letterSpacing": "1.6px",
+                            "textTransform": "uppercase"
+                          },
+                          "text": "Environment"
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Tag"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "color": "#5f5f5c",
+                            "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                            "fontSize": "10px",
+                            "fontWeight": 500,
+                            "letterSpacing": "1px"
+                          },
+                          "text": "SENSOR.1-3"
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "meta": {
+                      "name": "Header"
+                    },
+                    "position": {
+                      "basis": "26px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "alignItems": "center",
+                      "style": {
+                        "backgroundColor": "#a3a3a0",
+                        "borderBottom": "1px solid #6e6e6c",
+                        "gap": "8px",
+                        "padding": "0 10px"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Repeater"
+                        },
+                        "position": {
+                          "grow": 1
+                        },
+                        "props": {
+                          "elementPosition": {
+                            "basis": "0"
+                          },
+                          "instances": [
+                            {
+                              "displayName": "Sensor 1",
+                              "instancePosition": {
+                                "basis": "0",
+                                "grow": 1,
+                                "shrink": 1
+                              },
+                              "instanceStyle": {},
+                              "tagPath": "[]Overview/Sensor 1"
+                            },
+                            {
+                              "displayName": "Sensor 2",
+                              "instancePosition": {
+                                "basis": "0",
+                                "grow": 1,
+                                "shrink": 1
+                              },
+                              "instanceStyle": {},
+                              "tagPath": "[]Overview/Sensor 2"
+                            },
+                            {
+                              "displayName": "Sensor 3",
+                              "instancePosition": {
+                                "basis": "0",
+                                "grow": 1,
+                                "shrink": 1
+                              },
+                              "instanceStyle": {},
+                              "tagPath": "[]Overview/Sensor 3"
+                            }
+                          ],
+                          "path": "templates/units/Sensor",
+                          "style": {
+                            "backgroundColor": "#6e6e6c",
+                            "gap": "1px"
+                          },
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
+                        },
+                        "type": "ia.display.flex-repeater"
+                      }
+                    ],
+                    "meta": {
+                      "name": "Body"
+                    },
+                    "position": {
+                      "grow": 1
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "gap": "0px",
+                        "overflow": "hidden",
+                        "padding": "0"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  }
+                ],
+                "meta": {
+                  "name": "Sensors"
+                },
+                "position": {
+                  "basis": "170px"
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "backgroundColor": "#c9c9c6",
+                    "border": "1px solid #6e6e6c",
+                    "overflow": "hidden"
+                  }
                 },
                 "type": "ia.container.flex"
               }
             ],
             "meta": {
-              "name": "Body"
+              "name": "LeftCol"
+            },
+            "position": {
+              "basis": "320px",
+              "shrink": 0
+            },
+            "props": {
+              "direction": "column",
+              "style": {
+                "gap": "12px"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Title"
+                        },
+                        "position": {
+                          "grow": 1,
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "color": "#111111",
+                            "fontSize": "11px",
+                            "fontWeight": 600,
+                            "letterSpacing": "1.6px",
+                            "textTransform": "uppercase"
+                          },
+                          "text": "Conveyor Motors"
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Tag"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "color": "#5f5f5c",
+                            "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                            "fontSize": "10px",
+                            "fontWeight": 500,
+                            "letterSpacing": "1px"
+                          },
+                          "text": "M.1-8"
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "meta": {
+                      "name": "Header"
+                    },
+                    "position": {
+                      "basis": "26px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "alignItems": "center",
+                      "style": {
+                        "backgroundColor": "#a3a3a0",
+                        "borderBottom": "1px solid #6e6e6c",
+                        "gap": "8px",
+                        "padding": "0 10px"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "M1"
+                            },
+                            "position": {
+                              "basis": "0",
+                              "grow": 1
+                            },
+                            "props": {
+                              "params": {
+                                "displayName": "M-01",
+                                "tagPath": "[]Overview/Motor 1"
+                              },
+                              "path": "templates/units/Motor"
+                            },
+                            "type": "ia.display.view"
+                          },
+                          {
+                            "meta": {
+                              "name": "M2"
+                            },
+                            "position": {
+                              "basis": "0",
+                              "grow": 1
+                            },
+                            "props": {
+                              "params": {
+                                "displayName": "M-02",
+                                "tagPath": "[]Overview/Motor 2"
+                              },
+                              "path": "templates/units/Motor"
+                            },
+                            "type": "ia.display.view"
+                          },
+                          {
+                            "meta": {
+                              "name": "M3"
+                            },
+                            "position": {
+                              "basis": "0",
+                              "grow": 1
+                            },
+                            "props": {
+                              "params": {
+                                "displayName": "M-03",
+                                "tagPath": "[]Overview/Motor 3"
+                              },
+                              "path": "templates/units/Motor"
+                            },
+                            "type": "ia.display.view"
+                          },
+                          {
+                            "meta": {
+                              "name": "M4"
+                            },
+                            "position": {
+                              "basis": "0",
+                              "grow": 1
+                            },
+                            "props": {
+                              "params": {
+                                "displayName": "M-04",
+                                "tagPath": "[]Overview/Motor 4"
+                              },
+                              "path": "templates/units/Motor"
+                            },
+                            "type": "ia.display.view"
+                          }
+                        ],
+                        "meta": {
+                          "name": "Row1"
+                        },
+                        "position": {
+                          "basis": "0",
+                          "grow": 1
+                        },
+                        "props": {
+                          "style": {
+                            "backgroundColor": "#6e6e6c",
+                            "gap": "1px"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "M5"
+                            },
+                            "position": {
+                              "basis": "0",
+                              "grow": 1
+                            },
+                            "props": {
+                              "params": {
+                                "displayName": "M-05",
+                                "tagPath": "[]Overview/Motor 5"
+                              },
+                              "path": "templates/units/Motor"
+                            },
+                            "type": "ia.display.view"
+                          },
+                          {
+                            "meta": {
+                              "name": "M6"
+                            },
+                            "position": {
+                              "basis": "0",
+                              "grow": 1
+                            },
+                            "props": {
+                              "params": {
+                                "displayName": "M-06",
+                                "tagPath": "[]Overview/Motor 6"
+                              },
+                              "path": "templates/units/Motor"
+                            },
+                            "type": "ia.display.view"
+                          },
+                          {
+                            "meta": {
+                              "name": "M7"
+                            },
+                            "position": {
+                              "basis": "0",
+                              "grow": 1
+                            },
+                            "props": {
+                              "params": {
+                                "displayName": "M-07",
+                                "tagPath": "[]Overview/Motor 7"
+                              },
+                              "path": "templates/units/Motor"
+                            },
+                            "type": "ia.display.view"
+                          },
+                          {
+                            "meta": {
+                              "name": "M8"
+                            },
+                            "position": {
+                              "basis": "0",
+                              "grow": 1
+                            },
+                            "props": {
+                              "params": {
+                                "displayName": "M-08",
+                                "tagPath": "[]Overview/Motor 8"
+                              },
+                              "path": "templates/units/Motor"
+                            },
+                            "type": "ia.display.view"
+                          }
+                        ],
+                        "meta": {
+                          "name": "Row2"
+                        },
+                        "position": {
+                          "basis": "0",
+                          "grow": 1
+                        },
+                        "props": {
+                          "style": {
+                            "backgroundColor": "#6e6e6c",
+                            "gap": "1px"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      }
+                    ],
+                    "meta": {
+                      "name": "Body"
+                    },
+                    "position": {
+                      "grow": 1
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "backgroundColor": "#6e6e6c",
+                        "gap": "1px",
+                        "overflow": "hidden",
+                        "padding": "0"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  }
+                ],
+                "meta": {
+                  "name": "Motors"
+                },
+                "position": {
+                  "basis": "394px"
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "backgroundColor": "#c9c9c6",
+                    "border": "1px solid #6e6e6c",
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Title"
+                        },
+                        "position": {
+                          "grow": 1,
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "color": "#111111",
+                            "fontSize": "11px",
+                            "fontWeight": 600,
+                            "letterSpacing": "1.6px",
+                            "textTransform": "uppercase"
+                          },
+                          "text": "End of Line"
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Tag"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "color": "#5f5f5c",
+                            "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                            "fontSize": "10px",
+                            "fontWeight": 500,
+                            "letterSpacing": "1px"
+                          },
+                          "text": "PAL.1-2 / WRAP"
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "meta": {
+                      "name": "Header"
+                    },
+                    "position": {
+                      "basis": "26px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "alignItems": "center",
+                      "style": {
+                        "backgroundColor": "#a3a3a0",
+                        "borderBottom": "1px solid #6e6e6c",
+                        "gap": "8px",
+                        "padding": "0 10px"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "PalRep"
+                            },
+                            "position": {
+                              "basis": "0",
+                              "grow": 2
+                            },
+                            "props": {
+                              "elementPosition": {
+                                "basis": "0"
+                              },
+                              "instances": [
+                                {
+                                  "displayName": "Palletizer 1",
+                                  "instancePosition": {
+                                    "basis": "0",
+                                    "grow": 1,
+                                    "shrink": 1
+                                  },
+                                  "instanceStyle": {},
+                                  "tagPath": "[]Overview/Palletizer 1"
+                                },
+                                {
+                                  "displayName": "Palletizer 2",
+                                  "instancePosition": {
+                                    "basis": "0",
+                                    "grow": 1,
+                                    "shrink": 1
+                                  },
+                                  "instanceStyle": {},
+                                  "tagPath": "[]Overview/Palletizer 2"
+                                }
+                              ],
+                              "path": "templates/units/Palletizer",
+                              "style": {
+                                "backgroundColor": "#6e6e6c",
+                                "gap": "1px"
+                              },
+                              "useDefaultViewHeight": false,
+                              "useDefaultViewWidth": false
+                            },
+                            "type": "ia.display.flex-repeater"
+                          },
+                          {
+                            "meta": {
+                              "name": "WrapRep"
+                            },
+                            "position": {
+                              "basis": "0",
+                              "grow": 1
+                            },
+                            "props": {
+                              "elementPosition": {
+                                "basis": "0"
+                              },
+                              "instances": [
+                                {
+                                  "displayName": "Pallet Wrapper",
+                                  "instancePosition": {
+                                    "basis": "0",
+                                    "grow": 1,
+                                    "shrink": 1
+                                  },
+                                  "instanceStyle": {},
+                                  "tagPath": "[]Overview/Pallet Wrapper"
+                                }
+                              ],
+                              "path": "templates/units/PalletWrapper",
+                              "useDefaultViewHeight": false,
+                              "useDefaultViewWidth": false
+                            },
+                            "type": "ia.display.flex-repeater"
+                          }
+                        ],
+                        "meta": {
+                          "name": "PalRow"
+                        },
+                        "position": {
+                          "grow": 1
+                        },
+                        "props": {
+                          "style": {
+                            "backgroundColor": "#6e6e6c",
+                            "gap": "1px"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      }
+                    ],
+                    "meta": {
+                      "name": "Body"
+                    },
+                    "position": {
+                      "grow": 1
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "gap": "0px",
+                        "overflow": "hidden",
+                        "padding": "0"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  }
+                ],
+                "meta": {
+                  "name": "EOL"
+                },
+                "position": {
+                  "basis": "170px"
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "backgroundColor": "#c9c9c6",
+                    "border": "1px solid #6e6e6c",
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Title"
+                        },
+                        "position": {
+                          "grow": 1,
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "color": "#111111",
+                            "fontSize": "11px",
+                            "fontWeight": 600,
+                            "letterSpacing": "1.6px",
+                            "textTransform": "uppercase"
+                          },
+                          "text": "Production KPI"
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Tag"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "color": "#5f5f5c",
+                            "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                            "fontSize": "10px",
+                            "fontWeight": 500,
+                            "letterSpacing": "1px"
+                          },
+                          "text": "SHIFT"
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "meta": {
+                      "name": "Header"
+                    },
+                    "position": {
+                      "basis": "26px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "alignItems": "center",
+                      "style": {
+                        "backgroundColor": "#a3a3a0",
+                        "borderBottom": "1px solid #6e6e6c",
+                        "gap": "8px",
+                        "padding": "0 10px"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                                "meta": {
+                                  "name": "L"
+                                },
+                                "position": {
+                                  "basis": "14px"
+                                },
+                                "props": {
+                                  "style": {
+                                    "color": "#5f5f5c",
+                                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                    "fontSize": "9px",
+                                    "letterSpacing": "1px",
+                                    "textTransform": "uppercase"
+                                  },
+                                  "text": "OEE"
+                                },
+                                "type": "ia.display.label"
+                              },
+                              {
+                                "children": [
+                                  {
+                                    "meta": {
+                                      "name": "V"
+                                    },
+                                    "position": {
+                                      "grow": 1
+                                    },
+                                    "propConfig": {
+                                      "props.text": {
+                                        "binding": {
+                                          "config": {
+                                            "expression": "numberFormat(tag(\u0027[]Overview/CaseCount\u0027) / 60, \u00270.0\u0027)"
+                                          },
+                                          "type": "expr"
+                                        }
+                                      }
+                                    },
+                                    "props": {
+                                      "style": {
+                                        "color": "#111111",
+                                        "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                        "fontSize": "20px",
+                                        "fontWeight": 600,
+                                        "lineHeight": "1.0"
+                                      }
+                                    },
+                                    "type": "ia.display.label"
+                                  },
+                                  {
+                                    "meta": {
+                                      "name": "U"
+                                    },
+                                    "props": {
+                                      "style": {
+                                        "alignSelf": "flex-end",
+                                        "color": "#5f5f5c",
+                                        "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                        "fontSize": "10px",
+                                        "marginLeft": "3px"
+                                      },
+                                      "text": "%"
+                                    },
+                                    "type": "ia.display.label"
+                                  }
+                                ],
+                                "meta": {
+                                  "name": "ValRow"
+                                },
+                                "position": {
+                                  "basis": "26px"
+                                },
+                                "props": {
+                                  "alignItems": "baseline"
+                                },
+                                "type": "ia.container.flex"
+                              },
+                              {
+                                "meta": {
+                                  "name": "Bar"
+                                },
+                                "position": {
+                                  "basis": "4px",
+                                  "shrink": 0
+                                },
+                                "propConfig": {
+                                  "props.value": {
+                                    "binding": {
+                                      "config": {
+                                        "expression": "if((tag(\u0027[]Overview/CaseCount\u0027) / 60) \u003e 100, 100, if((tag(\u0027[]Overview/CaseCount\u0027) / 60) \u003c 0, 0, (tag(\u0027[]Overview/CaseCount\u0027) / 60) / 100 * 100))"
+                                      },
+                                      "type": "expr"
+                                    }
+                                  }
+                                },
+                                "props": {
+                                  "bgColor": "#9a9a97",
+                                  "color": "#2c2c2a",
+                                  "maximum": 100,
+                                  "style": {
+                                    "borderRadius": "0",
+                                    "height": "4px"
+                                  }
+                                },
+                                "type": "ia.display.progress"
+                              }
+                            ],
+                            "meta": {
+                              "name": "OEE"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "direction": "column",
+                              "style": {
+                                "backgroundColor": "#c9c9c6",
+                                "gap": "6px",
+                                "padding": "10px 12px"
+                              }
+                            },
+                            "type": "ia.container.flex"
+                          },
+                          {
+                            "children": [
+                              {
+                                "meta": {
+                                  "name": "L"
+                                },
+                                "position": {
+                                  "basis": "14px"
+                                },
+                                "props": {
+                                  "style": {
+                                    "color": "#5f5f5c",
+                                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                    "fontSize": "9px",
+                                    "letterSpacing": "1px",
+                                    "textTransform": "uppercase"
+                                  },
+                                  "text": "AVAILABILITY"
+                                },
+                                "type": "ia.display.label"
+                              },
+                              {
+                                "children": [
+                                  {
+                                    "meta": {
+                                      "name": "V"
+                                    },
+                                    "position": {
+                                      "grow": 1
+                                    },
+                                    "propConfig": {
+                                      "props.text": {
+                                        "binding": {
+                                          "config": {
+                                            "expression": "numberFormat(92, \u00270.0\u0027)"
+                                          },
+                                          "type": "expr"
+                                        }
+                                      }
+                                    },
+                                    "props": {
+                                      "style": {
+                                        "color": "#111111",
+                                        "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                        "fontSize": "20px",
+                                        "fontWeight": 600,
+                                        "lineHeight": "1.0"
+                                      }
+                                    },
+                                    "type": "ia.display.label"
+                                  },
+                                  {
+                                    "meta": {
+                                      "name": "U"
+                                    },
+                                    "props": {
+                                      "style": {
+                                        "alignSelf": "flex-end",
+                                        "color": "#5f5f5c",
+                                        "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                        "fontSize": "10px",
+                                        "marginLeft": "3px"
+                                      },
+                                      "text": "%"
+                                    },
+                                    "type": "ia.display.label"
+                                  }
+                                ],
+                                "meta": {
+                                  "name": "ValRow"
+                                },
+                                "position": {
+                                  "basis": "26px"
+                                },
+                                "props": {
+                                  "alignItems": "baseline"
+                                },
+                                "type": "ia.container.flex"
+                              },
+                              {
+                                "meta": {
+                                  "name": "Bar"
+                                },
+                                "position": {
+                                  "basis": "4px",
+                                  "shrink": 0
+                                },
+                                "propConfig": {
+                                  "props.value": {
+                                    "binding": {
+                                      "config": {
+                                        "expression": "if((92) \u003e 100, 100, if((92) \u003c 0, 0, (92) / 100 * 100))"
+                                      },
+                                      "type": "expr"
+                                    }
+                                  }
+                                },
+                                "props": {
+                                  "bgColor": "#9a9a97",
+                                  "color": "#2c2c2a",
+                                  "maximum": 100,
+                                  "style": {
+                                    "borderRadius": "0",
+                                    "height": "4px"
+                                  }
+                                },
+                                "type": "ia.display.progress"
+                              }
+                            ],
+                            "meta": {
+                              "name": "Avail"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "direction": "column",
+                              "style": {
+                                "backgroundColor": "#c9c9c6",
+                                "gap": "6px",
+                                "padding": "10px 12px"
+                              }
+                            },
+                            "type": "ia.container.flex"
+                          },
+                          {
+                            "children": [
+                              {
+                                "meta": {
+                                  "name": "L"
+                                },
+                                "position": {
+                                  "basis": "14px"
+                                },
+                                "props": {
+                                  "style": {
+                                    "color": "#5f5f5c",
+                                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                    "fontSize": "9px",
+                                    "letterSpacing": "1px",
+                                    "textTransform": "uppercase"
+                                  },
+                                  "text": "THROUGHPUT"
+                                },
+                                "type": "ia.display.label"
+                              },
+                              {
+                                "children": [
+                                  {
+                                    "meta": {
+                                      "name": "V"
+                                    },
+                                    "position": {
+                                      "grow": 1
+                                    },
+                                    "propConfig": {
+                                      "props.text": {
+                                        "binding": {
+                                          "config": {
+                                            "expression": "numberFormat(tag(\u0027[]Overview/CurrentRun\u0027) * 26, \u00270.0\u0027)"
+                                          },
+                                          "type": "expr"
+                                        }
+                                      }
+                                    },
+                                    "props": {
+                                      "style": {
+                                        "color": "#111111",
+                                        "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                        "fontSize": "20px",
+                                        "fontWeight": 600,
+                                        "lineHeight": "1.0"
+                                      }
+                                    },
+                                    "type": "ia.display.label"
+                                  },
+                                  {
+                                    "meta": {
+                                      "name": "U"
+                                    },
+                                    "props": {
+                                      "style": {
+                                        "alignSelf": "flex-end",
+                                        "color": "#5f5f5c",
+                                        "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                        "fontSize": "10px",
+                                        "marginLeft": "3px"
+                                      },
+                                      "text": "CPH"
+                                    },
+                                    "type": "ia.display.label"
+                                  }
+                                ],
+                                "meta": {
+                                  "name": "ValRow"
+                                },
+                                "position": {
+                                  "basis": "26px"
+                                },
+                                "props": {
+                                  "alignItems": "baseline"
+                                },
+                                "type": "ia.container.flex"
+                              },
+                              {
+                                "meta": {
+                                  "name": "Bar"
+                                },
+                                "position": {
+                                  "basis": "4px",
+                                  "shrink": 0
+                                },
+                                "propConfig": {
+                                  "props.value": {
+                                    "binding": {
+                                      "config": {
+                                        "expression": "if((tag(\u0027[]Overview/CurrentRun\u0027) * 26) \u003e 250, 100, if((tag(\u0027[]Overview/CurrentRun\u0027) * 26) \u003c 0, 0, (tag(\u0027[]Overview/CurrentRun\u0027) * 26) / 250 * 100))"
+                                      },
+                                      "type": "expr"
+                                    }
+                                  }
+                                },
+                                "props": {
+                                  "bgColor": "#9a9a97",
+                                  "color": "#2c2c2a",
+                                  "maximum": 100,
+                                  "style": {
+                                    "borderRadius": "0",
+                                    "height": "4px"
+                                  }
+                                },
+                                "type": "ia.display.progress"
+                              }
+                            ],
+                            "meta": {
+                              "name": "TP"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "direction": "column",
+                              "style": {
+                                "backgroundColor": "#c9c9c6",
+                                "gap": "6px",
+                                "padding": "10px 12px"
+                              }
+                            },
+                            "type": "ia.container.flex"
+                          },
+                          {
+                            "children": [
+                              {
+                                "meta": {
+                                  "name": "L"
+                                },
+                                "position": {
+                                  "basis": "14px"
+                                },
+                                "props": {
+                                  "style": {
+                                    "color": "#5f5f5c",
+                                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                    "fontSize": "9px",
+                                    "letterSpacing": "1px",
+                                    "textTransform": "uppercase"
+                                  },
+                                  "text": "REJECTS"
+                                },
+                                "type": "ia.display.label"
+                              },
+                              {
+                                "children": [
+                                  {
+                                    "meta": {
+                                      "name": "V"
+                                    },
+                                    "position": {
+                                      "grow": 1
+                                    },
+                                    "propConfig": {
+                                      "props.text": {
+                                        "binding": {
+                                          "config": {
+                                            "expression": "numberFormat(tag(\u0027[]Overview/CurrentRun\u0027) * 30, \u00270.0\u0027)"
+                                          },
+                                          "type": "expr"
+                                        }
+                                      }
+                                    },
+                                    "props": {
+                                      "style": {
+                                        "color": "#111111",
+                                        "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                        "fontSize": "20px",
+                                        "fontWeight": 600,
+                                        "lineHeight": "1.0"
+                                      }
+                                    },
+                                    "type": "ia.display.label"
+                                  },
+                                  {
+                                    "meta": {
+                                      "name": "U"
+                                    },
+                                    "props": {
+                                      "style": {
+                                        "alignSelf": "flex-end",
+                                        "color": "#5f5f5c",
+                                        "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                        "fontSize": "10px",
+                                        "marginLeft": "3px"
+                                      },
+                                      "text": "PPM"
+                                    },
+                                    "type": "ia.display.label"
+                                  }
+                                ],
+                                "meta": {
+                                  "name": "ValRow"
+                                },
+                                "position": {
+                                  "basis": "26px"
+                                },
+                                "props": {
+                                  "alignItems": "baseline"
+                                },
+                                "type": "ia.container.flex"
+                              },
+                              {
+                                "meta": {
+                                  "name": "Bar"
+                                },
+                                "position": {
+                                  "basis": "4px",
+                                  "shrink": 0
+                                },
+                                "propConfig": {
+                                  "props.color": {
+                                    "binding": {
+                                      "config": {
+                                        "expression": "if((tag(\u0027[]Overview/CurrentRun\u0027) * 30) \u003e\u003d 600, \u0027#c8362a\u0027, if((tag(\u0027[]Overview/CurrentRun\u0027) * 30) \u003e\u003d 400, \u0027#d49a1f\u0027, \u0027#2c2c2a\u0027))"
+                                      },
+                                      "type": "expr"
+                                    }
+                                  },
+                                  "props.value": {
+                                    "binding": {
+                                      "config": {
+                                        "expression": "if((tag(\u0027[]Overview/CurrentRun\u0027) * 30) \u003e 1000, 100, if((tag(\u0027[]Overview/CurrentRun\u0027) * 30) \u003c 0, 0, (tag(\u0027[]Overview/CurrentRun\u0027) * 30) / 1000 * 100))"
+                                      },
+                                      "type": "expr"
+                                    }
+                                  }
+                                },
+                                "props": {
+                                  "bgColor": "#9a9a97",
+                                  "maximum": 100,
+                                  "style": {
+                                    "borderRadius": "0",
+                                    "height": "4px"
+                                  }
+                                },
+                                "type": "ia.display.progress"
+                              }
+                            ],
+                            "meta": {
+                              "name": "Rej"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "direction": "column",
+                              "style": {
+                                "backgroundColor": "#c9c9c6",
+                                "gap": "6px",
+                                "padding": "10px 12px"
+                              }
+                            },
+                            "type": "ia.container.flex"
+                          }
+                        ],
+                        "meta": {
+                          "name": "Row"
+                        },
+                        "position": {
+                          "grow": 1
+                        },
+                        "props": {
+                          "style": {
+                            "backgroundColor": "#6e6e6c",
+                            "gap": "1px"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      }
+                    ],
+                    "meta": {
+                      "name": "Body"
+                    },
+                    "position": {
+                      "grow": 1
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "gap": "0px",
+                        "overflow": "hidden",
+                        "padding": "0"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  }
+                ],
+                "meta": {
+                  "name": "KPI"
+                },
+                "position": {
+                  "basis": "100px"
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "backgroundColor": "#c9c9c6",
+                    "border": "1px solid #6e6e6c",
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "CenterCol"
             },
             "position": {
               "grow": 1
             },
             "props": {
+              "direction": "column",
               "style": {
-                "gap": "10px",
-                "padding": "10px 0 0 0"
+                "gap": "12px"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Title"
+                        },
+                        "position": {
+                          "grow": 1,
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "color": "#111111",
+                            "fontSize": "11px",
+                            "fontWeight": 600,
+                            "letterSpacing": "1.6px",
+                            "textTransform": "uppercase"
+                          },
+                          "text": "Active Alarms"
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Tag"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "color": "#5f5f5c",
+                            "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                            "fontSize": "10px",
+                            "fontWeight": 500,
+                            "letterSpacing": "1px"
+                          },
+                          "text": "ALM.LIVE"
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "meta": {
+                      "name": "Header"
+                    },
+                    "position": {
+                      "basis": "26px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "alignItems": "center",
+                      "style": {
+                        "backgroundColor": "#a3a3a0",
+                        "borderBottom": "1px solid #6e6e6c",
+                        "gap": "8px",
+                        "padding": "0 10px"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "H1"
+                            },
+                            "position": {
+                              "basis": "40px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#5f5f5c",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "9px",
+                                "fontWeight": 600,
+                                "letterSpacing": "1px"
+                              },
+                              "text": "PRI"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "H2"
+                            },
+                            "position": {
+                              "basis": "60px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#5f5f5c",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "9px",
+                                "fontWeight": 600,
+                                "letterSpacing": "1px"
+                              },
+                              "text": "TIME"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "H3"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#5f5f5c",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "9px",
+                                "fontWeight": 600,
+                                "letterSpacing": "1px"
+                              },
+                              "text": "TAG / DESCRIPTION"
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "Hdr"
+                        },
+                        "position": {
+                          "basis": "22px"
+                        },
+                        "props": {
+                          "alignItems": "center",
+                          "style": {
+                            "backgroundColor": "#a3a3a0",
+                            "borderBottom": "1px solid #6e6e6c",
+                            "gap": "8px",
+                            "padding": "0 8px"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Pri"
+                            },
+                            "position": {
+                              "basis": "40px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#c8362a",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "10px",
+                                "fontWeight": 700
+                              },
+                              "text": "CRIT"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Time"
+                            },
+                            "position": {
+                              "basis": "60px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "10px"
+                              },
+                              "text": "14:22:08"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "children": [
+                              {
+                                "meta": {
+                                  "name": "Tag"
+                                },
+                                "position": {
+                                  "basis": "14px"
+                                },
+                                "props": {
+                                  "style": {
+                                    "color": "#111111",
+                                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                    "fontSize": "10px",
+                                    "fontWeight": 700
+                                  },
+                                  "text": "CMP.01.tempDischarge"
+                                },
+                                "type": "ia.display.label"
+                              },
+                              {
+                                "meta": {
+                                  "name": "Msg"
+                                },
+                                "position": {
+                                  "grow": 1
+                                },
+                                "props": {
+                                  "style": {
+                                    "color": "#3a3a38",
+                                    "fontSize": "10px"
+                                  },
+                                  "text": "Discharge temp high — 218°F \u003e 215°F"
+                                },
+                                "type": "ia.display.label"
+                              }
+                            ],
+                            "meta": {
+                              "name": "MsgCol"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "direction": "column"
+                            },
+                            "type": "ia.container.flex"
+                          }
+                        ],
+                        "meta": {
+                          "name": "AlarmRow"
+                        },
+                        "position": {
+                          "basis": "42px"
+                        },
+                        "props": {
+                          "style": {
+                            "borderBottom": "1px dotted #8c8c89",
+                            "gap": "8px",
+                            "padding": "5px 8px"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Pri"
+                            },
+                            "position": {
+                              "basis": "40px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#d49a1f",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "10px",
+                                "fontWeight": 700
+                              },
+                              "text": "WARN"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Time"
+                            },
+                            "position": {
+                              "basis": "60px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "10px"
+                              },
+                              "text": "14:18:51"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "children": [
+                              {
+                                "meta": {
+                                  "name": "Tag"
+                                },
+                                "position": {
+                                  "basis": "14px"
+                                },
+                                "props": {
+                                  "style": {
+                                    "color": "#111111",
+                                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                    "fontSize": "10px",
+                                    "fontWeight": 700
+                                  },
+                                  "text": "CT.02.pH"
+                                },
+                                "type": "ia.display.label"
+                              },
+                              {
+                                "meta": {
+                                  "name": "Msg"
+                                },
+                                "position": {
+                                  "grow": 1
+                                },
+                                "props": {
+                                  "style": {
+                                    "color": "#3a3a38",
+                                    "fontSize": "10px"
+                                  },
+                                  "text": "pH out of range — 9.4 \u003e 9.0"
+                                },
+                                "type": "ia.display.label"
+                              }
+                            ],
+                            "meta": {
+                              "name": "MsgCol"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "direction": "column"
+                            },
+                            "type": "ia.container.flex"
+                          }
+                        ],
+                        "meta": {
+                          "name": "AlarmRow_0"
+                        },
+                        "position": {
+                          "basis": "42px"
+                        },
+                        "props": {
+                          "style": {
+                            "borderBottom": "1px dotted #8c8c89",
+                            "gap": "8px",
+                            "padding": "5px 8px"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Pri"
+                            },
+                            "position": {
+                              "basis": "40px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#d49a1f",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "10px",
+                                "fontWeight": 700
+                              },
+                              "text": "WARN"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Time"
+                            },
+                            "position": {
+                              "basis": "60px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "10px"
+                              },
+                              "text": "13:47:02"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "children": [
+                              {
+                                "meta": {
+                                  "name": "Tag"
+                                },
+                                "position": {
+                                  "basis": "14px"
+                                },
+                                "props": {
+                                  "style": {
+                                    "color": "#111111",
+                                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                    "fontSize": "10px",
+                                    "fontWeight": 700
+                                  },
+                                  "text": "M.5.Amps"
+                                },
+                                "type": "ia.display.label"
+                              },
+                              {
+                                "meta": {
+                                  "name": "Msg"
+                                },
+                                "position": {
+                                  "grow": 1
+                                },
+                                "props": {
+                                  "style": {
+                                    "color": "#3a3a38",
+                                    "fontSize": "10px"
+                                  },
+                                  "text": "Motor 5 current trending high"
+                                },
+                                "type": "ia.display.label"
+                              }
+                            ],
+                            "meta": {
+                              "name": "MsgCol"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "direction": "column"
+                            },
+                            "type": "ia.container.flex"
+                          }
+                        ],
+                        "meta": {
+                          "name": "AlarmRow_1"
+                        },
+                        "position": {
+                          "basis": "42px"
+                        },
+                        "props": {
+                          "style": {
+                            "borderBottom": "1px dotted #8c8c89",
+                            "gap": "8px",
+                            "padding": "5px 8px"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Pri"
+                            },
+                            "position": {
+                              "basis": "40px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#5f5f5c",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "10px",
+                                "fontWeight": 700
+                              },
+                              "text": "INFO"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Time"
+                            },
+                            "position": {
+                              "basis": "60px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "10px"
+                              },
+                              "text": "13:31:44"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "children": [
+                              {
+                                "meta": {
+                                  "name": "Tag"
+                                },
+                                "position": {
+                                  "basis": "14px"
+                                },
+                                "props": {
+                                  "style": {
+                                    "color": "#111111",
+                                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                    "fontSize": "10px",
+                                    "fontWeight": 700
+                                  },
+                                  "text": "SYS.runState"
+                                },
+                                "type": "ia.display.label"
+                              },
+                              {
+                                "meta": {
+                                  "name": "Msg"
+                                },
+                                "position": {
+                                  "grow": 1
+                                },
+                                "props": {
+                                  "style": {
+                                    "color": "#3a3a38",
+                                    "fontSize": "10px"
+                                  },
+                                  "text": "Run started — Order 10428"
+                                },
+                                "type": "ia.display.label"
+                              }
+                            ],
+                            "meta": {
+                              "name": "MsgCol"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "direction": "column"
+                            },
+                            "type": "ia.container.flex"
+                          }
+                        ],
+                        "meta": {
+                          "name": "AlarmRow_2"
+                        },
+                        "position": {
+                          "basis": "42px"
+                        },
+                        "props": {
+                          "style": {
+                            "borderBottom": "1px dotted #8c8c89",
+                            "gap": "8px",
+                            "padding": "5px 8px"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      }
+                    ],
+                    "meta": {
+                      "name": "Body"
+                    },
+                    "position": {
+                      "grow": 1
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "gap": "0px",
+                        "overflow": "hidden",
+                        "padding": "0"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  }
+                ],
+                "meta": {
+                  "name": "AlarmLog"
+                },
+                "position": {
+                  "basis": "220px"
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "backgroundColor": "#c9c9c6",
+                    "border": "1px solid #6e6e6c",
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Title"
+                        },
+                        "position": {
+                          "grow": 1,
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "color": "#111111",
+                            "fontSize": "11px",
+                            "fontWeight": 600,
+                            "letterSpacing": "1.6px",
+                            "textTransform": "uppercase"
+                          },
+                          "text": "Order Queue"
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Tag"
+                        },
+                        "position": {
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "color": "#5f5f5c",
+                            "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                            "fontSize": "10px",
+                            "fontWeight": 500,
+                            "letterSpacing": "1px"
+                          },
+                          "text": "SCHED"
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "meta": {
+                      "name": "Header"
+                    },
+                    "position": {
+                      "basis": "26px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "alignItems": "center",
+                      "style": {
+                        "backgroundColor": "#a3a3a0",
+                        "borderBottom": "1px solid #6e6e6c",
+                        "gap": "8px",
+                        "padding": "0 10px"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "H1"
+                            },
+                            "position": {
+                              "basis": "48px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#5f5f5c",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "9px",
+                                "fontWeight": 600,
+                                "letterSpacing": "1px"
+                              },
+                              "text": "ORDER"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "H2"
+                            },
+                            "position": {
+                              "basis": "40px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#5f5f5c",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "9px",
+                                "fontWeight": 600,
+                                "letterSpacing": "1px"
+                              },
+                              "text": "SKU"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "H3"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#5f5f5c",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "9px",
+                                "fontWeight": 600,
+                                "letterSpacing": "1px",
+                                "textAlign": "right"
+                              },
+                              "text": "QTY"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "H4"
+                            },
+                            "position": {
+                              "basis": "60px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#5f5f5c",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "9px",
+                                "fontWeight": 600,
+                                "letterSpacing": "1px"
+                              },
+                              "text": "STATUS"
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "Hdr"
+                        },
+                        "position": {
+                          "basis": "22px"
+                        },
+                        "props": {
+                          "alignItems": "center",
+                          "style": {
+                            "backgroundColor": "#a3a3a0",
+                            "borderBottom": "1px solid #6e6e6c",
+                            "gap": "8px",
+                            "padding": "0 8px"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Ord"
+                            },
+                            "position": {
+                              "basis": "48px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#111111",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "11px",
+                                "fontWeight": 600
+                              },
+                              "text": "10428"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Sku"
+                            },
+                            "position": {
+                              "basis": "40px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "11px"
+                              },
+                              "text": "A22"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Qty"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#111111",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "11px",
+                                "textAlign": "right"
+                              },
+                              "text": "1,200"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Stat"
+                            },
+                            "position": {
+                              "basis": "60px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#1f7a7a",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "11px",
+                                "fontWeight": 600,
+                                "letterSpacing": "1px"
+                              },
+                              "text": "RUN"
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "QR"
+                        },
+                        "position": {
+                          "basis": "26px"
+                        },
+                        "props": {
+                          "alignItems": "center",
+                          "style": {
+                            "borderBottom": "1px dotted #8c8c89",
+                            "gap": "8px",
+                            "padding": "0 8px"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Ord"
+                            },
+                            "position": {
+                              "basis": "48px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#111111",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "11px",
+                                "fontWeight": 600
+                              },
+                              "text": "10429"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Sku"
+                            },
+                            "position": {
+                              "basis": "40px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "11px"
+                              },
+                              "text": "B14"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Qty"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#111111",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "11px",
+                                "textAlign": "right"
+                              },
+                              "text": "840"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Stat"
+                            },
+                            "position": {
+                              "basis": "60px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "11px",
+                                "fontWeight": 600,
+                                "letterSpacing": "1px"
+                              },
+                              "text": "QUEUE"
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "QR_0"
+                        },
+                        "position": {
+                          "basis": "26px"
+                        },
+                        "props": {
+                          "alignItems": "center",
+                          "style": {
+                            "borderBottom": "1px dotted #8c8c89",
+                            "gap": "8px",
+                            "padding": "0 8px"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Ord"
+                            },
+                            "position": {
+                              "basis": "48px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#111111",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "11px",
+                                "fontWeight": 600
+                              },
+                              "text": "10430"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Sku"
+                            },
+                            "position": {
+                              "basis": "40px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "11px"
+                              },
+                              "text": "A22"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Qty"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#111111",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "11px",
+                                "textAlign": "right"
+                              },
+                              "text": "2,400"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Stat"
+                            },
+                            "position": {
+                              "basis": "60px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "11px",
+                                "fontWeight": 600,
+                                "letterSpacing": "1px"
+                              },
+                              "text": "QUEUE"
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "QR_1"
+                        },
+                        "position": {
+                          "basis": "26px"
+                        },
+                        "props": {
+                          "alignItems": "center",
+                          "style": {
+                            "borderBottom": "1px dotted #8c8c89",
+                            "gap": "8px",
+                            "padding": "0 8px"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Ord"
+                            },
+                            "position": {
+                              "basis": "48px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#111111",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "11px",
+                                "fontWeight": 600
+                              },
+                              "text": "10431"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Sku"
+                            },
+                            "position": {
+                              "basis": "40px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "11px"
+                              },
+                              "text": "C07"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Qty"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#111111",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "11px",
+                                "textAlign": "right"
+                              },
+                              "text": "600"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Stat"
+                            },
+                            "position": {
+                              "basis": "60px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "11px",
+                                "fontWeight": 600,
+                                "letterSpacing": "1px"
+                              },
+                              "text": "QUEUE"
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "QR_2"
+                        },
+                        "position": {
+                          "basis": "26px"
+                        },
+                        "props": {
+                          "alignItems": "center",
+                          "style": {
+                            "borderBottom": "1px dotted #8c8c89",
+                            "gap": "8px",
+                            "padding": "0 8px"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Ord"
+                            },
+                            "position": {
+                              "basis": "48px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#111111",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "11px",
+                                "fontWeight": 600
+                              },
+                              "text": "10432"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Sku"
+                            },
+                            "position": {
+                              "basis": "40px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#3a3a38",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "11px"
+                              },
+                              "text": "A22"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Qty"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#111111",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "11px",
+                                "textAlign": "right"
+                              },
+                              "text": "1,800"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Stat"
+                            },
+                            "position": {
+                              "basis": "60px"
+                            },
+                            "props": {
+                              "style": {
+                                "color": "#d49a1f",
+                                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                                "fontSize": "11px",
+                                "fontWeight": 600,
+                                "letterSpacing": "1px"
+                              },
+                              "text": "HOLD"
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "QR_3"
+                        },
+                        "position": {
+                          "basis": "26px"
+                        },
+                        "props": {
+                          "alignItems": "center",
+                          "style": {
+                            "borderBottom": "1px dotted #8c8c89",
+                            "gap": "8px",
+                            "padding": "0 8px"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      }
+                    ],
+                    "meta": {
+                      "name": "Body"
+                    },
+                    "position": {
+                      "grow": 1
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "gap": "0px",
+                        "overflow": "hidden",
+                        "padding": "0"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  }
+                ],
+                "meta": {
+                  "name": "Queue"
+                },
+                "position": {
+                  "grow": 1
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "backgroundColor": "#c9c9c6",
+                    "border": "1px solid #6e6e6c",
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "RightCol"
+            },
+            "position": {
+              "basis": "340px",
+              "shrink": 0
+            },
+            "props": {
+              "direction": "column",
+              "style": {
+                "gap": "12px"
               }
             },
             "type": "ia.container.flex"
           }
         ],
         "meta": {
-          "name": "PackagingSection"
+          "name": "Body"
         },
         "position": {
-          "basis": "0",
           "grow": 1
         },
         "props": {
-          "direction": "column",
           "style": {
-            "gap": "0px"
+            "alignItems": "stretch",
+            "gap": "12px",
+            "padding": "12px"
           }
         },
         "type": "ia.container.flex"
@@ -836,10 +3233,10 @@
     "props": {
       "direction": "column",
       "style": {
-        "backgroundColor": "#CCCCCC",
-        "gap": "10px",
+        "backgroundColor": "#b6b6b3",
+        "gap": "0px",
         "overflow": "hidden",
-        "padding": "10px"
+        "padding": "0"
       }
     },
     "type": "ia.container.flex"

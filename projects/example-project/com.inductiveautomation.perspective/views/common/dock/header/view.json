@@ -3,96 +3,530 @@
   "params": {},
   "props": {
     "defaultSize": {
-      "height": 56
+      "height": 80,
+      "width": 1021
     }
   },
   "root": {
     "children": [
       {
+        "children": [
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Mark"
+                },
+                "position": {
+                  "basis": "10px",
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "backgroundColor": "#e6e6e3",
+                    "height": "10px",
+                    "margin": "0 8px 0 0"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "meta": {
+                  "name": "BrandText"
+                },
+                "position": {
+                  "grow": 1,
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "color": "#e6e6e3",
+                    "fontSize": "13px",
+                    "fontWeight": 700,
+                    "letterSpacing": "3px",
+                    "textTransform": "uppercase"
+                  },
+                  "text": "PLANT CONTROL"
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "Brand"
+            },
+            "position": {
+              "basis": "220px",
+              "shrink": 0
+            },
+            "props": {
+              "alignItems": "center",
+              "style": {
+                "paddingLeft": "16px"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "events": {
+                  "component": {
+                    "onActionPerformed": {
+                      "config": {
+                        "page": "/overview"
+                      },
+                      "scope": "C",
+                      "type": "nav"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "navOverview"
+                },
+                "position": {
+                  "basis": "140px"
+                },
+                "props": {
+                  "style": {
+                    "backgroundColor": "transparent",
+                    "borderLeft": "1px solid #1a1a18",
+                    "borderRadius": "0",
+                    "borderRight": "1px solid #1a1a18",
+                    "color": "#e6e6e3",
+                    "fontSize": "11px",
+                    "fontWeight": 500,
+                    "height": "100%",
+                    "letterSpacing": "2px"
+                  },
+                  "text": "OVERVIEW"
+                },
+                "type": "ia.input.button"
+              },
+              {
+                "events": {
+                  "component": {
+                    "onActionPerformed": {
+                      "config": {
+                        "page": "/refrigeration"
+                      },
+                      "scope": "C",
+                      "type": "nav"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "navRefrigeration"
+                },
+                "position": {
+                  "basis": "160px"
+                },
+                "props": {
+                  "style": {
+                    "backgroundColor": "transparent",
+                    "borderRadius": "0",
+                    "borderRight": "1px solid #1a1a18",
+                    "color": "#e6e6e3",
+                    "fontSize": "11px",
+                    "fontWeight": 500,
+                    "height": "100%",
+                    "letterSpacing": "2px"
+                  },
+                  "text": "REFRIGERATION"
+                },
+                "type": "ia.input.button"
+              }
+            ],
+            "meta": {
+              "name": "Nav"
+            },
+            "position": {
+              "grow": 1,
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "gap": "0px"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "L"
+                    },
+                    "props": {
+                      "style": {
+                        "color": "#a8a8a5",
+                        "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                        "fontSize": "9px",
+                        "letterSpacing": "1px"
+                      },
+                      "text": "CRIT"
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "V"
+                    },
+                    "props": {
+                      "style": {
+                        "color": "#c8362a",
+                        "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                        "fontSize": "11px",
+                        "fontWeight": 700
+                      },
+                      "text": "1"
+                    },
+                    "type": "ia.display.label"
+                  }
+                ],
+                "meta": {
+                  "name": "Crit"
+                },
+                "position": {
+                  "basis": "76px"
+                },
+                "props": {
+                  "alignItems": "center",
+                  "justifyContent": "space-between",
+                  "style": {
+                    "backgroundColor": "#424240",
+                    "gap": "8px",
+                    "height": "24px",
+                    "padding": "0 10px"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "L"
+                    },
+                    "props": {
+                      "style": {
+                        "color": "#a8a8a5",
+                        "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                        "fontSize": "9px",
+                        "letterSpacing": "1px"
+                      },
+                      "text": "WARN"
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "V"
+                    },
+                    "props": {
+                      "style": {
+                        "color": "#d49a1f",
+                        "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                        "fontSize": "11px",
+                        "fontWeight": 700
+                      },
+                      "text": "2"
+                    },
+                    "type": "ia.display.label"
+                  }
+                ],
+                "meta": {
+                  "name": "Warn"
+                },
+                "position": {
+                  "basis": "76px"
+                },
+                "props": {
+                  "alignItems": "center",
+                  "justifyContent": "space-between",
+                  "style": {
+                    "backgroundColor": "#424240",
+                    "gap": "8px",
+                    "height": "24px",
+                    "padding": "0 10px"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "L"
+                    },
+                    "props": {
+                      "style": {
+                        "color": "#a8a8a5",
+                        "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                        "fontSize": "9px",
+                        "letterSpacing": "1px"
+                      },
+                      "text": "UNACK"
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "V"
+                    },
+                    "props": {
+                      "style": {
+                        "color": "#e6e6e3",
+                        "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                        "fontSize": "11px",
+                        "fontWeight": 700
+                      },
+                      "text": "3"
+                    },
+                    "type": "ia.display.label"
+                  }
+                ],
+                "meta": {
+                  "name": "Unack"
+                },
+                "position": {
+                  "basis": "76px"
+                },
+                "props": {
+                  "alignItems": "center",
+                  "justifyContent": "space-between",
+                  "style": {
+                    "backgroundColor": "#424240",
+                    "gap": "8px",
+                    "height": "24px",
+                    "padding": "0 10px"
+                  }
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "Alarms"
+            },
+            "position": {
+              "basis": "244px",
+              "shrink": 0
+            },
+            "props": {
+              "alignItems": "center",
+              "style": {
+                "backgroundColor": "#1a1a18",
+                "border": "1px solid #1a1a18",
+                "gap": "1px",
+                "marginRight": "16px"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Date"
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "expression": "dateFormat(now(0), \u0027EEE, MMM dd yyyy\u0027)"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "color": "#a8a8a5",
+                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                    "fontSize": "9px",
+                    "letterSpacing": "1px",
+                    "textAlign": "right"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Time"
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "expression": "dateFormat(now(1000), \u0027HH:mm:ss\u0027)"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "color": "#e6e6e3",
+                    "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                    "fontSize": "12px",
+                    "fontWeight": 600,
+                    "textAlign": "right"
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "Clock"
+            },
+            "position": {
+              "basis": "160px",
+              "shrink": 0
+            },
+            "props": {
+              "direction": "column",
+              "style": {
+                "gap": "1px",
+                "paddingRight": "16px"
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
         "meta": {
-          "name": "Title"
+          "name": "L1"
         },
         "position": {
-          "basis": "0",
-          "grow": 1,
+          "basis": "48px",
           "shrink": 0
-        },
-        "propConfig": {
-          "props.text": {
-            "binding": {
-              "config": {
-                "path": "page.props.title"
-              },
-              "type": "property"
-            }
-          }
         },
         "props": {
           "style": {
-            "color": "#FFFFFF",
-            "fontSize": "16px",
-            "fontWeight": 600
+            "backgroundColor": "#2c2c2a",
+            "borderBottom": "2px solid #000"
           }
         },
-        "type": "ia.display.label"
+        "type": "ia.container.flex"
       },
       {
-        "events": {
-          "component": {
-            "onActionPerformed": {
-              "config": {
-                "page": "/overview"
+        "children": [
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Lbl"
+                },
+                "props": {
+                  "style": {
+                    "color": "#111111",
+                    "fontSize": "11px",
+                    "fontWeight": 600,
+                    "letterSpacing": "1px",
+                    "textTransform": "uppercase"
+                  },
+                  "text": "PLANT"
+                },
+                "type": "ia.display.label"
               },
-              "scope": "C",
-              "type": "nav"
-            }
+              {
+                "meta": {
+                  "name": "Sep"
+                },
+                "props": {
+                  "style": {
+                    "color": "#5f5f5c",
+                    "fontSize": "11px"
+                  },
+                  "text": " / "
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Page"
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "page.props.title"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "color": "#111111",
+                    "fontSize": "11px",
+                    "fontWeight": 600,
+                    "letterSpacing": "1px",
+                    "textTransform": "uppercase"
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "Crumb"
+            },
+            "position": {
+              "grow": 1
+            },
+            "props": {
+              "alignItems": "center",
+              "style": {
+                "gap": "0px",
+                "paddingLeft": "16px"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "meta": {
+              "name": "Meta"
+            },
+            "props": {
+              "style": {
+                "color": "#3a3a38",
+                "fontFamily": "\u0027IBM Plex Mono\u0027, monospace",
+                "fontSize": "10px",
+                "letterSpacing": "1px",
+                "paddingRight": "16px"
+              },
+              "text": "SITE 01 · LINE A · 60 HZ · IMPERIAL"
+            },
+            "type": "ia.display.label"
           }
-        },
+        ],
         "meta": {
-          "name": "navOverview"
+          "name": "L2"
         },
         "position": {
-          "basis": "120px",
+          "basis": "28px",
           "shrink": 0
         },
         "props": {
-          "text": "Overview"
-        },
-        "type": "ia.input.button"
-      },
-      {
-        "events": {
-          "component": {
-            "onActionPerformed": {
-              "config": {
-                "page": "/refrigeration"
-              },
-              "scope": "C",
-              "type": "nav"
-            }
+          "alignItems": "center",
+          "style": {
+            "backgroundColor": "#a3a3a0",
+            "borderBottom": "1px solid #6e6e6c"
           }
         },
-        "meta": {
-          "name": "navRefrigeration"
-        },
-        "position": {
-          "basis": "120px",
-          "shrink": 0
-        },
-        "props": {
-          "text": "Refrigeration"
-        },
-        "type": "ia.input.button"
+        "type": "ia.container.flex"
       }
     ],
     "meta": {
       "name": "root"
     },
     "props": {
+      "direction": "column",
       "style": {
-        "backgroundColor": "#5A5A5A",
-        "gap": "15px",
-        "padding": "14px"
+        "backgroundColor": "#2c2c2a",
+        "gap": "0px",
+        "overflow": "hidden",
+        "padding": "0"
       }
     },
     "type": "ia.container.flex"

@@ -26,7 +26,7 @@
         "modal": false,
         "resizable": false,
         "show": "visible",
-        "size": 50,
+        "size": 80,
         "viewParams": {},
         "viewPath": "common/dock/header"
       }
