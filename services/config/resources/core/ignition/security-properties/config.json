@@ -15,17 +15,8 @@
   "designerPermissions": {
     "securityLevels": [
       {
-        "children": [
-          {
-            "children": [
-              {
-                "children": [],
-                "name": "Administrator"
-              }
-            ],
-            "name": "Roles"
-          }
-        ],
+        "children": [],
+        "description": "Represents a user who has been authenticated by the system.",
         "name": "Authenticated"
       }
     ],
@@ -36,17 +27,8 @@
   "readPermissions": {
     "securityLevels": [
       {
-        "children": [
-          {
-            "children": [
-              {
-                "children": [],
-                "name": "Administrator"
-              }
-            ],
-            "name": "Roles"
-          }
-        ],
+        "children": [],
+        "description": "Represents a user who has been authenticated by the system.",
         "name": "Authenticated"
       }
     ],
@@ -58,17 +40,8 @@
   "writePermissions": {
     "securityLevels": [
       {
-        "children": [
-          {
-            "children": [
-              {
-                "children": [],
-                "name": "Administrator"
-              }
-            ],
-            "name": "Roles"
-          }
-        ],
+        "children": [],
+        "description": "Represents a user who has been authenticated by the system.",
         "name": "Authenticated"
       }
     ],
