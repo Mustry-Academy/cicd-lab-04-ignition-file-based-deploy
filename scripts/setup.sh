@@ -177,7 +177,7 @@ wait_for_gateway() {
     local container
     container="$(gateway_container "$gateway")"
     echo -e "${RED}Error: $gateway gateway did not reach RUNNING within $((max_attempts * 2))s.${NC}" >&2
-    echo "  Check logs:  docker compose logs $container --tail 200" >&2
+    echo "  Check logs:  docker logs --tail 200 $container" >&2
     return 1
 }
 
@@ -255,7 +255,7 @@ if is_placeholder_api_key; then
 fi
 echo "Useful commands:"
 echo "  docker compose ps                          # check container state"
-echo "  docker compose logs lab04-ignition-local   # tail local gateway logs"
+echo "  docker logs -f lab04-ignition-local        # tail local gateway logs"
 echo "  scripts/trigger-scan.sh both               # rescan local (default)"
 echo "  scripts/trigger-scan.sh both --gateway dev # rescan dev"
 echo "  scripts/teardown.sh                        # stop the stack"

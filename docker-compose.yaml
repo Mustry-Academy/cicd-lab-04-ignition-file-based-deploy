@@ -186,7 +186,7 @@ services:
 
   # --- shared TimescaleDB with three logical databases ----------------------
   # POSTGRES_DB is the database created automatically at first init. The init
-  # script under services/timescaledb-init/ creates the other two so each
+  # script under ./db-init/ (mounted below) creates the other two so each
   # gateway can point at its own database.
   timescaledb:
     image: timescale/timescaledb:latest-pg16

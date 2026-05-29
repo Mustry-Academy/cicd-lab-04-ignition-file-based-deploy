@@ -37,6 +37,8 @@ Login to any of them with the credentials from `.env` (`GATEWAY_ADMIN_USERNAME_L
 
 > **Trial mode:** each gateway runs in 2-hour trial mode. Reset via *Gateway → Config → Licensing → Reset Trial* — unlimited and entirely legal for development. You'll do this **three times** if you keep all three gateways up long enough.
 
+> **Stuck?** See [`docs/TROUBLESHOOTING.md`](./docs/TROUBLESHOOTING.md) for the common stack / runner / deploy failures and their fixes. Before opening a PR, run `scripts/validate.sh` (mirrors CI).
+
 ## Lab structure
 
 | Block | Topic | Exercise |
@@ -56,6 +58,10 @@ git checkout block-b-start
 git checkout block-b-end
 ```
 
+> **Maintainer note:** these four checkpoint tags are **not cut yet** — they'll be created once the
+> repo reaches its final state. Until then, work on `main` (the repo runs as-is). See
+> [`docs/MAINTAINING.md`](./docs/MAINTAINING.md) for what each tag should contain.
+
 ## Repo layout
 
 ```
@@ -69,8 +75,8 @@ cicd-lab-04-ignition-file-based-deploy/
 │   ├── workflows/
 │   │   ├── ci.yml                      ← PR validation (ubuntu-latest, free)
 │   │   ├── deploy.yml                  ← push to main → dev gateway (self-hosted)
-│   │   ├── release.yml                 ← tag v* → prod gateway (self-hosted)
-│   │   └── azure.yml                   ← reference Azure DevOps pipeline (ignored by GH)
+│   │   └── release.yml                 ← tag v* → prod gateway (self-hosted)
+│   ├── actionlint.yaml                 ← declares the self-hosted `lab04` runner label
 │   └── pull_request_template.md
 ├── exercises/
 │   ├── block-a.md
@@ -89,10 +95,13 @@ cicd-lab-04-ignition-file-based-deploy/
 │   ├── lib.sh                          ← shared helpers
 │   └── git-hooks/                      ← skip-worktree hooks for Ignition state files
 ├── projects/                           ← project content (bind-mounted into `local` only)
-│   └── README.md
-└── services/
-    ├── config/                         ← gateway-level config (bind-mounted into `local`)
-    ├── modules.json                    ← module enablement (shared by all three gateways)
+│   └── example-project/                ← a real Perspective project (views, templates)
+├── services/
+│   ├── config/                         ← gateway-level config (bind-mounted into `local`)
+│   │   └── resources/                  ← <scope>/<module-id>/<resource-type>/<name>/{config.json,resource.json}
+│   └── modules.json                    ← module enablement (shared by all three gateways)
+├── third-party-modules/                ← bundled .modl binaries the gateways install at startup
+└── tests/                              ← validation scaffold (see scripts/validate.sh)
 ```
 
 ## The Compose stack
@@ -114,8 +123,10 @@ Three workflows under [`.github/workflows/`](./.github/workflows/):
 | File | Trigger | Runner | Purpose |
 |---|---|---|---|
 | [`ci.yml`](./.github/workflows/ci.yml) | PR to `main` | `ubuntu-latest` (free) | Validate JSON, `.deployignore` syntax, and the workflow files themselves. |
-| [`deploy.yml`](./.github/workflows/deploy.yml) | Push to `main`, manual | `[self-hosted, lab04]` | File-based deploy to the **dev** gateway via `docker cp`. |
+| [`deploy.yml`](./.github/workflows/deploy.yml) | Push to `main` (deploy paths only), manual | `[self-hosted, lab04]` | File-based deploy to the **dev** gateway via `docker cp`. |
 | [`release.yml`](./.github/workflows/release.yml) | Tag `v*`, manual | `[self-hosted, lab04]` | File-based deploy to the **prod** gateway. Same mechanics, different environment. |
+
+> `deploy.yml` has a `paths:` filter (`projects/**`, `services/config/**`, `.deployignore`, `scripts/trigger-scan.sh`), so a push that only touches docs or the README does **not** trigger a deploy — edit project or config content to see it fire.
 
 Both deploy workflows need:
 

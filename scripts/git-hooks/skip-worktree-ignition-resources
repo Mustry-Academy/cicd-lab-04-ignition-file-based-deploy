@@ -18,12 +18,17 @@ set -e
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
 cd "$REPO_ROOT"
 
+# Ignition rewrites resource.json (timestamps, signatures) AND the config
+# payloads themselves (config.json, config-mode.json) on every gateway
+# interaction, so all three must be covered or the tree stays dirty.
 git ls-files -- \
-    'services/ignition-*/config/resources/*resource.json' \
-    'services/ignition-*/config/resources/**/resource.json' \
+    'services/config/resources/**/resource.json' \
+    'services/config/resources/**/config.json' \
+    'services/config/resources/**/config-mode.json' \
     'projects/**/resource.json' \
-    'services/ignition-it/config/resources/local/ignition/local-system-properties/config.json' \
-    'services/ignition-ot/config/resources/local/ignition/local-system-properties/config.json' \
+    'services/config/resources/*resource.json' \
+    'services/config/resources/**/resource.json' \
+    'services/config/resources/local/ignition/local-system-properties/config.json' 
   | while IFS= read -r f; do
         # Only skip if not already skipped (avoids redundant index writes)
         if ! git ls-files -v -- "$f" 2>/dev/null | grep -q '^S'; then

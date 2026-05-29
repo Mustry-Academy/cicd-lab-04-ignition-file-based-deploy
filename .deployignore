@@ -8,18 +8,20 @@
 
 # Lab-only files that have nothing to do with the gateway runtime
 README.md
-PLAN.md
 LICENSE
 .deployignore
 .gitignore
 .gitattributes
-.deployignore
 .env.example
 .github/
 docs/
 exercises/
 instructor-notes/
 scripts/
+tests/
+third-party-modules/
+db-init/
+# learner's solo notes from Block A (gitignored anyway)
 NOTES.local.md
 
 # OS noise
