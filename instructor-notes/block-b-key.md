@@ -8,7 +8,7 @@ By the end of Block B, the participant has:
 
 1. The bundled `github-runner` container online — visible in their fork's *Settings → Actions → Runners* as `self-hosted, lab04`.
 2. Two GitHub environments configured (`lab-gateway-dev`, `lab-gateway-prod`), each with `IGNITION_API_KEY` set as an environment-scoped secret.
-3. Edited `projects/sample/views/Hello/view.json` in a PR, watched CI pass on `ubuntu-latest`, merged to main.
+3. Edited `projects/sample/com.inductiveautomation.perspective/views/Hello/view.json` in a PR, watched CI pass on `ubuntu-latest`, merged to main. (The sample project must be committed first — the I-do leaves it untracked.)
 4. Watched `deploy.yml` run end-to-end on their bundled runner: checkout → verify prereqs → prune → ship (docker cp) → scan → smoke-check.
 5. Verified the change in the **dev** gateway UI (http://localhost:8089).
 6. Pushed a `v*` tag and watched `release.yml` promote the same change to **prod** (http://localhost:8090).
@@ -20,7 +20,7 @@ If any of these is missing, especially #7, push them to complete. The failure ca
 
 Use this on the board if students need a re-walk:
 
-1. **Commit:** developer edits `projects/sample/views/Hello/view.json`, commits, pushes a PR. PR merges to main.
+1. **Commit:** developer edits `projects/sample/com.inductiveautomation.perspective/views/Hello/view.json`, commits, pushes a PR. PR merges to main.
 2. **Checkout:** the bundled runner picks up the workflow, checks out the merged commit.
 3. **Prune:** the runner reads `.deployignore` and removes those files from the working tree before they can ship.
 4. **Ship:** `docker exec` wipes the target's `projects/` and `config/` dirs, then `docker cp` writes the working tree into the dev gateway's container.
@@ -37,8 +37,6 @@ on:
       - "services/config/**"
       - ".deployignore"
       - "scripts/trigger-scan.sh"
-      - "scripts/lib.sh"
-      - ".github/workflows/deploy.yml"
   workflow_dispatch:                # let humans trigger manually for testing
 
 permissions:
@@ -140,10 +138,14 @@ If a participant asks *"what if the new view is bad and we need to revert *now*?
 
 ## Stretch — gateway-level config
 
-A participant who completes the stretch should have noticed that `services/config/` ships the same way `projects/` does — both workflows copy both trees. The interesting question is what *needs a restart* vs *picks up via scan*. They should land on:
+A participant who completes the stretch should have noticed two distinct things:
 
-- Database connection JSON files: scan-friendly. New connection visible in the UI after scan.
-- `modules.json` (module enablement): needs a gateway restart. The scan API can't reload module state.
+1. **What ships:** the workflows `docker cp ./projects/.` and `./services/config/.` — so project content and the `config/resources/` tree ride along. But `services/modules.json` is a **sibling of** `services/config/`, *not under it*, so it is **not shipped** by the deploy workflows at all (it's bind-mounted into the gateways in this lab). Confirm via the `docker cp` targets in `deploy.yml`.
+2. **What a scan can apply:** even setting aside shipping, module enable/disable can't be hot-reloaded —
+   - Database connection JSON files: scan-friendly. New connection visible in the UI after scan.
+   - `modules.json` (module enablement): needs a gateway restart. The scan API can't reload module state.
+
+The payoff question (foreshadows Lab 05): file-based + scan is great for the things that change daily (views, connections) but can't touch the gateway/module baseline — which is exactly what image-based deploys own.
 
 If they ask "how would I script the restart?" — `docker compose restart ignition-dev` from the runner, but that takes ~60s and breaks the smoke-check window. Real customer deploys handle this with a longer drain/restart cycle. Out of scope for Block B.
 

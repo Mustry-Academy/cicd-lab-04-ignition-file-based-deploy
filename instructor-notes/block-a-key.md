@@ -10,18 +10,23 @@ By the end of Block A, participants should be able to answer the question *"Whic
 
 The We-do and You-do exercises pick from a list of typical gateway changes. Here's the answer key for each:
 
+All paths are the real 8.3 layout: project resources are namespaced by owning module, and config
+resources are `config/resources/<scope>/<module-id>/<resource-type>/<name>/{config.json, resource.json}`.
+(Scope is usually `core` for portable config.) Tell learners to expect a longer `find` result than an
+8.1-style flat path.
+
 | Change | Bucket | On-disk path | In git? |
 |---|---|---|---|
-| Create a new Perspective view in project X | Project-level | `data/projects/X/views/<Name>/view.json` | Yes |
-| Add or modify a script library in project X | Project-level | `data/projects/X/scripts/<library>.py` | Yes |
-| Add a UDT or tag in project X | Project-level | `data/projects/X/tags/<provider>.json` | Yes |
+| Create a new Perspective view in project X | Project-level | `data/projects/X/com.inductiveautomation.perspective/views/<group>/<Name>/{view.json, resource.json}` | Yes |
+| Add or modify a script library in project X | Project-level | `data/projects/X/ignition/script-python/<library>/` | Yes |
+| Add a UDT / tag definition | Gateway-level | tag config under the tag provider: `config/resources/core/ignition/tag-provider/<name>/` | Yes |
 | Change a project's title/description | Project-level | `data/projects/X/project.json` | Yes |
-| Change gateway timezone (Config → System → Time) | Gateway-level | `data/config/resources/system/timezone.json` (or similar; path may shift between 8.3 minor versions) | Yes — but most teams gitignore it and set via env |
-| Add a database connection | Gateway-level | `data/config/resources/datasources/<name>.json` | Yes |
-| Add a tag history connection | Gateway-level | `data/config/resources/tag-history/<name>.json` | Yes |
-| Add a new identity provider (OIDC) | Gateway-level | `data/config/resources/identity/<name>.json` | Yes (with secrets stripped out, usually) |
-| Enable / disable a module | Gateway-level | `data/modules.json` | Yes |
-| Install a new module (.modl) | Gateway-level binary | `data/modules/<module>.modl` | **Almost never** — too big, manage separately |
+| Change gateway timezone (Config → System → Time) | Gateway-level | under `config/resources/core/ignition/system-properties/config.json` (or a sibling resource; path may shift between 8.3 minor versions) | Yes — but often in gitignore and set via env |
+| Add a database connection | Gateway-level | `data/config/resources/core/ignition/database-connection/<name>/config.json` | Yes |
+| Add a historian connection | Gateway-level | `data/config/resources/core/com.inductiveautomation.historian/historian-provider/<name>/config.json` | Yes |
+| Add a new identity provider (OIDC) | Gateway-level | `data/config/resources/core/ignition/identity-provider/<name>/config.json` | Yes |
+| Enable / disable a module | Gateway-level | `data/modules.json` (repo: `services/modules.json`) | Yes |
+| Install a new module (.modl) | Gateway-level binary | `data/modules/<module>.modl` | Yes / No |
 | Add a new gateway user (UI-managed) | Operational | `data/users.idb` (internal store) | **No** |
 | Change the gateway admin password | Operational | `data/users.idb` | **No** |
 | Tag values changing at runtime | Operational | Internal H2 in `data/db/` | **No** |
@@ -36,11 +41,11 @@ These two questions handle ~99% of cases.
 
 ## Common stumbles
 
-- **"My new user shows up in `users.idb` — I should commit that, right?"** No. `users.idb` is the *whole* user database, including hashed passwords, last-login timestamps, lockout state. Commit it once and you've leaked everyone's session history. The right pattern is to define users via `data/config/resources/identity/` (which gives you SSO and group sync, source-controllable). Lab-07 covers this properly.
+- **"My new user shows up in `users.idb` — I should commit that, right?"** No. `users.idb` is the *whole* user database, including hashed passwords, last-login timestamps, lockout state. Commit it once and you've leaked everyone's session history. The right pattern is to define users via an identity provider (`data/config/resources/core/ignition/identity-provider/<name>/`), which gives you SSO and group sync, source-controllable. Lab-07 covers this properly.
 
 - **"Why isn't `modules/` in git?"** Because `.modl` files are 5-100 MB binary blobs and they're keyed by license/vendor. Pin versions in a manifest; install separately. (Lab-04-image-based revisits this in the context of derived Docker images.)
 
-- **"I changed the timezone in the UI but I can't find the file."** Sometimes the path is config-mode dependent — and Ignition 8.3 has shifted some config from XML to JSON across minor releases. The `docker exec lab04-ignition-local find /usr/local/bin/ignition/data/config -newer /tmp/marker -type f` trick handles this: the file *will* be newer than the marker, regardless of which precise path it's at.
+- **"I changed the timezone in the UI but I can't find the file."** Sometimes the path is config-mode dependent — and Ignition 8.3 has shifted some config from XML to JSON across minor releases. The `docker exec lab04-ignition-local find /usr/local/bin/ignition/data/config -newer /tmp/marker -type f` trick handles this: the file *will* be newer than the marker, regardless of which precise path it's at. **Prerequisite:** the marker only works if they ran `docker exec lab04-ignition-local touch /tmp/marker` *before* the UI change (it's step 2 of the We-do). If they forgot, just re-touch the marker and redo the change. Expect the change to also rewrite a sibling `resource.json` — that's the gateway's manifest, not your edit.
 
 - **"I made a Perspective change in the Designer but nothing's on disk yet."** Did they *save* in the Designer? Unsaved changes live only in the Designer's memory. The classroom symptom is "I see the change in the Designer preview but the file isn't there."
 
