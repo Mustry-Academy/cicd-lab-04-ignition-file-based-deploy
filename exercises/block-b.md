@@ -18,8 +18,6 @@ You should leave this block able to:
 ## Pre-flight
 
 ```bash
-git fetch --tags
-git checkout block-b-start
 scripts/setup.sh    # idempotent — safe even if the stack is already up
 ```
 
@@ -48,22 +46,27 @@ Live demo:
 
 ```bash
 # Add a tiny project on disk (simulating what a developer commit would produce).
-# Because `local` bind-mounts ./projects/, this file is already on the local
-# gateway's disk before we do anything else.
-mkdir -p projects/sample/views/Hello
+# Because `local` bind-mounts ./projects/, these files are already on the local
+# gateway's disk before we do anything else. Note the 8.3 module-namespaced path
+# and the required resource.json manifest.
+VIEW="projects/sample/com.inductiveautomation.perspective/views/Hello"
+mkdir -p "$VIEW"
 cat > projects/sample/project.json <<'EOF'
-{"title":"Sample","description":"Demo from Block B","parent":"","enabled":true,"inheritable":false}
+{"title":"Sample","description":"Demo from Block B","enabled":true,"inheritable":false,"parent":""}
 EOF
-cat > projects/sample/views/Hello/view.json <<'EOF'
+cat > "$VIEW/view.json" <<'EOF'
 {"custom":{},"params":{},"props":{"defaultSize":{"height":600,"width":800}},
  "root":{"type":"ia.container.coord","version":0}}
+EOF
+cat > "$VIEW/resource.json" <<'EOF'
+{"scope":"G","version":1,"restricted":false,"overridable":true,"files":["view.json"],"attributes":{}}
 EOF
 
 # Trigger a project scan on the local gateway:
 scripts/trigger-scan.sh projects --gateway local
 ```
 
-In the local gateway UI (http://localhost:8088) refresh **Config → Projects** — the `sample` project should now appear.
+In the local gateway UI (http://localhost:8088), the `sample` project should now appear in the project list (Config → Projects, or the Perspective project launcher).
 
 Sketch the *runner topology* on the board:
 
@@ -93,7 +96,7 @@ Together, do the deploy manually using the shipped scripts. We'll target all thr
    # The trigger-scan script will read IGNITION_API_KEY_LOCAL/_DEV/_PROD from .env,
    # so as long as those are filled in you don't need to export anything.
    ```
-2. Change `projects/sample/views/Hello/view.json` (e.g., `width: 800` → `width: 1200`).
+2. Change `projects/sample/com.inductiveautomation.perspective/views/Hello/view.json` (e.g., `width: 800` → `width: 1200`).
 3. Scan the **local** gateway — local sees the change via bind mount immediately, scan tells it to notice:
    ```bash
    scripts/trigger-scan.sh both --gateway local
@@ -108,7 +111,7 @@ Together, do the deploy manually using the shipped scripts. We'll target all thr
    scripts/trigger-scan.sh both --gateway dev
    ```
    Verify in http://localhost:8089 — the same view should appear, the same width.
-5. Inspect `.deployignore`. Notice it excludes `README.md`, `PLAN.md`, the `.github/` directory, `docs/`, etc. Why? Because the gateway shouldn't care about lab documentation.
+5. Inspect `.deployignore`. Notice it excludes `README.md`, `LICENSE`, the `.github/` directory, `docs/`, `exercises/`, `scripts/`, etc. Why? Because the gateway shouldn't care about lab documentation or tooling — only project and config content belongs on it.
 
 ## You do (40 min)
 
@@ -134,14 +137,22 @@ In your fork on GitHub, *Settings → Actions → Runners* should show the runne
 In your fork:
 
 1. *Settings → Environments → New environment*: `lab-gateway-dev`.
-2. Under that environment, *Add secret*: `IGNITION_API_KEY` = the API key you generated from http://localhost:8089. (The workflow reads `secrets.IGNITION_API_KEY` scoped to the environment.)
-3. Repeat for `lab-gateway-prod` with the API key from http://localhost:8090.
+2. Under that environment, *Add secret*: `IGNITION_API_KEY` = the API key you generated **on the dev gateway** (its UI is at http://localhost:8089). (The workflow reads `secrets.IGNITION_API_KEY` scoped to the environment.)
+3. Repeat for `lab-gateway-prod` with the API key generated **on the prod gateway** (http://localhost:8090).
+
+> **API keys are per-gateway, not per-URL.** You generate each key in *that gateway's* UI; the dev key won't authenticate against prod. The host ports (8089/8090) are just how *you* reach the UIs — the **runner** reaches the same gateways by their compose service names (`http://ignition-dev:8088`, `http://ignition-prod:8088`), which is why `IGNITION_URL`'s default differs from the host port.
 
 You **don't** need to set `IGNITION_URL` or `IGNITION_CONTAINER` variables unless your runner topology differs from the lab's — the workflow defaults match the bundled runner.
 
 ### Part 3 — Trigger `deploy.yml` (15 min)
 
-1. Open a PR that touches `projects/sample/views/Hello/view.json` — change the height value.
+> **Prerequisite:** Part 3's PR needs the `sample` project to be *committed*. The I-do/We-do created it on disk but left it untracked, so commit it first:
+> ```bash
+> git add projects/sample && git commit -m "Add sample project"
+> ```
+> No `sample` project (e.g. you skipped the demo)? Touch any view under the shipped `projects/example-project/` instead — the flow is identical.
+
+1. Open a PR that touches `projects/sample/com.inductiveautomation.perspective/views/Hello/view.json` — change the height value.
 2. Watch [`ci.yml`](../.github/workflows/ci.yml) run on the PR. It runs on `ubuntu-latest` (free, no self-hosted needed), validates JSON, `.deployignore`, and the workflow files themselves.
 3. Merge the PR to `main`. [`deploy.yml`](../.github/workflows/deploy.yml) fires because of the `paths:` filter.
 4. Watch the workflow run. The interesting step is **Ship projects and config into gateway container** — this is the `docker cp` half. Then **Trigger gateway scan** posts to `/data/api/v1/scan/{projects,config}`.
@@ -169,9 +180,25 @@ Cause one of these on purpose and read the workflow output:
 
 End state matches `block-b-end`.
 
+## Definition of done
+
+You're finished with Block B when:
+
+- [ ] The bundled runner shows **online** in your fork (*Settings → Actions → Runners*, `self-hosted, lab04`).
+- [ ] Both GitHub environments (`lab-gateway-dev`, `lab-gateway-prod`) exist, each with an `IGNITION_API_KEY` secret.
+- [ ] A merged PR triggered `deploy.yml` and the change is visible on the **dev** gateway (:8089).
+- [ ] A `v*` tag triggered `release.yml` and the change is visible on the **prod** gateway (:8090).
+- [ ] You broke **one** deploy on purpose (Part 5) and can describe the failure mode and recovery.
+- [ ] You can explain, in five steps, what the runner does between "PR merged" and "gateway reloaded."
+
 ## Stretch challenge `[OPTIONAL]`
 
-Notice that **gateway-level config** (the contents of `services/config/`) ships the same way `projects/` does — both workflows copy both trees. Some gateway-level changes require a **restart**, not just a scan. The scan API doesn't reload everything. Test by changing a `services/modules.json` entry — does the scan pick it up, or does the gateway need a `docker compose restart ignition-dev` for the change to take effect?
+Notice that **gateway-level config** (the contents of `services/config/`) ships the same way `projects/` does — both workflows `docker cp ./services/config/.` onto the gateway. But not every gateway change rides that path, and not every change a scan can apply:
+
+- **Module enablement** lives in `services/modules.json` — a *sibling* of `services/config/`, **not under it**. The deploy workflows copy `./services/config/.`, so `modules.json` is **not shipped** by them at all; in this lab it's bind-mounted into all three gateways. Open `deploy.yml` and confirm the `docker cp` targets to see this.
+- Even if you did get a new `modules.json` onto a gateway, **a scan won't apply it** — module enable/disable needs a gateway **restart** (`docker compose restart ignition-dev`), unlike views/config which hot-reload on scan.
+
+So the question to chew on: why does the file-based scan pattern work beautifully for views and database connections but not for modules? What does that tell you about where the image-based deploy (Lab 05) earns its keep?
 
 ## Debrief (10 min)
 
