@@ -10,9 +10,6 @@ Thumbs.db
 .idea/
 *.swp
 
-# Local notes
-NOTES.local.md
-
 # Python (used by any lab tooling)
 __pycache__/
 *.pyc
