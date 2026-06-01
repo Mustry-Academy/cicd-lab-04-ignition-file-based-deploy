@@ -48,20 +48,6 @@ Login to any of them with the credentials from `.env` (`GATEWAY_ADMIN_USERNAME_L
 
 > Blocks C and D of Day 3 are in separate labs ([image-based](https://github.com/mustry-academy/cicd-lab-05-ignition-image-based-deploy), [multi-gateway](https://github.com/mustry-academy/cicd-lab-06-multi-gateway-deploy)).
 
-## Checkpoints
-
-```bash
-git fetch --tags
-git checkout block-a-start
-git checkout block-a-end
-git checkout block-b-start
-git checkout block-b-end
-```
-
-> **Maintainer note:** these four checkpoint tags are **not cut yet** — they'll be created once the
-> repo reaches its final state. Until then, work on `main` (the repo runs as-is). See
-> [`docs/MAINTAINING.md`](./docs/MAINTAINING.md) for what each tag should contain.
-
 ## Repo layout
 
 ```
