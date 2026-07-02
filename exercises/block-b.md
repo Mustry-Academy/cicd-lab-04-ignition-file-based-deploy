@@ -35,7 +35,7 @@ You'll need:
 
 If you'd like to read ahead: [`docs/file-based-deploy-pattern.md`](../docs/file-based-deploy-pattern.md).
 
-## I do (20 min)
+## We-do (20 min)
 
 The file-based pattern, demoed end-to-end across the three lab gateways.
 
@@ -156,7 +156,7 @@ You **don't** need to set `IGNITION_URL` or `IGNITION_CONTAINER` variables unles
 > git checkout -b develop && git push -u origin develop
 > ```
 >
-> **Prerequisite:** Part 3's change needs the `sample` project to be *committed* (the I-do/We-do left it untracked). Commit it to `develop` first:
+> **Prerequisite:** Part 3's change needs the `sample` project to be *committed* (the We-do/We-do left it untracked). Commit it to `develop` first:
 > ```bash
 > git add projects/sample && git commit -m "Add sample project"
 > git push origin develop
