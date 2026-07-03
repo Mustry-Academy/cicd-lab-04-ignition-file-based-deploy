@@ -9,7 +9,7 @@ By the end of Block B, the participant has:
 1. The bundled `github-runner` container online — visible in their fork's *Settings → Actions → Runners* as `self-hosted, lab04`.
 2. A `develop` branch created in their fork (Git Flow's integration branch).
 3. Two GitHub environments configured (`lab-gateway-dev`, `lab-gateway-prod`), each with `IGNITION_API_KEY` set as an environment-scoped secret.
-4. Edited a view on a `feature/*` branch, opened a PR **into `develop`**, watched CI pass on `ubuntu-latest`, merged. (The sample project must be committed to `develop` first — the I-do leaves it untracked.)
+4. Edited a view on a `feature/*` branch, opened a PR **into `develop`**, watched CI pass on `ubuntu-latest`, merged. (The sample project must be committed to `develop` first — the We-do leaves it untracked.)
 5. Watched `deploy.yml` run end-to-end on their bundled runner: checkout → verify prereqs → prune → ship (docker cp) → scan → smoke-check.
 6. Verified the change in the **dev** gateway UI (http://localhost:8089).
 7. Merged `develop` → `main`, pushed a `v*` tag, and watched `release.yml` promote the same change to **prod** (http://localhost:8090).

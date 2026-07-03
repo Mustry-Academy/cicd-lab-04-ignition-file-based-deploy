@@ -29,7 +29,7 @@ Open <http://localhost:8088> (the `local` gateway — the one you'll work with f
 
 If you'd like to read ahead: [`docs/ignition-file-structure.md`](../docs/ignition-file-structure.md).
 
-## I do (20 min)
+## We-do (20 min)
 
 The instructor walks through the gateway's `data/` directory live, both from the inside (via `docker exec`) and from the outside (the host bind mounts).
 

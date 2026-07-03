@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab 04 — Assignment: Decode the disk &amp; ship a file-based deploy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0e1b2e;
+  --navy2:#15233a;
+  --blue:#2563eb;
+  --blue-d:#1d4ed8;
+  --peri:#93a9f0;
+  --peri2:#a8bef7;
+  --peri-soft:#e8eefc;
+  --bg:#eef1f6;
+  --panel:#ffffff;
+  --panel2:#f5f8fc;
+  --line:#e3e9f1;
+  --line2:#d3dcea;
+  --txt:#15233a;
+  --txt-dim:#5a6a7e;
+  --txt-faint:#94a2b4;
+  --good:#16a34a; --good-soft:#e3f6ea;
+  --warn:#d97706; --warn-soft:#fbf0db;
+  --teal:#3bbdb4; --teal-l:#5fd6cd;
+  --shadow:0 1px 2px rgba(14,27,46,.05),0 10px 30px -16px rgba(14,27,46,.28);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--navy);
+  color:var(--txt);
+  font-family:'Libre Franklin',sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+.mono{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums}
+
+/* ---- deck mechanics ---- */
+.deck{height:100vh;width:100vw;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth}
+.deck::-webkit-scrollbar{display:none}
+.slide{
+  height:100vh;width:100vw;scroll-snap-align:start;scroll-snap-stop:always;
+  display:flex;flex-direction:column;position:relative;
+  padding:64px 64px 40px;background:var(--bg);
+}
+.slide.dark{background:radial-gradient(120% 120% at 80% -10%,#1c3358 0%,#0e1b2e 55%)}
+
+/* progress + nav */
+.hud{position:fixed;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.08);z-index:50}
+.hud .bar{height:100%;background:linear-gradient(90deg,var(--blue),var(--peri));width:0;transition:width .3s}
+.pager{position:fixed;right:22px;bottom:18px;z-index:50;font-size:11px;color:var(--txt-faint);font-family:'IBM Plex Mono'}
+.pager.on-dark{color:rgba(255,255,255,.55)}
+.hint{position:fixed;left:22px;bottom:16px;z-index:50;font-size:10.5px;color:var(--txt-faint);letter-spacing:.3px}
+.hint.on-dark{color:rgba(255,255,255,.4)}
+
+/* ---- logo ---- */
+.brandrow{display:flex;align-items:center;gap:13px}
+.logo-img{height:30px;width:auto;display:block}
+.logo-img.logo-lg{height:44px}
+
+/* slide chrome */
+.eyebrow{font-size:11px;letter-spacing:2.4px;text-transform:uppercase;color:var(--blue);font-weight:700;margin-bottom:14px}
+.dark .eyebrow{color:var(--peri2)}
+.title{font-weight:800;font-size:38px;line-height:1.05;letter-spacing:-1px;color:var(--navy)}
+.dark .title{color:#fff}
+.lead{font-size:16px;color:var(--txt-dim);line-height:1.5;max-width:820px;margin-top:14px}
+.dark .lead{color:#c4cfde}
+.sechead{display:flex;align-items:baseline;gap:14px;margin-bottom:22px}
+.sechead .num{font-family:'IBM Plex Mono';font-size:12px;font-weight:600;color:#fff;background:var(--blue);padding:5px 11px;border-radius:8px;letter-spacing:.5px;white-space:nowrap}
+.sechead .num.phase2{background:var(--peri)}
+.sechead .num.warm{background:var(--teal)}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:40px}
+.topbar .stage{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt-faint);font-weight:600}
+.topbar .stage.on-dark{color:rgba(255,255,255,.5)}
+
+/* ---- cover ---- */
+.cover{flex:1;display:flex;flex-direction:column;justify-content:center;gap:8px}
+.cover .big{font-weight:800;font-size:58px;line-height:1.02;letter-spacing:-1.6px;color:#fff;max-width:18ch}
+.cover .big em{font-style:normal;color:var(--peri2)}
+.cover .sub{font-size:17px;color:#aebbcd;max-width:64ch;line-height:1.55;margin-top:18px}
+.cover .for{margin-top:30px;display:flex;align-items:center;gap:14px;font-size:13px;color:#8fa0b6;flex-wrap:wrap}
+.cover .for .pill{border:1px solid rgba(255,255,255,.16);border-radius:30px;padding:7px 15px;color:#dbe4f0}
+.cover .for .pill b{color:#fff;font-weight:700}
+
+/* ---- generic layout ---- */
+.body{flex:1;display:flex;flex-direction:column;justify-content:center}
+
+/* ---- numbered task steps ---- */
+.steps{display:flex;flex-direction:column;gap:13px;margin-top:4px}
+.step{display:grid;grid-template-columns:34px 1fr;gap:15px;align-items:start}
+.step .ix{width:34px;height:34px;border-radius:10px;background:var(--peri-soft);color:var(--blue);font-weight:800;font-size:14px;display:grid;place-items:center;font-family:'IBM Plex Mono'}
+.step .ix.t{background:rgba(59,189,180,.16);color:var(--teal)}
+.step .ix.p{background:rgba(147,169,240,.22);color:var(--blue-d)}
+.step .tx{font-size:15px;color:var(--txt-dim);line-height:1.5;padding-top:5px}
+.step .tx b{color:var(--txt);font-weight:700}
+.step .tx code,.inlinecode{font-family:'IBM Plex Mono';font-size:13.5px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:2px 7px;color:var(--blue-d)}
+
+/* code block */
+.code{background:var(--navy);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);margin-top:6px;overflow:auto}
+.code pre{font-family:'IBM Plex Mono';font-size:14px;color:#dbe6f5;line-height:1.7}
+.code .cm{color:#7d93ad}
+.code .cmd2{color:var(--peri2)}
+
+/* goal / objective banner */
+.goal{display:flex;gap:14px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--blue);border-radius:14px;padding:16px 20px;box-shadow:var(--shadow);margin-top:auto}
+.goal .badge{font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#fff;background:var(--blue);padding:5px 10px;border-radius:7px;white-space:nowrap}
+.goal p{font-size:14px;color:var(--txt-dim);line-height:1.5}
+.goal p b{color:var(--txt);font-weight:700}
+.goal.warn-g{border-left-color:var(--warn)}
+.goal.warn-g .badge{background:var(--warn)}
+.goal.good-g{border-left-color:var(--good)}
+.goal.good-g .badge{background:var(--good)}
+
+/* checklist (dark) */
+.checks{display:flex;flex-direction:column;gap:13px;margin-top:6px}
+.checks li{list-style:none;display:flex;gap:13px;align-items:flex-start;font-size:15.5px;color:var(--txt-dim);line-height:1.5}
+.checks li b{color:var(--txt);font-weight:700}
+.ck{flex:none;width:23px;height:23px;border-radius:7px;background:var(--peri-soft);display:grid;place-items:center;margin-top:1px}
+.ck svg{width:12px;height:12px;color:var(--blue)}
+.dark .checks li{color:#c4cfde}
+.dark .checks li b{color:#fff}
+.dark .ck{background:rgba(147,169,240,.18)}
+.dark .ck svg{color:var(--peri2)}
+
+/* phase map (cover-ish overview) */
+.pmap{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:10px}
+.pcard{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 20px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.pcard:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--teal)}
+.pcard.p1:before{background:var(--blue)}
+.pcard.p2:before{background:var(--peri)}
+.pcard.p3:before{background:var(--warn)}
+.pcard .pn{font-family:'IBM Plex Mono';font-size:11px;color:var(--txt-faint);font-weight:600;letter-spacing:1px}
+.pcard h4{font-size:18px;font-weight:800;letter-spacing:-.3px;margin:8px 0 4px}
+.pcard p{font-size:13px;color:var(--txt-dim);line-height:1.5;margin-top:8px}
+.pcard .gate{font-family:'IBM Plex Mono';font-size:11px;color:var(--blue);font-weight:600;margin-top:12px}
+
+/* two-column for parts */
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+
+.foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;font-size:11.5px;color:var(--txt-faint);padding-top:22px}
+.dark .foot{color:rgba(255,255,255,.45)}
+
+@media print{
+  body{overflow:visible}
+  .deck{height:auto;overflow:visible}
+  .slide{height:100vh;page-break-after:always;break-after:page}
+  .hud,.pager,.hint{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+<!-- 1 · COVER -->
+<!-- Day 2 · afternoon per instructor brief. You-do slots per the exercise files: Block A 30 min, Block B 40 min. -->
+<section class="slide dark">
+  <div class="topbar">
+    <div class="on-dark brandrow"><img class="logo-img logo-lg" src="logos/OriginalLight.png" alt="Mustry Solutions"></div>
+    <div class="stage on-dark">Lab 04 · The assignment · Blocks A &amp; B</div>
+  </div>
+  <div class="cover">
+    <div class="eyebrow">The assignment · breakout rooms</div>
+    <div class="big">Decode the disk, then <em>ship it</em>.</div>
+    <div class="sub">Two blocks. In Block A you become the person who can point at any file in an Ignition gateway's <span class="mono" style="color:#dbe4f0">data/</span> directory and say what it is, who owns it, and whether it belongs in git. In Block B you wire that knowledge into GitHub Actions: a PR merged into <span class="mono" style="color:#dbe4f0">develop</span> lands on the dev gateway, a tag on <span class="mono" style="color:#dbe4f0">main</span> lands on prod — hot scan, no restarts.</div>
+    <div class="for">
+      <span>Floating to help</span>
+      <span class="pill"><b>Sam</b></span>
+      <span class="pill"><b>Jasper</b></span>
+      <span>·</span>
+      <span class="pill">share your screen</span>
+    </div>
+  </div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Lab 04 — Ignition file-based deploy</span></div>
+</section>
+
+<!-- 2 · HOW THIS WORKS / RULES -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">The assignment · ground rules</div>
+  </div>
+  <div class="body">
+    <div class="sechead"><span class="num">READ FIRST</span><div><div class="title">How this works</div></div></div>
+    <ul class="checks" style="max-width:940px">
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Share your screen</b> in your breakout room — this is a "look over your shoulder" class. We'll drop in where it's useful.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Work in your fork.</b> The self-hosted runner registers against <i>your</i> fork, not the upstream. The exercise files are the source of truth: <span class="inlinecode">exercises/block-a.md</span> and <span class="inlinecode">exercises/block-b.md</span>.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Run <span class="inlinecode">scripts/setup.sh</span> first</b> — it's idempotent. It brings up three gateways + TimescaleDB + the runner and waits until everything is RUNNING (cold start takes a few minutes).</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Trial mode is fine.</b> Each gateway runs a 2-hour trial. Reset via <i>Gateway → Config → Licensing → Reset Trial</i> — unlimited, and you'll do it three times if all gateways stay up.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Answer keys exist</b> (<span class="inlinecode">instructor-notes/</span>) — <b>don't peek</b> before you've done the solo work. The classification skill <i>is</i> the lesson.</span></li>
+    </ul>
+    <div class="goal good-g">
+      <span class="badge">Ask early</span>
+      <p>Stuck for more than a couple of minutes? <b>Say so in the room.</b> Also: <span class="inlinecode">docs/TROUBLESHOOTING.md</span> covers the common stack / runner / deploy failures.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Block A → Block B, in order</span></div>
+</section>
+
+<!-- 3 · THE PLAN -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">The assignment · the plan</div>
+  </div>
+  <div class="body">
+    <div class="sechead"><span class="num">THE PLAN</span><div><div class="title">Four stops, in order</div></div></div>
+    <div class="pmap">
+      <div class="pcard">
+        <div class="pn">BLOCK A · WE DO</div>
+        <h4>Find the file</h4>
+        <p>The marker trick: touch a marker, make a UI change, <span class="inlinecode">find -newer</span> the file the gateway wrote.</p>
+        <div class="gate">exercises/block-a.md · We do</div>
+      </div>
+      <div class="pcard p1">
+        <div class="pn">BLOCK A · YOU DO</div>
+        <h4>Classify 3 changes</h4>
+        <p>Pick three gateway changes. For each: what changed, where on disk, which bucket, commit it or not?</p>
+        <div class="gate">gate → definition of done ✅</div>
+      </div>
+      <div class="pcard p2">
+        <div class="pn">BLOCK B · WE DO</div>
+        <h4>Deploy by hand</h4>
+        <p>Edit a view → scan local → <span class="inlinecode">docker cp</span> to dev → scan dev. The workflow, done manually once.</p>
+        <div class="gate">exercises/block-b.md · We do</div>
+      </div>
+      <div class="pcard p3">
+        <div class="pn">BLOCK B · YOU DO</div>
+        <h4>Wire it into Actions</h4>
+        <p>Runner online → environments + secrets → PR to <span class="inlinecode">develop</span> ships dev → tag ships prod → break one on purpose.</p>
+        <div class="gate">Parts 1 → 5</div>
+      </div>
+    </div>
+    <div class="goal">
+      <span class="badge">Why this order</span>
+      <p>Block B automates <b>exactly</b> what you do by hand in Block A/We-do. Start the Block B prerequisites early: <b>fork with Actions enabled, a <span class="inlinecode">develop</span> branch, a PAT in <span class="inlinecode">.env</span>, an API key per gateway</b> — the #1 "nothing deploys" cause is a missing <span class="inlinecode">develop</span> branch.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Block A before Block B</span></div>
+</section>
+
+<!-- 4 · BLOCK A · WE DO 1 -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Block A · we do · together</div>
+  </div>
+  <div class="body">
+    <div class="sechead"><span class="num warm">BLOCK A · WE DO 1</span><div><div class="title">The marker trick — catch the gateway writing</div><div class="lead">Every UI click writes a file somewhere under <span class="inlinecode">data/</span>. Set a timestamp marker, click, then ask <span class="inlinecode">find</span> what's newer.</div></div></div>
+    <div class="cols2">
+      <div class="steps">
+        <div class="step"><div class="ix t">1</div><div class="tx">List every top-level entry of <span class="inlinecode">data/</span> — note which <b>bucket</b> each is. (Operational paths only show via <span class="inlinecode">docker exec</span>; they live in the named volume, not the host bind mount.)</div></div>
+        <div class="step"><div class="ix t">2</div><div class="tx"><b>Set the marker</b> — do this <i>before</i> every UI change you want to trace.</div></div>
+        <div class="step"><div class="ix t">3</div><div class="tx">In the local gateway UI (<span class="inlinecode">:8088</span>): <b>Config → Networking → Web Server</b> → change <i>Idle Timeout</i> (default 300). Save.</div></div>
+        <div class="step"><div class="ix t">4</div><div class="tx"><b>Find what changed</b> — then <span class="inlinecode">cat</span> the file. You'll see a <span class="inlinecode">config.json</span> plus the gateway rewriting a sibling <span class="inlinecode">resource.json</span> manifest.</div></div>
+      </div>
+      <div>
+        <div class="code"><pre><span class="cm"># 1 — the full tree, from inside the container</span>
+docker exec -it lab04-ignition-local bash -lc \
+  "ls -la /usr/local/bin/ignition/data"
+
+<span class="cm"># 2 — the marker</span>
+docker exec lab04-ignition-local touch /tmp/marker
+
+<span class="cm"># 4 — what did the UI change write?</span>
+docker exec lab04-ignition-local find \
+  /usr/local/bin/ignition/data/config \
+  -newer /tmp/marker -type f 2>/dev/null</pre></div>
+        <div class="goal" style="margin-top:18px">
+          <span class="badge">Bind mount</span>
+          <p>Because <b>local</b> bind-mounts <span class="inlinecode">./services/config/</span>, that file also just appeared <b>in your repo on the host</b>. Run <span class="inlinecode">git status</span> and see.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Block A we-do 1 of 2</span></div>
+</section>
+
+<!-- 5 · BLOCK A · WE DO 2 -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Block A · we do · together</div>
+  </div>
+  <div class="body">
+    <div class="sechead"><span class="num warm">BLOCK A · WE DO 2</span><div><div class="title">Add a database connection, find where it lands</div><div class="lead">A gateway-level change this time — watch it land under <span class="inlinecode">config/resources/&lt;scope&gt;/</span>.</div></div></div>
+    <div class="cols2">
+      <div class="steps">
+        <div class="step"><div class="ix t">1</div><div class="tx">Re-touch the marker (<span class="inlinecode">docker exec lab04-ignition-local touch /tmp/marker</span>).</div></div>
+        <div class="step"><div class="ix t">2</div><div class="tx">UI: <b>Config → Databases → Connections → New</b>. Postgres datasource → host <span class="inlinecode">timescaledb</span>, port <span class="inlinecode">5432</span>, db <span class="inlinecode">ignition_loc</span>, user/pass from <span class="inlinecode">.env</span> (default <span class="inlinecode">ignition</span>/<span class="inlinecode">ignition</span>). Save.</div></div>
+        <div class="step"><div class="ix t">3</div><div class="tx">Run the <span class="inlinecode">find -newer</span> again. The connection lands at <span class="inlinecode">config/resources/&lt;scope&gt;/ignition/database-connection/&lt;name&gt;/config.json</span>.</div></div>
+        <div class="step"><div class="ix t">4</div><div class="tx"><b>Answer out loud:</b> gateway-level or project-level? Would you commit it? Which scope did it land in — and why does that matter for dev vs prod?</div></div>
+      </div>
+      <div>
+        <div class="code"><pre><span class="cm"># hostname "timescaledb" is the compose service name —</span>
+<span class="cm"># the gateway resolves it on the lab's docker network</span>
+
+docker exec lab04-ignition-local touch /tmp/marker
+<span class="cm"># …make the UI change, then:</span>
+docker exec lab04-ignition-local find \
+  /usr/local/bin/ignition/data/config \
+  -newer /tmp/marker -type f 2>/dev/null
+
+docker exec lab04-ignition-local cat &lt;path-you-found&gt;</pre></div>
+        <div class="goal warn-g" style="margin-top:18px">
+          <span class="badge">Heads-up</span>
+          <p>Expect a <b>longer path than 8.1 habits suggest</b> — scope first, then module namespace. If you can't find the file, you probably forgot to re-touch the marker <i>before</i> the change.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Block A we-do 2 of 2 → now go solo</span></div>
+</section>
+
+<!-- 6 · BLOCK A · YOU DO -->
+<section class="slide dark">
+  <div class="topbar">
+    <div class="on-dark brandrow"><img class="logo-img" src="logos/OriginalLight.png" alt="Mustry Solutions"></div>
+    <div class="stage on-dark">Block A · you do · solo · 30 min</div>
+  </div>
+  <div class="body">
+    <div class="eyebrow">Block A · solo · which bucket, where on disk?</div>
+    <div class="title" style="color:#fff">Make three changes. Classify every one.</div>
+    <p class="lead">Pick <b style="color:#fff">three</b> from the list (or invent your own — at least one of your own is worth more). For each, note: <b style="color:#fff">what you changed · where it lives on disk (relative to <span class="mono">data/</span>) · which bucket · would you commit it, one sentence why</b>.</p>
+    <ul class="checks" style="max-width:980px;margin-top:20px">
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>A Perspective view</b> in a project — no Designer? Simulate on disk: <span class="mono" style="color:#dbe4f0">projects/sample/com.inductiveautomation.perspective/views/Hello/{view.json, resource.json}</span> (minimal content in <span class="mono" style="color:#dbe4f0">docs/ignition-file-structure.md</span> — the <b>resource.json manifest is required</b>).</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Gateway timezone</b> (Config → System → Time) · <b>a new user</b> (Config → Security → Users) · <b>a new tag provider</b> (Config → Tags → Realtime) · <b>toggle a module</b> (Config → Modules).</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Use the marker trick every time</b> — re-touch before each change, <span class="mono" style="color:#dbe4f0">find -newer</span> after. One of the five lands somewhere that must <b>never</b> go in git. Which?</span></li>
+    </ul>
+    <div class="goal" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.14);border-left-color:var(--good)">
+      <span class="badge" style="background:var(--good)">Done when</span>
+      <p style="color:#c4cfde">Without peeking: you can name each <span class="mono" style="color:#dbe4f0">data/</span> entry's bucket · find any UI change's file with the marker trick · state the 8.3 path shape for a view <b style="color:#fff">and</b> a config resource · explain why <span class="mono" style="color:#dbe4f0">users.idb</span> and <span class="mono" style="color:#dbe4f0">.resources/</span> are never committed.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>exercises/block-a.md · You do — answers in your notes</span></div>
+</section>
+
+<!-- 7 · BLOCK A · STRETCH -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Block A · optional stretch</div>
+  </div>
+  <div class="body">
+    <div class="sechead"><span class="num warm">OPTIONAL · A</span><div><div class="title">Stretch — draft the <span class="mono" style="font-size:30px">.gitignore</span></div><div class="lead">You now know the operational bucket. Turn that knowledge into ignore patterns — the precursor to <span class="inlinecode">.deployignore</span>, which Block B puts to work.</div></div></div>
+    <div class="cols2">
+      <div class="steps">
+        <div class="step"><div class="ix t">1</div><div class="tx">From memory, draft a starter <span class="inlinecode">.gitignore</span> for an Ignition project repo. Cover the <b>operational bucket</b>: logs, internal DBs, idb, temp, metadata.</div></div>
+        <div class="step"><div class="ix t">2</div><div class="tx">Compare with the shipped <span class="inlinecode">.gitignore</span> in this repo. <b>What did you miss? What did the shipped one miss?</b></div></div>
+        <div class="step"><div class="ix t">3</div><div class="tx">Commonly forgotten: <span class="inlinecode">config/resources/local/</span> (instance identity), <span class="inlinecode">*.gwbk</span> (backups), <span class="inlinecode">*.modl</span> (module binaries), <span class="inlinecode">.metadata/</span>.</div></div>
+      </div>
+      <div>
+        <div class="code"><pre><span class="cm"># a reasonable answer looks something like:</span>
+data/db/
+data/users.idb
+data/temp/
+data/logs/
+data/.metadata/
+data/config/resources/local/
+data/modules/*.modl
+*.gwbk
+.env</pre></div>
+      </div>
+    </div>
+    <div class="goal">
+      <span class="badge">Debrief question</span>
+      <p>Which bucket has the <b>trickiest deploy story</b>? Hint: it's the one that <i>sometimes</i> needs a restart — and it frames everything in Block B.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Stretch — optional · then on to Block B</span></div>
+</section>
+
+<!-- 8 · BLOCK B · PRE-FLIGHT -->
+<section class="slide dark">
+  <div class="topbar">
+    <div class="on-dark brandrow"><img class="logo-img" src="logos/OriginalLight.png" alt="Mustry Solutions"></div>
+    <div class="stage on-dark">Block B · pre-flight</div>
+  </div>
+  <div class="body">
+    <div class="eyebrow">Block B · before anything can deploy</div>
+    <div class="title" style="color:#fff;max-width:22ch">Pre-flight — five things your fork needs</div>
+    <ul class="checks" style="max-width:960px;margin-top:20px">
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Fork with Actions enabled.</b> Forks ship with workflows <b>disabled</b> — open your fork's <i>Actions</i> tab and click "enable" or nothing will ever trigger.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>A <span class="mono" style="color:#dbe4f0">develop</span> branch</b> — Git Flow's integration branch. Optionally make it the fork's default branch so PRs target it automatically.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>A GitHub PAT with <span class="mono" style="color:#dbe4f0">repo</span> scope</b> in <span class="mono" style="color:#dbe4f0">.env</span> as <span class="mono" style="color:#dbe4f0">RUNNER_GITHUB_PAT</span>, and <span class="mono" style="color:#dbe4f0">RUNNER_REPO_URL</span> pointing at <b>your fork</b>. The bundled runner auto-registers with it.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>An API key per gateway</b>: each gateway's UI → <i>Config → Security → API Keys → New</i>, scoped to <b>Project Scan + Config Scan</b> only. Copy immediately — you can't read it back. Into <span class="mono" style="color:#dbe4f0">.env</span> as <span class="mono" style="color:#dbe4f0">IGNITION_API_KEY_LOCAL/_DEV/_PROD</span>.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Two GitHub environments</b>: <span class="mono" style="color:#dbe4f0">lab-gateway-dev</span> and <span class="mono" style="color:#dbe4f0">lab-gateway-prod</span> — set up in Part 2.</span></li>
+    </ul>
+    <div class="code" style="max-width:640px;margin-top:18px"><pre><span class="cm"># the develop branch, one-time</span>
+git checkout -b develop &amp;&amp; git push -u origin develop</pre></div>
+  </div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>exercises/block-b.md · Pre-flight</span></div>
+</section>
+
+<!-- 9 · BLOCK B · WE DO -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Block B · we do · together</div>
+  </div>
+  <div class="body">
+    <div class="sechead"><span class="num warm">BLOCK B · WE DO</span><div><div class="title">The deploy, by hand, once</div><div class="lead">Everything <span class="inlinecode">deploy.yml</span> automates — done manually so the workflow holds no mysteries.</div></div></div>
+    <div class="cols2">
+      <div class="steps">
+        <div class="step"><div class="ix t">1</div><div class="tx">Edit <span class="inlinecode">projects/sample/…/views/Hello/view.json</span> (e.g. <span class="inlinecode">width: 800 → 1200</span>). It's <b>already on the local gateway's disk</b> — bind mount.</div></div>
+        <div class="step"><div class="ix t">2</div><div class="tx"><b>Scan local</b>, verify at <span class="inlinecode">:8088</span> — the scan makes the gateway <i>notice</i> what's on disk.</div></div>
+        <div class="step"><div class="ix t">3</div><div class="tx"><b>Ship to dev by hand</b>: wipe, <span class="inlinecode">docker cp</span>, scan. Verify at <span class="inlinecode">:8089</span> — same view, same width.</div></div>
+        <div class="step"><div class="ix t">4</div><div class="tx">Open <span class="inlinecode">.deployignore</span>. For each pattern, say <b>why the gateway shouldn't have that file</b>.</div></div>
+      </div>
+      <div>
+        <div class="code"><pre><span class="cm"># 2 — local: files already there, just scan</span>
+scripts/trigger-scan.sh both --gateway local
+
+<span class="cm"># 3 — dev: wipe → copy → scan (deploy.yml does exactly this)</span>
+docker exec lab04-ignition-dev sh -c \
+  "rm -rf /usr/local/bin/ignition/data/projects/* \
+          /usr/local/bin/ignition/data/config/*"
+docker cp ./projects/. \
+  lab04-ignition-dev:/usr/local/bin/ignition/data/projects/
+docker cp ./services/config/. \
+  lab04-ignition-dev:/usr/local/bin/ignition/data/config/
+scripts/trigger-scan.sh both --gateway dev</pre></div>
+        <div class="goal" style="margin-top:16px">
+          <span class="badge">No sample project?</span>
+          <p>If you skipped the demo, use any view under the shipped <span class="inlinecode">projects/example-project/</span> instead — the flow is identical.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Block B we-do → now automate it</span></div>
+</section>
+
+<!-- 10 · BLOCK B · YOU DO · PARTS 1–2 -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Block B · you do · parts 1–2</div>
+  </div>
+  <div class="body">
+    <div class="sechead"><span class="num p" style="background:var(--peri)">PARTS 1–2</span><div><div class="title">Runner online + environments &amp; secrets</div><div class="lead">15 min. The plumbing between your fork and your gateways.</div></div></div>
+    <div class="cols2">
+      <div class="steps">
+        <div class="step"><div class="ix p">1</div><div class="tx"><b>Verify the runner</b> (it's part of the compose stack). Then check your fork: <i>Settings → Actions → Runners</i> must show it <b>online</b> with labels <span class="inlinecode">self-hosted, lab04</span>.</div></div>
+        <div class="step"><div class="ix p">2</div><div class="tx">Not there? Three checks: <span class="inlinecode">RUNNER_REPO_URL</span> points at <b>your fork</b> · <span class="inlinecode">RUNNER_GITHUB_PAT</span> is a real PAT (not the placeholder) · <span class="inlinecode">docker compose restart github-runner</span>.</div></div>
+        <div class="step"><div class="ix p">3</div><div class="tx"><b>Create environment</b> <span class="inlinecode">lab-gateway-dev</span> (<i>Settings → Environments</i>) with secret <span class="inlinecode">IGNITION_API_KEY</span> = the key you generated <b>on the dev gateway</b> (:8089).</div></div>
+        <div class="step"><div class="ix p">4</div><div class="tx">Repeat: <span class="inlinecode">lab-gateway-prod</span> with the key from the <b>prod gateway</b> (:8090). Leave <span class="inlinecode">IGNITION_URL</span> / <span class="inlinecode">IGNITION_CONTAINER</span> unset — the defaults match the bundled runner.</div></div>
+      </div>
+      <div>
+        <div class="code"><pre><span class="cm"># part 1 — is the runner alive?</span>
+docker compose ps github-runner
+docker compose logs --tail 50 github-runner
+<span class="cm"># look for "Listening for Jobs"</span></pre></div>
+        <div class="goal warn-g" style="margin-top:18px">
+          <span class="badge">Per-gateway keys</span>
+          <p><b>API keys are per-gateway, not per-URL.</b> The dev key won't authenticate against prod. And the runner reaches gateways by <b>compose service name</b> (<span class="inlinecode">http://ignition-dev:8088</span>) — the host ports 8089/8090 are only how <i>you</i> reach the UIs.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Parts 1–2 of 5</span></div>
+</section>
+
+<!-- 11 · BLOCK B · YOU DO · PART 3 -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Block B · you do · part 3</div>
+  </div>
+  <div class="body">
+    <div class="sechead"><span class="num p" style="background:var(--peri)">PART 3</span><div><div class="title">Ship to dev via <span class="mono" style="font-size:30px">develop</span></div><div class="lead">15 min. A real PR rides the pipeline: feature branch → PR → CI → merge → deploy.yml → dev gateway.</div></div></div>
+    <div class="cols2">
+      <div class="steps">
+        <div class="step"><div class="ix p">1</div><div class="tx"><b>One-time:</b> the sample project must be <i>committed</i> to <span class="inlinecode">develop</span> (the We-do left it untracked).</div></div>
+        <div class="step"><div class="ix p">2</div><div class="tx">Branch <span class="inlinecode">feature/tweak-view</span> off <span class="inlinecode">develop</span>, change the view's <b>height</b>, push.</div></div>
+        <div class="step"><div class="ix p">3</div><div class="tx">Open a PR <b>into <span class="inlinecode">develop</span></b>. Watch <span class="inlinecode">ci.yml</span> run on <span class="inlinecode">ubuntu-latest</span> (free) — JSON, <span class="inlinecode">.deployignore</span> and workflow validation.</div></div>
+        <div class="step"><div class="ix p">4</div><div class="tx"><b>Merge.</b> <span class="inlinecode">deploy.yml</span> fires (note the <span class="inlinecode">paths:</span> filter — docs-only pushes don't deploy). Watch the <b>Ship</b> and <b>Trigger gateway scan</b> steps.</div></div>
+        <div class="step"><div class="ix p">5</div><div class="tx"><b>Verify at :8089</b> — the dev gateway shows your new height.</div></div>
+      </div>
+      <div>
+        <div class="code"><pre><span class="cm"># 1 — one-time: get sample onto develop</span>
+git add projects/sample
+git commit -m <span class="cmd2">"Add sample project"</span>
+git push origin develop
+
+<span class="cm"># 2 — the feature</span>
+git checkout develop
+git checkout -b feature/tweak-view
+<span class="cm"># edit …/views/Hello/view.json — change height</span>
+git commit -am <span class="cmd2">"Tweak Hello view height"</span>
+git push -u origin feature/tweak-view
+<span class="cm"># then: PR into develop → CI green → merge</span></pre></div>
+      </div>
+    </div>
+    <div class="goal warn-g">
+      <span class="badge">Nothing deployed?</span>
+      <p>Two classic causes: you merged into <b><span class="inlinecode">main</span></b> instead of <span class="inlinecode">develop</span> (only <span class="inlinecode">develop</span> triggers <span class="inlinecode">deploy.yml</span>), or your fork has no <span class="inlinecode">develop</span> branch so the PR silently targeted <span class="inlinecode">main</span>.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Part 3 of 5</span></div>
+</section>
+
+<!-- 12 · BLOCK B · YOU DO · PART 4 -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Block B · you do · part 4</div>
+  </div>
+  <div class="body">
+    <div class="sechead"><span class="num p" style="background:var(--peri)">PART 4</span><div><div class="title">Release to prod: <span class="mono" style="font-size:30px">main</span> + a tag</div><div class="lead">10 min. The Git Flow release: bring <span class="inlinecode">develop</span> to <span class="inlinecode">main</span>, then tag. <b>The tag — not the merge — is what ships.</b></div></div></div>
+    <div class="cols2">
+      <div class="steps">
+        <div class="step"><div class="ix p">6</div><div class="tx">Merge <span class="inlinecode">develop</span> into <span class="inlinecode">main</span> (a simple <span class="inlinecode">--no-ff</span> merge stands in for a <span class="inlinecode">release/*</span> branch today).</div></div>
+        <div class="step"><div class="ix p">7</div><div class="tx"><b>Observe: nothing deploys.</b> A push to <span class="inlinecode">main</span> triggers no workflow — by design.</div></div>
+        <div class="step"><div class="ix p">8</div><div class="tx">Tag <span class="inlinecode">v0.1.0</span> and push the tag. <span class="inlinecode">release.yml</span> fires — same five steps, different environment, prod container.</div></div>
+        <div class="step"><div class="ix p">9</div><div class="tx"><b>Verify at :8090</b> — prod now shows the change you merged through <span class="inlinecode">develop</span> and just released.</div></div>
+      </div>
+      <div>
+        <div class="code"><pre>git checkout main &amp;&amp; git pull
+git merge --no-ff develop -m <span class="cmd2">"Release v0.1.0"</span>
+git push origin main          <span class="cm"># ← nothing happens</span>
+
+git tag v0.1.0
+git push origin v0.1.0        <span class="cm"># ← release.yml fires</span></pre></div>
+        <div class="goal good-g" style="margin-top:18px">
+          <span class="badge">Why tags</span>
+          <p>Prod always runs a <b>named, re-deployable version</b>. That's also your rollback button: <span class="inlinecode">release.yml</span>'s <b>workflow_dispatch</b> takes a tag input — re-deploying <span class="inlinecode">v0.1.0</span> is two clicks, no git surgery.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Part 4 of 5</span></div>
+</section>
+
+<!-- 13 · BLOCK B · YOU DO · PART 5 -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Block B · you do · part 5</div>
+  </div>
+  <div class="body">
+    <div class="sechead"><span class="num p" style="background:var(--peri)">PART 5</span><div><div class="title">Break a deploy on purpose</div><div class="lead">~5 min, optional but strongly encouraged — reading the failure is half the lesson. Pick one.</div></div></div>
+    <div class="cols2">
+      <div class="steps">
+        <div class="step"><div class="ix p">A</div><div class="tx"><b>Wrong API key.</b> Set garbage in <span class="inlinecode">lab-gateway-dev</span>'s secret, re-run the deploy. The <b>Ship step succeeds</b> (docker cp doesn't care about keys) but the <b>scan 403s</b>. Files are in the container; the gateway never reloaded. <i>What's your recovery story?</i></div></div>
+        <div class="step"><div class="ix p">B</div><div class="tx"><b>Stopped container.</b> <span class="inlinecode">docker compose stop ignition-dev</span>, then trigger a deploy. The <b>verify step fails fast</b>: "container is in state 'exited', expected 'running'" — before any file moved. Much better than failing halfway.</div></div>
+        <div class="step"><div class="ix p">C</div><div class="tx">Then <b>fix it and re-run</b> the workflow (manual <span class="inlinecode">workflow_dispatch</span> works too). The steps are idempotent — the deploy converges.</div></div>
+      </div>
+      <div>
+        <div class="code"><pre><span class="cm"># failure B — stop the target, watch verify fail fast</span>
+docker compose stop ignition-dev
+<span class="cm"># … re-run deploy.yml from the Actions tab …</span>
+docker compose up -d ignition-dev  <span class="cm"># recovery</span></pre></div>
+        <div class="goal" style="margin-top:18px">
+          <span class="badge">Write it down</span>
+          <p>For your chosen failure: <b>symptom → state of the gateway → recovery → which workflow step should have caught it earlier?</b> Bring the answer to the debrief.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Part 5 of 5 → definition of done</span></div>
+</section>
+
+<!-- 14 · STRETCH · MODULES PUZZLE -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Block B · optional stretch</div>
+  </div>
+  <div class="body">
+    <div class="sechead"><span class="num warm">OPTIONAL · B</span><div><div class="title">Stretch — the <span class="mono" style="font-size:30px">modules.json</span> puzzle</div><div class="lead">Gateway config ships the same way projects do… but not <b>every</b> gateway change rides that path. Two things to discover.</div></div></div>
+    <div class="cols2">
+      <div class="steps">
+        <div class="step"><div class="ix t">1</div><div class="tx"><b>It doesn't ship.</b> <span class="inlinecode">services/modules.json</span> is a <b>sibling</b> of <span class="inlinecode">services/config/</span> — and the workflows <span class="inlinecode">docker cp ./services/config/.</span> only. Open <span class="inlinecode">deploy.yml</span> and confirm from the <span class="inlinecode">docker cp</span> targets. (In this lab it's bind-mounted into all three gateways instead.)</div></div>
+        <div class="step"><div class="ix t">2</div><div class="tx"><b>A scan can't apply it anyway.</b> Even with a new <span class="inlinecode">modules.json</span> on the gateway, module enable/disable needs a <b>restart</b> (<span class="inlinecode">docker compose restart ignition-dev</span>) — unlike views and DB connections, which hot-reload.</div></div>
+        <div class="step"><div class="ix t">3</div><div class="tx"><b>Chew on this:</b> why does copy + scan work beautifully for views and database connections, but not for modules? List everything else a scan could never apply (memory, Java args, module binaries…) — and bring the list to the debrief.</div></div>
+      </div>
+      <div>
+        <div class="code"><pre><span class="cm"># deploy.yml ships exactly two trees:</span>
+docker cp ./projects/. …:$DATA/projects/
+docker cp ./services/config/. …:$DATA/config/
+<span class="cm"># modules.json is not under either one.</span></pre></div>
+        <div class="goal" style="margin-top:18px;border-left-color:var(--peri)">
+          <span class="badge" style="background:var(--peri);color:var(--navy)">Restart ≠ scan</span>
+          <p>A restart drops Perspective sessions and takes the gateway down for a minute or more. Deploys that need one are a <b>different beast</b>: plan them, announce them, keep them rare — and keep the daily scan lane free of them.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Stretch — optional · the limits of the scan</span></div>
+</section>
+
+<!-- 15 · DONE -->
+<section class="slide dark">
+  <div class="topbar">
+    <div class="on-dark brandrow"><img class="logo-img" src="logos/OriginalLight.png" alt="Mustry Solutions"></div>
+    <div class="stage on-dark">The assignment → Wrap-up</div>
+  </div>
+  <div class="body">
+    <div class="eyebrow">Nicely done</div>
+    <div class="title" style="color:#fff;max-width:24ch">You built a pipeline that ships Ignition.</div>
+    <ul class="checks" style="max-width:960px;margin-top:22px">
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>Your runner is <b>online</b> · both environments hold an <b>API key</b> · a PR into <span class="mono" style="color:#dbe4f0">develop</span> deployed <b>dev</b> · a <span class="mono" style="color:#dbe4f0">v*</span> tag deployed <b>prod</b> · you broke one deploy and can explain its recovery.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>You can say, in five steps, what happens between "merge" and "gateway reloaded" — and name the routing: <b>develop → dev, tag on main → prod, local outside the flow</b>.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>Bring to the debrief: your Part 5 failure story, your rollback answer (revert on <span class="mono" style="color:#dbe4f0">develop</span> vs re-deploy a tag), and <b>where a runner would sit at your customer's site</b>.</span></li>
+    </ul>
+    <div class="goal" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.14);border-left-color:var(--peri2)">
+      <span class="badge" style="background:var(--peri2);color:var(--navy)">Day 3</span>
+      <p style="color:#c4cfde"><b style="color:#fff">Baking this into images</b> — Lab 05. Bring your <span class="mono" style="color:#dbe4f0">modules.json</span> answer from the stretch.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Lab 04 complete</span></div>
+</section>
+
+</div>
+
+<div class="hud"><div class="bar" id="bar"></div></div>
+<div class="pager" id="pager">01 / 15</div>
+<div class="hint" id="hint">↑ ↓ / scroll to navigate</div>
+
+<script>
+const deck=document.getElementById('deck');
+const slides=[...document.querySelectorAll('.slide')];
+const bar=document.getElementById('bar');
+const pager=document.getElementById('pager');
+const hint=document.getElementById('hint');
+function pad(n){return String(n).padStart(2,'0')}
+function update(){
+  const i=Math.round(deck.scrollTop/window.innerHeight);
+  bar.style.width=((i)/(slides.length-1)*100)+'%';
+  pager.textContent=pad(i+1)+' / '+pad(slides.length);
+  const dark=slides[i]&&slides[i].classList.contains('dark');
+  pager.classList.toggle('on-dark',dark);
+  hint.classList.toggle('on-dark',dark);
+}
+deck.addEventListener('scroll',()=>{requestAnimationFrame(update)});
+window.addEventListener('keydown',e=>{
+  const i=Math.round(deck.scrollTop/window.innerHeight);
+  if(e.key==='ArrowDown'||e.key==='PageDown'||e.key===' '){e.preventDefault();deck.scrollTo({top:(i+1)*window.innerHeight})}
+  if(e.key==='ArrowUp'||e.key==='PageUp'){e.preventDefault();deck.scrollTo({top:(i-1)*window.innerHeight})}
+  if(e.key==='Home'){deck.scrollTo({top:0})}
+  if(e.key==='End'){deck.scrollTo({top:slides.length*window.innerHeight})}
+});
+update();
+setTimeout(()=>{hint.style.transition='opacity .6s';hint.style.opacity='0'},4200);
+</script>
+</body>
+</html>

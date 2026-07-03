@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab 04 — Teaching: Ignition 8.3 file structure &amp; file-based deploys</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0e1b2e;
+  --navy2:#15233a;
+  --blue:#2563eb;
+  --blue-d:#1d4ed8;
+  --peri:#93a9f0;
+  --peri2:#a8bef7;
+  --peri-soft:#e8eefc;
+  --bg:#eef1f6;
+  --panel:#ffffff;
+  --panel2:#f5f8fc;
+  --line:#e3e9f1;
+  --line2:#d3dcea;
+  --txt:#15233a;
+  --txt-dim:#5a6a7e;
+  --txt-faint:#94a2b4;
+  --good:#16a34a; --good-soft:#e3f6ea;
+  --warn:#d97706; --warn-soft:#fbf0db;
+  --teal:#3bbdb4;            /* node outline on dark, like the reference images */
+  --teal-l:#5fd6cd;
+  --shadow:0 1px 2px rgba(14,27,46,.05),0 10px 30px -16px rgba(14,27,46,.28);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--navy);
+  color:var(--txt);
+  font-family:'Libre Franklin',sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+.mono{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums}
+
+/* ---- deck mechanics ---- */
+.deck{height:100vh;width:100vw;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth}
+.deck::-webkit-scrollbar{display:none}
+.slide{
+  height:100vh;width:100vw;scroll-snap-align:start;scroll-snap-stop:always;
+  display:flex;flex-direction:column;position:relative;
+  padding:64px 64px 40px;background:var(--bg);
+}
+.slide.dark{background:radial-gradient(120% 120% at 80% -10%,#1c3358 0%,#0e1b2e 55%)}
+
+/* progress + nav */
+.hud{position:fixed;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.08);z-index:50}
+.hud .bar{height:100%;background:linear-gradient(90deg,var(--blue),var(--peri));width:0;transition:width .3s}
+.pager{position:fixed;right:22px;bottom:18px;z-index:50;font-size:11px;color:var(--txt-faint);font-family:'IBM Plex Mono'}
+.pager.on-dark{color:rgba(255,255,255,.55)}
+.hint{position:fixed;left:22px;bottom:16px;z-index:50;font-size:10.5px;color:var(--txt-faint);letter-spacing:.3px}
+.hint.on-dark{color:rgba(255,255,255,.4)}
+
+/* ---- logo ---- */
+.brandrow{display:flex;align-items:center;gap:13px}
+.logo-img{height:30px;width:auto;display:block}
+.logo-img.logo-lg{height:44px}
+
+/* slide chrome */
+.eyebrow{font-size:11px;letter-spacing:2.4px;text-transform:uppercase;color:var(--blue);font-weight:700;margin-bottom:14px}
+.dark .eyebrow{color:var(--peri2)}
+.title{font-weight:800;font-size:40px;line-height:1.04;letter-spacing:-1px;color:var(--navy)}
+.dark .title{color:#fff}
+.lead{font-size:16px;color:var(--txt-dim);line-height:1.5;max-width:760px;margin-top:14px}
+.dark .lead{color:#c4cfde}
+.sechead{display:flex;align-items:baseline;gap:14px;margin-bottom:26px}
+.sechead .num{font-family:'IBM Plex Mono';font-size:13px;font-weight:600;color:#fff;background:var(--blue);padding:5px 11px;border-radius:8px;letter-spacing:.5px}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:48px}
+.topbar .stage{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt-faint);font-weight:600}
+.topbar .stage.on-dark{color:rgba(255,255,255,.5)}
+
+/* ---- cover ---- */
+.cover{flex:1;display:flex;flex-direction:column;justify-content:center;gap:8px}
+.cover .big{font-weight:800;font-size:58px;line-height:1.02;letter-spacing:-1.6px;color:#fff;max-width:17ch}
+.cover .big em{font-style:normal;color:var(--peri2)}
+.cover .sub{font-size:17px;color:#aebbcd;max-width:64ch;line-height:1.55;margin-top:18px}
+
+/* ---- generic layout ---- */
+.body{flex:1;display:flex;flex-direction:column;justify-content:center}
+.cols{display:grid;gap:22px}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+
+/* bullets */
+.checks{display:flex;flex-direction:column;gap:13px;margin-top:6px}
+.checks li{list-style:none;display:flex;gap:13px;align-items:flex-start;font-size:14.5px;color:var(--txt-dim);line-height:1.5}
+.checks li b{color:var(--txt);font-weight:700}
+.ck{flex:none;width:22px;height:22px;border-radius:7px;background:var(--peri-soft);display:grid;place-items:center;margin-top:1px}
+.ck svg{width:12px;height:12px;color:var(--blue)}
+.dark .checks li{color:#c4cfde}
+.dark .checks li b{color:#fff}
+.dark .ck{background:rgba(147,169,240,.18)}
+.dark .ck svg{color:var(--peri2)}
+
+.callout{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 24px;box-shadow:var(--shadow);margin-top:22px}
+.callout .lab{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--warn);font-weight:700;margin-bottom:9px}
+.callout p{font-size:14.5px;color:var(--txt-dim);line-height:1.55}
+.callout p b{color:var(--txt);font-weight:700}
+.callout code{font-family:'IBM Plex Mono';font-size:13px;color:var(--blue-d)}
+
+.inlinecode{font-family:'IBM Plex Mono';font-size:13px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:2px 7px;color:var(--blue-d)}
+
+/* code block (navy) */
+.code{background:var(--navy);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);margin-top:6px;overflow:auto}
+.code pre{font-family:'IBM Plex Mono';font-size:13.5px;color:#dbe6f5;line-height:1.7}
+.code .cm{color:#7d93ad}
+.code .cmd2{color:var(--peri2)}
+
+.foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;font-size:11.5px;color:var(--txt-faint);padding-top:24px}
+.dark .foot{color:rgba(255,255,255,.45)}
+
+/* section divider */
+.divider{flex:1;display:flex;flex-direction:column;justify-content:center}
+.divider .q{font-weight:800;font-size:52px;line-height:1.05;letter-spacing:-1.4px;color:#fff;max-width:20ch}
+.divider .q em{font-style:normal;color:var(--peri2)}
+.divider .sub2{font-size:18px;color:#aebbcd;margin-top:18px;max-width:60ch;line-height:1.5}
+
+/* generic reveal — elements fade/rise in when .show is added */
+.reveal{opacity:0;transform:translateY(10px);transition:opacity .5s ease,transform .5s ease}
+.reveal.show{opacity:1;transform:none}
+
+/* ====== LAB-04 SPECIFIC VISUALS ====== */
+
+/* file tree (navy card) */
+.ftree{background:var(--navy);border-radius:14px;padding:20px 24px;box-shadow:var(--shadow);font-family:'IBM Plex Mono';font-size:13.5px;line-height:2;color:#dbe6f5}
+.ftree .dim{color:#7d93ad}
+.ftree .hl{color:#fff;font-weight:600}
+.ftag{display:inline-block;font-family:'IBM Plex Mono';font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;border-radius:5px;padding:2px 8px;margin-left:10px;vertical-align:1px}
+.ftag.proj{background:rgba(37,99,235,.28);color:#a8bef7}
+.ftag.gw{background:rgba(59,189,180,.22);color:#5fd6cd}
+.ftag.ops{background:rgba(217,119,6,.24);color:#f0b765}
+
+/* three-bucket cards */
+.buckets{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:8px}
+.bucket{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.bucket:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--blue)}
+.bucket.b2:before{background:var(--teal)}
+.bucket.b3:before{background:var(--warn)}
+.bucket h4{font-size:17px;font-weight:800;letter-spacing:-.3px}
+.bucket .who{font-family:'IBM Plex Mono';font-size:11px;color:var(--txt-faint);margin-top:3px}
+.bucket ul{margin-top:11px;display:flex;flex-direction:column;gap:5px}
+.bucket li{list-style:none;font-family:'IBM Plex Mono';font-size:12px;color:var(--txt-dim)}
+.bucket .dep{margin-top:13px;font-size:12.5px;color:var(--txt);background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:9px 12px;line-height:1.45}
+.bucket .dep b{font-weight:700}
+
+/* path anatomy (navy card with colored segments) */
+.anat{background:var(--navy);border-radius:14px;padding:22px 26px;box-shadow:var(--shadow);margin-top:10px}
+.anat .path{font-family:'IBM Plex Mono';font-size:16.5px;line-height:2.3;color:#dbe6f5;word-break:break-all}
+.anat .path .seg{padding:3px 7px;border-radius:6px;white-space:nowrap}
+.seg.sA{background:rgba(37,99,235,.32)}
+.seg.sB{background:rgba(59,189,180,.26)}
+.seg.sC{background:rgba(147,169,240,.24)}
+.seg.sD{background:rgba(217,119,6,.26)}
+.anat .legend{display:flex;gap:20px;flex-wrap:wrap;margin-top:14px;font-size:12px;color:#9fb6cf}
+.anat .legend .sw{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+
+/* scope chain */
+.scopes{display:flex;align-items:stretch;gap:12px;margin-top:14px}
+.scope{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px 16px;box-shadow:var(--shadow)}
+.scope .nm{font-family:'IBM Plex Mono';font-size:14px;font-weight:600;color:var(--blue-d)}
+.scope p{font-size:12px;color:var(--txt-dim);line-height:1.5;margin-top:6px}
+.scope.instance{border-left:5px solid var(--warn)}
+.scarr{align-self:center;color:var(--txt-faint);font-size:20px;font-family:'IBM Plex Mono';flex:none}
+
+/* tables */
+.tbl{width:100%;border-collapse:separate;border-spacing:0;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);margin-top:10px}
+.tbl th{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--txt-faint);text-align:left;padding:12px 18px;background:var(--panel2);border-bottom:1px solid var(--line)}
+.tbl td{font-size:13.5px;color:var(--txt-dim);padding:10px 18px;border-bottom:1px solid var(--line);line-height:1.45;vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td b{color:var(--txt);font-weight:700}
+.tbl td code{font-family:'IBM Plex Mono';font-size:12px;color:var(--blue-d)}
+.tbl .ok{color:var(--good);font-weight:700;white-space:nowrap}
+.tbl .no{color:var(--warn);font-weight:700;white-space:nowrap}
+
+/* 5-step pipeline */
+.pipe5{display:flex;align-items:stretch;gap:10px;margin-top:16px}
+.p5{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 14px;box-shadow:var(--shadow)}
+.p5 .n{font-family:'IBM Plex Mono';font-size:11px;font-weight:600;color:#fff;background:var(--blue);border-radius:7px;padding:3px 9px;display:inline-block}
+.p5 h5{font-size:15.5px;font-weight:800;margin-top:9px;letter-spacing:-.2px}
+.p5 p{font-size:12px;color:var(--txt-dim);line-height:1.5;margin-top:6px}
+.p5 code{font-family:'IBM Plex Mono';font-size:11px;color:var(--blue-d)}
+.p5arr{align-self:center;color:var(--txt-faint);font-size:20px;font-family:'IBM Plex Mono';flex:none}
+
+/* failure cards */
+.fails{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px}
+.fail{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--warn);border-radius:12px;padding:14px 17px;box-shadow:var(--shadow)}
+.fail h5{font-size:14.5px;font-weight:800;letter-spacing:-.2px}
+.fail p{font-size:12.5px;color:var(--txt-dim);line-height:1.5;margin-top:5px}
+.fail p code{font-family:'IBM Plex Mono';font-size:11.5px;color:var(--blue-d)}
+.fail p b{color:var(--txt)}
+
+/* ---- graph canvas (dark viz slides) ---- */
+.stage-wrap{flex:1;display:flex;flex-direction:column}
+.viz{position:relative;flex:1;min-height:0}
+.viz svg{position:absolute;inset:0;width:100%;height:100%}
+.vtitle{position:absolute;top:18px;left:0;right:0;text-align:center;font-weight:800;font-size:34px;letter-spacing:-.5px;color:#fff}
+
+/* svg fade-in helper */
+.vshow{opacity:0;transition:opacity .55s ease}
+.vshow.on{opacity:1}
+.vpop{opacity:0;transform-box:fill-box;transform-origin:center;transform:scale(.5);transition:opacity .45s ease,transform .45s cubic-bezier(.2,1.3,.4,1)}
+.vpop.on{opacity:1;transform:scale(1)}
+.vdraw{opacity:0;transition:opacity .5s ease}
+.vdraw.on{opacity:1}
+
+/* control bar for interactive slides */
+.controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:14px;margin-top:auto;border-top:1px solid rgba(255,255,255,.08)}
+.controls .lead-step{font-size:13.5px;color:#c4cfde;margin-right:auto;max-width:60ch;line-height:1.45}
+.controls .lead-step b{color:#fff}
+.btn{font-family:'IBM Plex Mono';font-size:13px;font-weight:600;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.04);color:#dbe4f0;padding:9px 16px;border-radius:10px;cursor:pointer;transition:.15s}
+.btn:hover:not(:disabled){background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.4)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.primary:hover:not(:disabled){background:var(--blue-d)}
+.btn:disabled{opacity:.32;cursor:default}
+
+@media print{
+  body{overflow:visible}
+  .deck{height:auto;overflow:visible}
+  .slide{height:100vh;page-break-after:always;break-after:page}
+  .hud,.pager,.hint,.controls{display:none}
+  .reveal,.vshow,.vpop,.vdraw{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+<!-- 1 · COVER -->
+<!-- Day 2 · afternoon per instructor brief. NOTE: README.md still says "Day 3" — align the README if this schedule holds. -->
+<section class="slide dark">
+  <div class="topbar">
+    <div class="on-dark brandrow">
+      <img class="logo-img logo-lg" src="logos/OriginalLight.png" alt="Mustry Solutions">
+    </div>
+    <div class="stage on-dark">Lab 04 · Day 2 · Afternoon · Blocks A &amp; B</div>
+  </div>
+
+  <div class="cover">
+    <div class="eyebrow">Teaching · 60 min</div>
+    <div class="big">Ignition on disk — and deploys that are <em>just files</em>.</div>
+    <div class="sub">Ignition 8.3 stores everything it is as readable files on disk. First we decode that file tree — what's project, what's gateway config, what belongs to the box. Then the payoff: if it's all files, a <em style="color:#fff;font-style:normal">deployment is a file copy plus one API call</em>. No restarts, no gateway backups, no clicking.</div>
+  </div>
+
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Lab 04 — Ignition file-based deploy</span></div>
+</section>
+
+<!-- 2 · WHERE WE ARE -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Teaching</div>
+  </div>
+
+  <div class="body">
+    <div class="sechead">
+      <span class="num">01</span>
+      <div>
+        <div class="title">Ignition finally enters the chat</div>
+        <div class="lead">Labs 01–03 deliberately stayed on a generic Python stack — so you could learn Git, PRs, linters and GitHub Actions without the Ignition file format adding noise. The plumbing is solid. <b>Today we point it at three real gateways.</b></div>
+      </div>
+    </div>
+    <ul class="checks" style="max-width:960px">
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>You already have:</b> git fluency, branching &amp; PRs done right, validation as a safety net, workflows/jobs/steps, and a self-hosted runner. Every one of those comes back today, unchanged.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>New today:</b> the Ignition 8.3 <span class="inlinecode">data/</span> directory decoded, the gateway scan API, <span class="inlinecode">.deployignore</span>, and a local → dev → prod promotion driven by Git Flow.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Not today:</b> image-based deploys and multi-gateway coordination — that's Day 3 (Labs 05–06). Today is a deep dive: decode the file tree, then master the deploy pattern built directly on it.</span></li>
+    </ul>
+    <div class="callout">
+      <div class="lab" style="color:var(--blue)">Why 8.3 changes the game</div>
+      <!-- [VERIFY] exact 8.1 vs 8.3 storage claim — 8.1 kept most gateway config in an internal DB; 8.3 moved it to JSON resource files under config/resources/ -->
+      <p>In 8.3, gateway configuration lives as <b>JSON resource files on disk</b> (<code>config/resources/…</code>) instead of being locked inside an internal database. Files mean <b>diffs, reviews, and deploys</b> — the whole reason this course can exist in its current shape.</p>
+    </div>
+  </div>
+
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Labs 01–03 built the plumbing — today it meets the gateway</span></div>
+</section>
+
+<!-- 3 · DIVIDER — WHAT'S ON DISK -->
+<section class="slide dark">
+  <div class="topbar">
+    <div class="on-dark brandrow"><img class="logo-img" src="logos/OriginalLight.png" alt="Mustry Solutions"></div>
+    <div class="stage on-dark">Block A · the file structure</div>
+  </div>
+  <div class="divider">
+    <div class="eyebrow">Block A</div>
+    <div class="q">What does Ignition actually write to <em>disk</em>?</div>
+    <div class="sub2">Everything the gateway is lives under <span class="mono" style="color:#dbe4f0">data/</span>. If you can classify any file in there, you know how to version it, deploy it, and roll it back. Let's open the box.</div>
+  </div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>projects → config → operational</span></div>
+</section>
+
+<!-- 4 · THE data/ DIRECTORY -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Block A · the file structure</div>
+  </div>
+
+  <div class="body">
+    <div class="sechead">
+      <span class="num">02</span>
+      <div>
+        <div class="title">The <span class="mono" style="font-size:34px">data/</span> directory, top to bottom</div>
+        <div class="lead">What you see when you <span class="inlinecode">docker exec</span> into a gateway and <span class="inlinecode">ls /usr/local/bin/ignition/data</span>. Every entry belongs to one of three buckets.</div>
+      </div>
+    </div>
+    <div class="cols2" style="grid-template-columns:1.2fr 1fr">
+      <div class="ftree">
+<span class="dim">/usr/local/bin/ignition/</span><span class="hl">data</span><br>
+├── <span class="hl">projects/</span><span class="ftag proj">project</span><br>
+│&nbsp;&nbsp;&nbsp;└── <span class="dim">&lt;name&gt;/ — one dir per project</span><br>
+├── <span class="hl">config/resources/</span><span class="ftag gw">gateway</span><br>
+│&nbsp;&nbsp;&nbsp;├── <span class="dim">&lt;scope&gt;/&lt;module&gt;/&lt;type&gt;/&lt;name&gt;/</span><br>
+│&nbsp;&nbsp;&nbsp;└── <span class="hl">.resources/</span><span class="ftag ops">operational</span> <span class="dim">— content-addressed blobs</span><br>
+├── <span class="hl">modules.json</span><span class="ftag gw">gateway</span> <span class="dim">— which modules are enabled</span><br>
+├── <span class="hl">modules/</span><span class="ftag gw">gateway · binaries</span> <span class="dim">— installed .modl files</span><br>
+├── <span class="hl">db/</span> · <span class="hl">users.idb</span><span class="ftag ops">operational</span> <span class="dim">— internal stores</span><br>
+└── <span class="hl">logs/</span> · <span class="hl">temp/</span> · <span class="hl">.metadata/</span><span class="ftag ops">operational</span>
+      </div>
+      <div>
+        <ul class="checks">
+          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><span class="ftag proj" style="margin-left:0">project</span> per-project resources — views, scripts, page config. <b>This is what you deploy daily.</b></span></li>
+          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><span class="ftag gw" style="margin-left:0">gateway</span> cross-project config — DB connections, identity providers, tag providers, module enablement. Shared by everything on the gateway.</span></li>
+          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><span class="ftag ops" style="margin-left:0">operational</span> runtime state the gateway owns — internal DBs, users, logs, generated blobs. <b>Never versioned, never deployed.</b></span></li>
+        </ul>
+        <div class="callout" style="margin-top:18px">
+          <div class="lab" style="color:var(--blue)">In this lab</div>
+          <p>On the <b>local</b> gateway, <code>projects/</code> and <code>config/</code> are <b>bind-mounted from your repo</b> — the file tree on your laptop <i>is</i> the gateway's disk. The operational paths stay hidden in the container's named volume.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>docker exec -it lab04-ignition-local bash</span></div>
+</section>
+
+<!-- 5 · THE THREE BUCKETS -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Block A · the mental model</div>
+  </div>
+
+  <div class="body">
+    <div class="sechead">
+      <span class="num">03</span>
+      <div>
+        <div class="title">The three-bucket model</div>
+        <div class="lead">The one artifact to take home from Block A. Each bucket has a different owner — and a completely different deploy story.</div>
+      </div>
+    </div>
+    <div class="buckets">
+      <div class="bucket">
+        <h4>Project-level</h4>
+        <div class="who">owner: the application · in git: YES</div>
+        <ul>
+          <li>projects/&lt;name&gt;/</li>
+          <li>views, scripts, page config</li>
+          <li>project.json descriptor</li>
+        </ul>
+        <div class="dep"><b>Deploy:</b> copy → <b>project scan</b>. Hot reload, no restart. The bread and butter of daily CI/CD.</div>
+      </div>
+      <div class="bucket b2">
+        <h4>Gateway-level</h4>
+        <div class="who">owner: the application · in git: YES</div>
+        <ul>
+          <li>config/resources/&lt;scope&gt;/</li>
+          <li>modules.json</li>
+          <li>modules/ (binaries — usually not in git)</li>
+        </ul>
+        <div class="dep"><b>Deploy:</b> copy → <b>config scan</b>… but <b>some changes need a restart</b> (modules, JVM args). The tricky bucket.</div>
+      </div>
+      <div class="bucket b3">
+        <h4>Operational</h4>
+        <div class="who">owner: the gateway · in git: NEVER</div>
+        <ul>
+          <li>db/, users.idb</li>
+          <li>logs/, temp/, .metadata/</li>
+          <li>.resources/ (blob store)</li>
+        </ul>
+        <div class="dep"><b>Deploy:</b> you don't. The gateway owns this state; <b>backups (gwbk)</b> are the recovery mechanism, not git.</div>
+      </div>
+    </div>
+    <div class="callout">
+      <div class="lab" style="color:var(--blue)">The two questions that classify ~99% of files</div>
+      <p><b>1.</b> Would this file be different on a teammate's identical clone? → if yes, it's <b>operational</b>. &nbsp; <b>2.</b> Would I want this file in git history? → if yes, it's <b>versioned</b>.</p>
+    </div>
+  </div>
+
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Which bucket? — the Block A exam question</span></div>
+</section>
+
+<!-- 6 · PROJECT RESOURCES IN 8.3 -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Block A · project resources</div>
+  </div>
+
+  <div class="body">
+    <div class="sechead">
+      <span class="num">04</span>
+      <div>
+        <div class="title">Project resources — the real 8.3 shape</div>
+        <div class="lead">8.3 namespaces every project resource by <b>the module that owns it</b>. There is no flat <span class="inlinecode">views/</span> folder like 8.1 had — expect longer paths.</div>
+      </div>
+    </div>
+    <div class="anat">
+      <div class="path">
+        <span class="seg sA">projects/&lt;name&gt;/</span><span class="seg sB">com.inductiveautomation.perspective/</span><span class="seg sC">views/pages/&lt;Page&gt;/</span><span class="seg sD">{view.json · resource.json}</span>
+      </div>
+      <div class="legend">
+        <span><span class="sw" style="background:rgba(37,99,235,.7)"></span>project root + <span class="mono">project.json</span> descriptor</span>
+        <span><span class="sw" style="background:rgba(59,189,180,.7)"></span>owning module's namespace</span>
+        <span><span class="sw" style="background:rgba(147,169,240,.7)"></span>resource type + name</span>
+        <span><span class="sw" style="background:rgba(217,119,6,.7)"></span>payload + manifest</span>
+      </div>
+    </div>
+    <div class="cols2" style="margin-top:20px">
+      <ul class="checks">
+        <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Every resource carries a sibling <span class="inlinecode">resource.json</span> manifest</b> (scope, version, files, signature). No manifest → the gateway won't register the resource.</span></li>
+        <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>The gateway <b>rewrites manifests on every interaction</b> — which is why this lab ships <b>skip-worktree git hooks</b> so they don't spam your <span class="inlinecode">git status</span>.</span></li>
+        <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>Platform-owned resources live under the <span class="inlinecode">ignition/</span> namespace — including <b>script libraries as plain <span class="inlinecode">code.py</span> files</b>: diffable, reviewable, lintable like any other source.</span></li>
+      </ul>
+      <div class="code"><pre><span class="cm"># the shipped example-project, for real:</span>
+projects/example-project/
+├── project.json
+├── com.inductiveautomation.perspective/
+│   ├── views/…/{view.json, resource.json}
+│   ├── page-config/{config.json, resource.json}
+│   └── session-props/{props.json, resource.json}
+└── ignition/
+    ├── global-props/{data.bin, resource.json}
+    └── script-python/&lt;pkg&gt;/&lt;name&gt;/{code.py, resource.json}
+        <span class="cm">e.g. common/util, domain/refrigeration, tests/…</span></pre></div>
+    </div>
+  </div>
+
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>docs/ignition-file-structure.md has the full cheat sheet</span></div>
+</section>
+
+<!-- 7 · GATEWAY CONFIG + SCOPES -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Block A · gateway config</div>
+  </div>
+
+  <div class="body">
+    <div class="sechead">
+      <span class="num">05</span>
+      <div>
+        <div class="title">Gateway config — scopes that inherit</div>
+        <div class="lead"><span class="inlinecode">config/resources/&lt;scope&gt;/&lt;module&gt;/&lt;type&gt;/&lt;name&gt;/{config.json, resource.json}</span> — scope first, then module-namespaced, just like projects. Scopes form an <b>inheritance chain</b>.</div>
+      </div>
+    </div>
+    <div class="scopes">
+      <div class="scope">
+        <div class="nm">external</div>
+        <p>Ignition's built-in defaults. The base everything inherits from. You never touch it.</p>
+      </div>
+      <span class="scarr">→</span>
+      <div class="scope" style="border-left:5px solid var(--blue)">
+        <div class="nm">core</div>
+        <p><b>The portable config you version and ship</b> — DB connections, identity providers, tag providers, system props. Inherits external.</p>
+      </div>
+      <span class="scarr">→</span>
+      <div class="scope" style="border-left:5px solid var(--teal)">
+        <div class="nm">loc / dev / prd</div>
+        <p>Per-environment overrides. Selected at boot with <span class="mono">-Dignition.config.mode=&lt;scope&gt;</span> — exactly how the lab's three gateways differ.</p>
+      </div>
+      <div class="scope instance" style="margin-left:16px">
+        <div class="nm">local</div>
+        <p><b>Instance-bound.</b> OPC-UA keystores, the gateway's UUID. Copy this across gateways and you clone one box's identity onto another. Treat as operational.</p>
+      </div>
+    </div>
+    <div class="cols2" style="margin-top:20px">
+      <div class="code"><pre><span class="cm"># the override in action (services/config/resources/)</span>
+core/ignition/database-connection/TimescaleDB/config.json
+  <span class="cmd2">"connectURL": "jdbc:postgresql://timescaledb:5432/ignition"</span>
+loc/ignition/database-connection/TimescaleDB/config.json
+  <span class="cmd2">…/ignition_loc</span>   <span class="cm"># same name — per-env override</span>
+dev/… → <span class="cmd2">…/ignition_dev</span>   ·   prd/… → <span class="cmd2">…/ignition_prd</span>
+loc/config-mode.json   <span class="cm"># scope descriptor {parent: "core"}</span></pre></div>
+      <div class="callout" style="margin-top:6px">
+        <div class="lab" style="color:var(--blue)">Same trick as env vars — but reviewable</div>
+        <p>In this repo, <b>loc / dev / prd each hold exactly one override</b>: the <code>TimescaleDB</code> connection's <code>connectURL</code>. A view queries "TimescaleDB" — <b>which database</b> that hits depends on the boot scope. One repo, three gateways, three historians, zero crosstalk.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>core = ship it · loc/dev/prd = per-env · local = the box's own</span></div>
+</section>
+
+<!-- 8 · WHAT NEVER GOES IN GIT -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Block A · the never list</div>
+  </div>
+
+  <div class="body">
+    <div class="sechead">
+      <span class="num">06</span>
+      <div>
+        <div class="title">What must <em style="font-style:italic">never</em> be committed</div>
+        <div class="lead">The operational bucket, spelled out. If any of these ever show up in <span class="inlinecode">git status</span>, your ignore rules are broken.</div>
+      </div>
+    </div>
+    <table class="tbl" style="max-width:1000px">
+      <tr><th>Path</th><th>What it is</th><th>Why it's radioactive</th></tr>
+      <tr><td><code>users.idb</code></td><td><b>The whole internal user DB</b></td><td>Hashed passwords, last-login timestamps, lockout state. Commit it once → you've leaked everyone's session history.</td></tr>
+      <tr><td><code>db/</code></td><td>Internal H2 store</td><td>Constantly rewritten at runtime; merge conflicts are meaningless. Backup via <b>gwbk</b>, not git.</td></tr>
+      <tr><td><code>config/resources/.resources/</code></td><td>Content-addressed blob store (SHA-256 names)</td><td>Generated and churning — and it lives <b>inside</b> the versioned config tree. The gateway rebuilds it; committing it doubles your repo for nothing.</td></tr>
+      <tr><td><code>config/ignition/tags/*.idb · *.digest.json · migration-log-*.md</code></td><td>More churn inside versioned trees</td><td>Tag value store, theme/font/icon digests, 8.3 migration logs. The shipped <code>.gitignore</code> masks all of these with <code>**/</code> patterns.</td></tr>
+      <tr><td><code>logs/ · temp/ · .metadata/</code></td><td>Runtime breadcrumbs</td><td>Regenerable noise. Often not even worth backing up.</td></tr>
+      <tr><td><code>config/resources/local/</code></td><td>Instance identity (OPC-UA keystores, UUID)</td><td>Belongs to <b>this specific box</b>. Promote it and you clone a gateway's identity onto another.</td></tr>
+    </table>
+    <div class="callout">
+      <div class="lab">Classroom confession</div>
+      <p>Many Ignition teams have been committing <code>users.idb</code> for years without realising what's inside. The right pattern for users is an <b>identity provider</b> (which <i>is</i> versionable config) — Lab 07 covers it properly.</p>
+    </div>
+  </div>
+
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>gitignore the operational bucket — the Block A stretch</span></div>
+</section>
+
+<!-- 9 · THE GATEWAY WRITES BACK -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Block A · living with the gateway</div>
+  </div>
+
+  <div class="body">
+    <div class="sechead">
+      <span class="num">07</span>
+      <div>
+        <div class="title">The gateway writes back — taming the churn</div>
+        <div class="lead">On <b>local</b>, your repo <i>is</i> the gateway's disk. That cuts both ways: every UI interaction rewrites manifests and config payloads <b>inside your working tree</b>. Untamed, <span class="inlinecode">git status</span> drowns in noise.</div>
+      </div>
+    </div>
+    <div class="cols2">
+      <ul class="checks">
+        <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>The shipped fix: skip-worktree hooks.</b> <span class="inlinecode">scripts/setup.sh</span> symlinks <span class="inlinecode">post-checkout</span> / <span class="inlinecode">post-merge</span> / <span class="inlinecode">post-rewrite</span> hooks that mark every tracked <span class="inlinecode">resource.json</span>, <span class="inlinecode">config.json</span> and <span class="inlinecode">config-mode.json</span> as <b>skip-worktree</b> — the gateway can rewrite them without dirtying git.</span></li>
+        <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Want to change a seed config on purpose?</b> Un-skip it, edit, commit — the next pull re-applies the skip automatically.</span></li>
+        <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>New files the gateway creates stay untracked</b> — that's deliberate. You decide with <span class="inlinecode">git add</span> what becomes a versioned seed; from then on the hooks manage it.</span></li>
+      </ul>
+      <div>
+        <div class="code"><pre><span class="cm"># installed by scripts/setup.sh:</span>
+scripts/git-hooks/
+├── post-checkout · post-merge · post-rewrite
+└── skip-worktree-ignition-resources
+
+<span class="cm"># deliberately edit a seed config:</span>
+git update-index --no-skip-worktree &lt;path&gt;
+<span class="cm"># edit → commit → push (next pull re-skips it)</span></pre></div>
+        <div class="callout" style="margin-top:16px">
+          <div class="lab">Symptom</div>
+          <p><i>"git status shows dozens of <code>config.json</code> / <code>resource.json</code> changes"</i> → the hooks aren't installed. Fix: re-run <code>scripts/setup.sh</code>, then <code>bash scripts/git-hooks/skip-worktree-ignition-resources</code>. Full story in <code>docs/TROUBLESHOOTING.md</code>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Versioned by you, rewritten by the gateway — the hooks keep the peace</span></div>
+</section>
+
+<!-- 10 · SCAN VS RESTART -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Block A → Block B · the hinge</div>
+  </div>
+
+  <div class="body">
+    <div class="sechead">
+      <span class="num">08</span>
+      <div>
+        <div class="title">Scan or restart? The question that shapes your pipeline</div>
+        <div class="lead">The gateway can <b>hot-reload</b> most file changes when you ask it to re-scan. But not all of them — and the ones it can't are exactly where file-based deploys stop.</div>
+      </div>
+    </div>
+    <table class="tbl" style="max-width:900px">
+      <tr><th>Change</th><th>Applied by…</th></tr>
+      <tr><td>Add / modify a <b>Perspective view</b></td><td class="ok">✓ project scan</td></tr>
+      <tr><td>Add / modify a <b>project script</b></td><td class="ok">✓ project scan</td></tr>
+      <tr><td>Add / modify a <b>tag UDT</b></td><td class="ok">✓ scan</td></tr>
+      <tr><td>Add a <b>database connection</b></td><td class="ok">✓ config scan</td></tr>
+      <tr><td>Enable / disable a <b>module</b> (<code>modules.json</code>)</td><td class="no">✗ gateway restart</td></tr>
+      <tr><td>Change gateway <b>memory / Java args</b></td><td class="no">✗ gateway restart</td></tr>
+    </table>
+    <div class="callout">
+      <div class="lab" style="color:var(--blue)">Remember this line</div>
+      <p><b>Scan owns everything that changes daily</b> (views, scripts, connections). When a scan isn't enough, the pipeline needs an <b>extra, disruptive step</b> — <code>docker compose restart ignition-dev</code> in this lab, <code>systemctl restart</code> on a real host. You'll hit the <code>modules.json</code> case yourself in the Block B stretch.</p>
+    </div>
+  </div>
+
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Hot reload has limits — know where they are</span></div>
+</section>
+
+<!-- 11 · DIVIDER — FILE-BASED DEPLOY -->
+<section class="slide dark">
+  <div class="topbar">
+    <div class="on-dark brandrow"><img class="logo-img" src="logos/OriginalLight.png" alt="Mustry Solutions"></div>
+    <div class="stage on-dark">Block B · the deploy pattern</div>
+  </div>
+  <div class="divider">
+    <div class="eyebrow">Block B</div>
+    <div class="q">If everything is a file… deployment is a <em>copy</em>.</div>
+    <div class="sub2">No SSH, no gwbk import, no remote desktop into the SCADA server. Files land on disk, one HTTP call tells the gateway to look, and it hot-reloads. Five steps, end to end.</div>
+  </div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>checkout → prune → ship → scan → verify</span></div>
+</section>
+
+<!-- 12 · THE FIVE STEPS (stepped reveal) -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Block B · the pattern</div>
+  </div>
+
+  <div class="body">
+    <div class="sechead">
+      <span class="num">09</span>
+      <div>
+        <div class="title">The file-based deploy in five steps</div>
+        <div class="lead">This is literally what <span class="inlinecode">deploy.yml</span> does on every merge into <span class="inlinecode">develop</span> — and what <span class="inlinecode">release.yml</span> does on every tag.</div>
+      </div>
+    </div>
+
+    <div class="pipe5">
+      <div class="p5 reveal" data-step="1">
+        <span class="n">1</span>
+        <h5>Commit</h5>
+        <p>A <code>feature/*</code> PR merges into <code>develop</code>. The git working tree <b>is</b> the deployable artifact.</p>
+      </div>
+      <span class="p5arr reveal" data-step="2">→</span>
+      <div class="p5 reveal" data-step="2">
+        <span class="n">2</span>
+        <h5>Checkout</h5>
+        <p>The self-hosted runner checks out the merged commit. Plain <code>actions/checkout@v4</code>.</p>
+      </div>
+      <span class="p5arr reveal" data-step="3">→</span>
+      <div class="p5 reveal" data-step="3">
+        <span class="n">3</span>
+        <h5>Prune</h5>
+        <p>Delete everything <code>.deployignore</code> matches. Docs, scripts and lab tooling never reach a gateway.</p>
+      </div>
+      <span class="p5arr reveal" data-step="4">→</span>
+      <div class="p5 reveal" data-step="4">
+        <span class="n">4</span>
+        <h5>Ship</h5>
+        <p>Wipe the target's <code>projects/</code> + <code>config/</code>, then <code>docker cp</code> the tree in.</p>
+      </div>
+      <span class="p5arr reveal" data-step="5">→</span>
+      <div class="p5 reveal" data-step="5">
+        <span class="n">5</span>
+        <h5>Scan</h5>
+        <p><code>POST /data/api/v1/scan/{projects,config}</code>. The gateway re-reads disk. No restart.</p>
+      </div>
+    </div>
+
+    <div class="callout reveal" data-step="6" style="border-left:5px solid var(--good)">
+      <div class="lab" style="color:var(--good)">…and then verify</div>
+      <p>The workflow polls <code>/StatusPing</code> for 20 seconds after the scan. A deploy that kills the gateway should <b>fail loudly in CI</b>, not surface as a phone call from operations.</p>
+    </div>
+  </div>
+
+  <div class="controls" style="border-top-color:var(--line)">
+    <span class="lead-step" id="five-step" style="color:var(--txt-dim)">Step through what the deploy workflow actually does.</span>
+    <button class="btn" data-act="back">◀ Back</button>
+    <button class="btn primary" data-act="next">Next ▶</button>
+  </div>
+</section>
+
+<!-- 13 · ONE REPO, THREE GATEWAYS (interactive SVG) -->
+<section class="slide dark">
+  <div class="topbar">
+    <div class="on-dark brandrow"><img class="logo-img" src="logos/OriginalLight.png" alt="Mustry Solutions"></div>
+    <div class="stage on-dark">Block B · topology</div>
+  </div>
+
+  <div class="stage-wrap">
+    <div class="vtitle">One repo → three gateways</div>
+    <p class="lead" style="text-align:center;margin:6px auto 0;color:#c4cfde">Git Flow decides <b style="color:#fff">which gateway</b> gets your files. The branch is the routing table.</p>
+    <div class="viz" id="viz-promo"></div>
+  </div>
+
+  <div class="controls">
+    <span class="lead-step" id="promo-step">The lab stack: your fork, a bundled runner, and three Ignition 8.3 gateways.</span>
+    <button class="btn" data-act="back">◀ Back</button>
+    <button class="btn primary" data-act="next">Next step ▶</button>
+  </div>
+</section>
+
+<!-- 14 · WHAT SHIPS, WHAT DOESN'T -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Block B · the repo map</div>
+  </div>
+
+  <div class="body">
+    <div class="sechead">
+      <span class="num">10</span>
+      <div>
+        <div class="title">How the repo pieces fit together</div>
+        <div class="lead">Everything in the lab repo has exactly one route onto (or around) the gateways. Know the route and the failure modes explain themselves.</div>
+      </div>
+    </div>
+    <table class="tbl">
+      <tr><th>Repo path</th><th>Where it lands</th><th>How it gets there</th></tr>
+      <tr><td><code>projects/</code></td><td><code>data/projects/</code></td><td><b>Shipped</b> by deploy/release (<code>docker cp</code> + project scan). Bind-mounted straight in on <b>local</b>.</td></tr>
+      <tr><td><code>services/config/</code></td><td><code>data/config/</code></td><td><b>Shipped</b> the same way + config scan. Bind-mounted on <b>local</b>.</td></tr>
+      <tr><td><code>services/modules.json</code></td><td><code>data/modules.json</code></td><td><b>Bind-mounted into all three gateways</b> — a <i>sibling</i> of <code>services/config/</code>, so the workflows never ship it. Changing it needs a <b>restart</b>, not a scan.</td></tr>
+      <tr><td><code>third-party-modules/*.modl</code></td><td><code>/third-party-modules</code></td><td><b>Bind-mounted</b>; installed at startup via <code>-Dignition.gateway.externalModulesFolder</code>. Binaries stay out of the deploy path entirely.</td></tr>
+      <tr><td><code>db-init/*.sql</code></td><td>TimescaleDB, first boot only</td><td>Adds <code>ignition_dev</code> + <code>ignition_prd</code> (<code>ignition_loc</code> comes from <code>POSTGRES_DB</code>) — one logical DB per environment. Never touches a gateway.</td></tr>
+      <tr><td><code>docs/ · exercises/ · scripts/ · README…</code></td><td>nowhere</td><td><b>Pruned</b> by <code>.deployignore</code> before the copy.</td></tr>
+    </table>
+  </div>
+
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Only projects/ and services/config/ ride the deploy</span></div>
+</section>
+
+<!-- 15 · .DEPLOYIGNORE -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Block B · pruning</div>
+  </div>
+
+  <div class="body">
+    <div class="sechead">
+      <span class="num">11</span>
+      <div>
+        <div class="title"><span class="mono" style="font-size:34px">.deployignore</span> — what <em style="font-style:italic">not</em> to put on a gateway</div>
+        <div class="lead">gitignore-style patterns, read by the deploy workflows. Anything matched exists in the repo but <b>never lands on the gateway</b>.</div>
+      </div>
+    </div>
+    <div class="cols2">
+      <div class="code"><pre><span class="cm"># .deployignore (shipped in this repo, abridged)</span>
+README.md
+LICENSE
+.github/
+docs/
+exercises/
+instructor-notes/
+scripts/
+tests/
+third-party-modules/
+db-init/
+services/config/local/   <span class="cm"># ← instance-bound scope!</span>
+.DS_Store
+docker-compose.yaml
+.env</pre></div>
+      <div>
+        <ul class="checks">
+          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Mostly hygiene:</b> a stray <span class="inlinecode">README.md</span> inside <span class="inlinecode">data/projects/</span> is harmless noise — but noise accumulates, and some lab files could shadow real resources.</span></li>
+          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Sometimes safety:</b> <span class="inlinecode">.env</span> holds your PAT and API keys. <span class="inlinecode">services/config/local/</span> is instance identity. Neither may ever reach a shared gateway.</span></li>
+          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>The lab's prune step handles <b>literal paths</b> and <b>bare-name globs</b> — not full gitignore semantics (no <span class="inlinecode">!</span> negation). Keep patterns simple.</span></li>
+        </ul>
+        <div class="callout" style="margin-top:16px">
+          <div class="lab" style="color:var(--blue)">The ignore-file family</div>
+          <p><span class="inlinecode">.gitignore</span> keeps files <b>out of history</b> · <span class="inlinecode">.deployignore</span> keeps files <b>off the gateway</b> · <span class="inlinecode">.dockerignore</span> keeps files <b>out of the image</b>. Same syntax, three different blast radii.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Repo ≠ gateway — prune before you ship</span></div>
+</section>
+
+<!-- 16 · SHIP MECHANICS: WIPE THEN COPY -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Block B · the ship step</div>
+  </div>
+
+  <div class="body">
+    <div class="sechead">
+      <span class="num">12</span>
+      <div>
+        <div class="title">Ship = wipe, then copy</div>
+        <div class="lead">dev and prod use <b>named volumes</b> — no shared filesystem with the runner. So the runner reaches <b>inside</b> the container with <span class="inlinecode">docker exec</span> + <span class="inlinecode">docker cp</span>.</div>
+      </div>
+    </div>
+    <div class="cols2">
+      <div class="code"><pre><span class="cm"># the "Ship" step from deploy.yml ($DATA = GATEWAY_DATA_PATH)</span>
+docker exec "$IGNITION_CONTAINER" sh -c \
+  "rm -rf $DATA/projects/* $DATA/config/*"
+
+docker cp ./projects/.        "$IGNITION_CONTAINER:$DATA/projects/"
+docker cp ./services/config/. "$IGNITION_CONTAINER:$DATA/config/"</pre></div>
+      <div>
+        <ul class="checks">
+          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Why wipe first?</b> <span class="inlinecode">docker cp</span> has no <span class="inlinecode">--delete</span>. Without the wipe, a view you deleted from the repo <b>keeps living on the gateway</b> — forever.</span></li>
+          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>Wipe-then-copy gives you <b>"deleted in repo → deleted on gateway"</b> — the same semantics <span class="inlinecode">rsync --delete</span> would give a bind-mount setup.</span></li>
+          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>It is not atomic.</b> A runner killed mid-copy leaves a partial tree. Two mitigations here: deploys are idempotent — <b>re-run and it converges</b> — and the workflows' <span class="inlinecode">concurrency</span> group <b>queues instead of cancelling</b>, so CI never kills its own copy.</span></li>
+        </ul>
+        <div class="callout" style="margin-top:16px">
+          <div class="lab">In production</div>
+          <p>The <span class="inlinecode">docker cp</span> trick is lab topology. Real-world equivalents: an <b>NFS-mounted <span class="inlinecode">data/</span></b>, or a runner <b>on the gateway host</b> writing to the filesystem directly. Same five steps, different transport.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>concurrency: cancel-in-progress: false — never kill a copy midway</span></div>
+</section>
+
+<!-- 17 · THE SCAN API -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Block B · the scan API</div>
+  </div>
+
+  <div class="body">
+    <div class="sechead">
+      <span class="num">13</span>
+      <div>
+        <div class="title">The scan API — one POST to reload the gateway</div>
+        <div class="lead">Files on disk are invisible until the gateway looks. The 8.3 scan endpoints make it look — authenticated with a gateway-issued API key.</div>
+      </div>
+    </div>
+    <div class="cols2">
+      <div class="code"><pre><span class="cm"># what scripts/trigger-scan.sh does under the hood</span>
+curl -X POST \
+  -H <span class="cmd2">"X-Ignition-API-Token: $IGNITION_API_KEY"</span> \
+  http://localhost:8088/data/api/v1/scan/projects
+
+curl -X POST \
+  -H <span class="cmd2">"X-Ignition-API-Token: $IGNITION_API_KEY"</span> \
+  http://localhost:8088/data/api/v1/scan/config
+
+<span class="cm"># the lab wrapper — picks key + URL per gateway from .env</span>
+scripts/trigger-scan.sh both --gateway dev</pre></div>
+      <div>
+        <ul class="checks">
+          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Keys are per-gateway, not per-URL.</b> Generate each in <i>that gateway's</i> UI (Config → Security → API Keys). The dev key will never authenticate against prod.</span></li>
+          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Least privilege:</b> scope the deploy key to <b>Project Scan + Config Scan</b> only. The deploy runner has no business taking backups or writing tags.</span></li>
+          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>In CI the key lives as an <b>environment-scoped GitHub secret</b> (<span class="inlinecode">lab-gateway-dev</span> / <span class="inlinecode">lab-gateway-prod</span>) — per-target secrets and deploy history for free, exactly like Lab 03 taught.</span></li>
+        </ul>
+        <div class="callout" style="margin-top:16px">
+          <div class="lab" style="color:var(--blue)">Symptom dictionary</div>
+          <p><i>"The file is right there but my change isn't picked up"</i> → <b>you forgot the scan</b>. <i>"Scan returns 403"</i> → wrong key, or the key lacks scan permissions. And fittingly: the key you create is itself a config resource on disk — <code>config/resources/core/ignition/api-token/&lt;name&gt;/config.json</code>, storing only a hash.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>POST /data/api/v1/scan/{projects,config}</span></div>
+</section>
+
+<!-- 18 · FAILURE MODES -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Block B · where it bites</div>
+  </div>
+
+  <div class="body">
+    <div class="sechead">
+      <span class="num">14</span>
+      <div>
+        <div class="title">Where people get it wrong</div>
+        <div class="lead">Five classic failure modes — you'll trigger at least one on purpose in the You-do, because reading the failure is half the lesson.</div>
+      </div>
+    </div>
+    <div class="fails">
+      <div class="fail">
+        <h5>Copying without wiping</h5>
+        <p>Deleted-in-repo files survive on the gateway and keep being served. <b>Wipe first</b>, always.</p>
+      </div>
+      <div class="fail">
+        <h5>Forgetting the scan</h5>
+        <p>Files on disk, gateway oblivious. Runtime serves stale state until someone asks it to look.</p>
+      </div>
+      <div class="fail">
+        <h5>Wrong API key for the gateway</h5>
+        <p>The <code>docker cp</code> succeeds (it doesn't care about keys), the scan <b>403s</b> — files shipped, gateway never reloaded. Know your recovery: fix the secret, re-run, idempotent.</p>
+      </div>
+      <div class="fail">
+        <h5>Scanning when a restart is needed</h5>
+        <p><code>modules.json</code>, memory, Java args — a scan can't apply these. The deploy "succeeds" and nothing changes.</p>
+      </div>
+      <div class="fail">
+        <h5>Partial ship (runner dies mid-copy)</h5>
+        <p>The gateway scans a half-state — a view may reference a script that hasn't landed. Rare, recoverable: <b>re-run to converge</b>. A mature variant stages to a temp dir and swaps — see <code>docs/file-based-deploy-pattern.md</code>.</p>
+      </div>
+      <div class="fail" style="border-left-color:var(--good)">
+        <h5>…and the guard rails in the shipped workflows</h5>
+        <p><b>Verify step</b> fails fast (container running? key present?) · <b>concurrency group</b> queues instead of cancelling · <b>smoke-check</b> catches a deploy that broke the gateway.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>You'll break one of these on purpose in Part 5</span></div>
+</section>
+
+<!-- 19 · TWO WORKFLOWS, ONE PATTERN -->
+<section class="slide">
+  <div class="topbar">
+    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
+    <div class="stage">Block B · the shipped workflows</div>
+  </div>
+
+  <div class="body">
+    <div class="sechead">
+      <span class="num">15</span>
+      <div>
+        <div class="title">Two workflows, one pattern</div>
+        <div class="lead"><span class="inlinecode">deploy.yml</span> and <span class="inlinecode">release.yml</span> run the <b>same six steps</b> — checkout → verify → prune → ship → scan → smoke-check. Diff them and the only differences are <b>the trigger and the target</b>. That's the whole deployment policy.</div>
+      </div>
+    </div>
+    <table class="tbl" style="max-width:1080px">
+      <tr><th></th><th>deploy.yml → dev</th><th>release.yml → prod</th></tr>
+      <tr><td><b>Trigger</b></td><td>Push to <code>develop</code> — gated by a <code>paths:</code> filter (<code>projects/**</code>, <code>services/config/**</code>, …). Docs-only pushes don't deploy.</td><td>Tag <code>v*</code> · manual <code>workflow_dispatch</code> with a <b>tag input</b> — the rollback button.</td></tr>
+      <tr><td><b>Checks out</b></td><td>The merged commit</td><td>The tag: <code>ref: inputs.tag || github.ref</code> — re-deploying <code>v0.1.0</code> ships that exact tree again.</td></tr>
+      <tr><td><b>Environment</b></td><td><code>lab-gateway-dev</code> · secret <code>IGNITION_API_KEY</code></td><td><code>lab-gateway-prod</code> — add <b>required reviewers</b> here for an approval gate, zero workflow changes.</td></tr>
+      <tr><td><b>Target defaults</b></td><td><code>http://ignition-dev:8088</code> · <code>lab04-ignition-dev</code></td><td><code>http://ignition-prod:8088</code> · <code>lab04-ignition-prod</code></td></tr>
+      <tr><td><b>Concurrency</b></td><td colspan="2">One group per gateway, <code>cancel-in-progress: false</code> — new runs <b>queue</b>; an in-flight copy is never killed.</td></tr>
+    </table>
+    <div class="callout">
+      <div class="lab" style="color:var(--blue)">Read the diff yourself</div>
+      <p><code>diff .github/workflows/deploy.yml .github/workflows/release.yml</code> — everything from <b>Verify prerequisites</b> down is step-for-step the pattern you just learned. Promote the same mechanics to a new environment by changing <b>trigger + environment + two defaults</b>, nothing else.</p>
+    </div>
+  </div>
+
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>The trigger is the policy · the steps are the pattern</span></div>
+</section>
+
+<!-- 20 · CLOSING / HANDOFF -->
+<section class="slide dark">
+  <div class="topbar">
+    <div class="on-dark brandrow"><img class="logo-img" src="logos/OriginalLight.png" alt="Mustry Solutions"></div>
+    <div class="stage on-dark">Teaching → We-do → You-do</div>
+  </div>
+
+  <div class="body">
+    <div class="eyebrow">Now we make it real</div>
+    <div class="title" style="max-width:24ch;color:#fff">Next: watch a change ride from your editor to a <em style="font-style:normal;color:var(--peri2)">prod</em> gateway.</div>
+    <ul class="checks" style="max-width:940px;margin-top:22px">
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>We-do (Block A).</b> Live tour of <span class="mono" style="color:#dbe4f0">data/</span> from inside the container — and the marker trick: touch a marker, click in the UI, <span class="mono" style="color:#dbe4f0">find -newer</span> the file it wrote.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>We-do (Block B).</b> A view created on disk by hand, scanned into the local gateway, then shipped to dev with the exact <span class="mono" style="color:#dbe4f0">docker cp</span> commands the workflow automates.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>You-do (breakout rooms).</b> Block A: classify real UI changes into buckets. Block B: wire your fork's runner, merge a PR into <span class="mono" style="color:#dbe4f0">develop</span> → <b>dev</b>, tag <span class="mono" style="color:#dbe4f0">v0.1.0</span> → <b>prod</b>. Then break a deploy on purpose.</span></li>
+    </ul>
+    <p class="lead" style="font-size:13.5px;color:#8fa0b6;margin-top:22px">Day 3 teaser: everything a scan <i>can't</i> apply — modules, the gateway baseline — gets baked into images. Lab 05.</p>
+  </div>
+
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Next → We-do, then exercises/block-a.md</span></div>
+</section>
+
+</div>
+
+<div class="hud"><div class="bar" id="bar"></div></div>
+<div class="pager" id="pager">01 / 20</div>
+<div class="hint" id="hint">↑ ↓ slides · ← → step the animation</div>
+
+<script>
+/* ============ deck navigation ============ */
+const deck=document.getElementById('deck');
+const slides=[...document.querySelectorAll('.slide')];
+const bar=document.getElementById('bar');
+const pager=document.getElementById('pager');
+const hint=document.getElementById('hint');
+function pad(n){return String(n).padStart(2,'0')}
+function curIndex(){return Math.round(deck.scrollTop/window.innerHeight)}
+function update(){
+  const i=curIndex();
+  bar.style.width=((i)/(slides.length-1)*100)+'%';
+  pager.textContent=pad(i+1)+' / '+pad(slides.length);
+  const dark=slides[i]&&slides[i].classList.contains('dark');
+  pager.classList.toggle('on-dark',dark);
+  hint.classList.toggle('on-dark',dark);
+}
+deck.addEventListener('scroll',()=>{requestAnimationFrame(update)});
+window.addEventListener('keydown',e=>{
+  if(e.target.tagName==='BUTTON')return;
+  const i=curIndex();
+  // Up/Down (and PageUp/Down) always move between slides
+  if(e.key==='ArrowDown'||e.key==='PageDown'){e.preventDefault();deck.scrollTo({top:(i+1)*window.innerHeight})}
+  if(e.key==='ArrowUp'||e.key==='PageUp'){e.preventDefault();deck.scrollTo({top:(i-1)*window.innerHeight})}
+  if(e.key==='Home'){deck.scrollTo({top:0})}
+  if(e.key==='End'){deck.scrollTo({top:slides.length*window.innerHeight})}
+  // Left/Right ONLY step the current slide's animation — they never change slides.
+  if(e.key==='ArrowRight'){e.preventDefault(); if(bound[i])bound[i].go(1);}
+  if(e.key==='ArrowLeft'){e.preventDefault(); if(bound[i])bound[i].go(-1);}
+});
+update();
+setTimeout(()=>{hint.style.transition='opacity .6s';hint.style.opacity='0'},5000);
+
+/* ============ tiny SVG helpers ============ */
+const NS='http://www.w3.org/2000/svg';
+function el(tag,attrs={},parent){const n=document.createElementNS(NS,tag);for(const k in attrs)n.setAttribute(k,attrs[k]);if(parent)parent.appendChild(n);return n;}
+function defsArrow(svg){
+  const d=el('defs',{},svg);
+  const m=el('marker',{id:'arrow',viewBox:'0 0 10 10',refX:'8',refY:'5',markerWidth:'7',markerHeight:'7',orient:'auto-start-reverse'},d);
+  el('path',{d:'M0,0 L10,5 L0,10 z',fill:'#fff'},m);
+}
+function reveal(elm,on){if(!elm)return;elm.classList.toggle('on',on!==false);}
+
+/* ============ per-slide step controllers ============ */
+const controllers={};
+function bindControls(slideEl,ctrl){
+  let step=0;
+  const next=slideEl.querySelector('[data-act="next"]');
+  const back=slideEl.querySelector('[data-act="back"]');
+  function sync(){ if(back)back.disabled=step<=0; if(next)next.disabled=step>=ctrl.max; ctrl.render(step,{next,back}); }
+  function go(d){ const prev=step; step=Math.max(0,Math.min(ctrl.max,step+d)); if(step!==prev){sync();return true;} return false; }
+  if(next)next.addEventListener('click',()=>go(1));
+  if(back)back.addEventListener('click',()=>go(-1));
+  ctrl.reset=()=>{step=0;sync();};
+  sync();
+  return {go,reset:ctrl.reset};
+}
+
+/* ---------- slide 12 (index 11): the five steps (HTML reveal) ---------- */
+(function(){
+  const slide=slides[11];
+  const items=[...slide.querySelectorAll('.reveal')];
+  const lead=slide.querySelector('#five-step');
+  const texts=['Step through what the deploy workflow actually does.',
+    '<b>1 · Commit.</b> A feature PR merges into <b>develop</b>. No build step, no artifact registry — the working tree in git <b>is</b> the deployable.',
+    '<b>2 · Checkout.</b> The self-hosted runner picks up the push and checks out the merged commit. Nothing Ignition-specific yet.',
+    '<b>3 · Prune.</b> The runner deletes everything <b>.deployignore</b> matches — docs, scripts, secrets — before it can ship.',
+    '<b>4 · Ship.</b> Wipe the target\'s projects/ and config/, then <b>docker cp</b> the tree in. Wipe-then-copy makes deletions propagate.',
+    '<b>5 · Scan.</b> One POST per endpoint and the gateway re-reads disk. Views hot-reload — <b>no restart, no downtime</b>.',
+    '<b>Verify.</b> Poll /StatusPing for 20s. If the deploy broke the gateway, the workflow goes red — CI catches it, not operations.'];
+  controllers.five={max:6,render(s){ items.forEach(it=>it.classList.toggle('show',+it.dataset.step<=s)); lead.innerHTML=texts[s]; }};
+})();
+
+/* ---------- slide 13 (index 12): one repo, three gateways (SVG) ---------- */
+(function(){
+  const svg=el('svg',{viewBox:'0 0 1500 700',preserveAspectRatio:'xMidYMid meet'},document.getElementById('viz-promo'));
+  defsArrow(svg);
+
+  // a titled box
+  function box(cx,cy,w,h,title,sub,stroke){
+    const g=el('g',{class:'vpop'},svg);
+    el('rect',{x:cx-w/2,y:cy-h/2,width:w,height:h,rx:16,fill:'rgba(255,255,255,.04)',stroke:stroke,'stroke-width':2.5},g);
+    el('text',{x:cx,y:cy-10,'text-anchor':'middle',fill:'#fff','font-family':'Libre Franklin','font-weight':800,'font-size':24},g).textContent=title;
+    if(sub){ sub.split('\n').forEach((line,i)=>{
+      el('text',{x:cx,y:cy+20+i*24,'text-anchor':'middle',fill:'#9fb6cf','font-family':'IBM Plex Mono','font-size':14},g).textContent=line;
+    });}
+    return g;
+  }
+  // a labelled flow arrow
+  function flow(x1,y1,x2,y2,label,color){
+    const g=el('g',{class:'vdraw'},svg);
+    el('line',{x1,y1,x2,y2,stroke:color,'stroke-width':3,'marker-end':'url(#arrow)'},g);
+    if(label){
+      const mx=(x1+x2)/2, my=(y1+y2)/2;
+      el('text',{x:mx,y:my-14,'text-anchor':'middle',fill:color,'font-family':'IBM Plex Mono','font-weight':600,'font-size':15},g).textContent=label;
+    }
+    return g;
+  }
+
+  const teal='var(--teal-l)', peri='var(--peri2)', amber='#f0a85a';
+  // layout: repo left, runner mid-bottom, gateways right column
+  const repo   = box(260,340,360,190,'your fork','projects/\nservices/config/', 'var(--teal)');
+  const local  = box(1200,120,380,140,'ignition-local  :8088','bind mount — your scratchpad', teal);
+  const runner = box(700,520,360,150,'lab04-runner','self-hosted · lab04\nshares /var/run/docker.sock', peri);
+  const dev    = box(1200,380,380,140,'ignition-dev  :8089','named volume — fed by CI', peri);
+  const prod   = box(1200,610,380,140,'ignition-prod  :8090','named volume — fed by tags', amber);
+
+  const fBind = flow(440,270,1005,140,'bind mount · edit → scan',teal);
+  const fPushD= flow(440,400,517,485,'merge PR into develop',peri);
+  const fShipD= flow(880,485,1005,410,'deploy.yml · docker cp + scan',peri);
+  const fTag  = flow(440,430,530,555,'tag vX.Y.Z on main',amber);
+  const fShipP= flow(880,560,1005,600,'release.yml · docker cp + scan',amber);
+
+  const lead=slides[12].querySelector('#promo-step');
+  const steps=[
+    {on:[repo,local,fBind],t:'<b>local</b> is your scratchpad: it bind-mounts <b>projects/</b> and <b>services/config/</b> straight from the repo. Edit a file, hit scan, see it at :8088 — no CI involved.'},
+    {on:[runner],t:'The <b>bundled runner</b> registers against <i>your fork</i> and polls GitHub for jobs. It shares the host\'s Docker socket — that\'s how it reaches inside the other containers. Lab convenience, not a production pattern.'},
+    {on:[dev,fPushD,fShipD],t:'Merge a feature PR into <b>develop</b> → <b>deploy.yml</b> runs on the runner → wipe + docker cp + scan → the change is live on <b>dev</b> (:8089). Many small merges a day.'},
+    {on:[prod,fTag,fShipP],t:'Merging to <b>main</b> ships <i>nothing</i>. Push a tag <b>vX.Y.Z</b> → <b>release.yml</b> ships that exact commit to <b>prod</b> (:8090). Prod always runs a named, re-deployable version.'},
+    {on:[],t:'The Git Flow routing table: <b>develop → dev</b> · <b>tag on main → prod</b> · <b>local outside the flow entirely</b>. The branch decides the gateway — no human picks a target by hand.'}
+  ];
+  const all=[repo,local,runner,dev,prod,fBind,fPushD,fShipD,fTag,fShipP];
+  controllers.promo={max:steps.length-1,render(s){
+    const onset=new Set(); for(let i=0;i<=s;i++)steps[i].on.forEach(g=>onset.add(g));
+    all.forEach(g=>reveal(g,onset.has(g)));
+    lead.innerHTML=steps[s].t;
+  }};
+})();
+
+/* ============ wire controllers to their slides + reset on entry ============ */
+const ctrlBySlide={11:'five',12:'promo'};
+const bound={};
+for(const idx in ctrlBySlide){const name=ctrlBySlide[idx];bound[idx]=bindControls(slides[idx],controllers[name]);}
+// reset a slide's animation when you scroll onto it
+let lastIdx=-1;
+function onView(){const i=curIndex();if(i!==lastIdx){lastIdx=i;if(bound[i])bound[i].reset();}}
+deck.addEventListener('scroll',()=>requestAnimationFrame(onView));
+onView();
+</script>
+</body>
+</html>
