@@ -1,0 +1,13 @@
+{
+  "custom": {},
+  "propConfig": {
+    "props.auth": {
+      "access": "PRIVATE",
+      "persistent": false
+    }
+  },
+  "props": {
+    "locale": "en-US",
+    "timeZoneId": "Europe/Brussels"
+  }
+}

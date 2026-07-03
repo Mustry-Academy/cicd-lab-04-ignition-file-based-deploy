@@ -1,0 +1,7 @@
+{
+  "title": "packaging-site",
+  "description": "Second site project (packaging line). Deployed alongside example-project to demonstrate multi-project file-based deploys. Re-theme freely.",
+  "enabled": true,
+  "inheritable": false,
+  "parent": ""
+}

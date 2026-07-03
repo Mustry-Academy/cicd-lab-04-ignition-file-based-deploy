@@ -1,14 +1,17 @@
 #!/bin/bash
-# Auto-apply skip-worktree to tracked resource.json files under the Ignition
-# config/project trees. Ignition rewrites these on every gateway interaction
-# with machine-specific values; without skip-worktree they pollute every
-# developer's git status.
+# Auto-apply skip-worktree to the tracked machine-local Ignition config file.
+# The gateway rewrites local-system-properties/config.json with values that
+# belong to this specific box (system UID, trial state); without skip-worktree
+# it pollutes every developer's git status.
 #
-# Sourced from post-merge, post-checkout, and post-rewrite hooks. New files
-# Ignition creates show up as untracked (so a developer can `git add` them);
-# once tracked, the next checkout/merge auto-skips them.
+# Everything else the gateway touches (resource.json manifests) stays visible
+# to git on purpose: real edits must show up. Volatile-only rewrites
+# (timestamps, signatures) are undone with scripts/clean-ignition-resource-churn.sh
+# and hidden from diffs by the textconv driver setup.sh configures.
 #
-# To intentionally update a seed file:
+# Sourced from post-merge, post-checkout, and post-rewrite hooks.
+#
+# To intentionally update the machine-local seed file:
 #   git update-index --no-skip-worktree <path>
 #   <edit, commit, push>
 #   (next pull re-applies skip-worktree)
@@ -18,17 +21,20 @@ set -e
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
 cd "$REPO_ROOT"
 
-# Ignition rewrites resource.json (timestamps, signatures) AND the config
-# payloads themselves (config.json, config-mode.json) on every gateway
-# interaction, so all three must be covered or the tree stays dirty.
+# Self-heal: earlier versions of this hook skipped every resource.json,
+# config.json and config-mode.json. Clear those stale flags so the files
+# show up in git status / git diff again.
+git ls-files -v \
+  | sed -n 's/^S //p' \
+  | while IFS= read -r f; do
+        case "$f" in
+            */local-system-properties/config.json) ;;
+            *) git update-index --no-skip-worktree -- "$f" 2>/dev/null || true ;;
+        esac
+    done
+
 git ls-files -- \
-    'services/config/resources/**/resource.json' \
-    'services/config/resources/**/config.json' \
-    'services/config/resources/**/config-mode.json' \
-    'projects/**/resource.json' \
-    'services/config/resources/*resource.json' \
-    'services/config/resources/**/resource.json' \
-    'services/config/resources/local/ignition/local-system-properties/config.json' 
+    'services/config/resources/**/local-system-properties/config.json' \
   | while IFS= read -r f; do
         # Only skip if not already skipped (avoids redundant index writes)
         if ! git ls-files -v -- "$f" 2>/dev/null | grep -q '^S'; then

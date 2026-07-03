@@ -1,7 +1,10 @@
 #!/bin/bash
 # One-shot setup for the lab 04 stack:
 #   - sanity-checks the host (docker compose v2, curl, WSL quirks)
-#   - installs the repo's git hooks (skip-worktree for Ignition resource files)
+#   - installs the repo's git hooks (skip-worktree for the machine-local
+#     Ignition config file) and a diff driver that hides volatile resource.json
+#     metadata; volatile-only churn is undone with
+#     scripts/clean-ignition-resource-churn.sh
 #   - ensures .env is in place
 #   - brings up the stack (three Ignition gateways + shared TimescaleDB)
 #   - waits for ALL THREE gateways to become RUNNING
@@ -34,6 +37,7 @@ require_cmd() {
 require_cmd docker
 require_cmd curl
 require_cmd git
+require_cmd python3
 
 if ! docker compose version >/dev/null 2>&1; then
     echo -e "${RED}Error: Docker Compose V2 plugin is required but not installed.${NC}"
@@ -123,6 +127,15 @@ install_git_hooks() {
 }
 
 install_git_hooks
+
+# ---- Git diff driver --------------------------------------------------------
+# .gitattributes routes resource.json through this textconv normalizer so
+# volatile Designer metadata (timestamps, signatures) never shows up in diffs.
+configure_git_diff_drivers() {
+    git config diff.ignition-resource.textconv "$PROJECT_ROOT/scripts/git-diff/normalize-ignition-resource-json.py"
+}
+
+configure_git_diff_drivers
 
 # ---- .env -----------------------------------------------------------------
 ensure_env_file() {

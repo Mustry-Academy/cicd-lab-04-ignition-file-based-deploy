@@ -30,10 +30,6 @@ venv/
 **/fonts.digest.json
 **/icons.digest.json
 
-
-# TO CHECK
-**/data/db/
-**/data/users.idb
-**/data/temp/
-**/data/logs/
-**/data/.metadata/
+# Data-root operational state (db/ — the internal SQLite DB incl. the user store —
+# jar-cache/, metricsdb/, var/) lives in the gateways' named volumes and never
+# appears in this repo's tree, so it needs no patterns here.

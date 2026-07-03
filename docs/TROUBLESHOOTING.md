@@ -24,18 +24,25 @@ are one of the first three.
 - **Trial expired.** Each gateway runs in 2-hour trial mode. After it lapses the gateway stops
   serving. Reset via *Gateway → Config → Licensing → Reset Trial* (unlimited, legal for dev).
 
-## `git status` shows dozens of `config.json` / `resource.json` changes
+## `git status` shows lots of `resource.json` changes
 
-Ignition rewrites these on every interaction. The repo ships a git hook that marks them
-`skip-worktree` so they stay out of `git status` — but the hook only runs after a
-checkout/merge/rewrite, and `scripts/setup.sh` installs it. If you see the churn:
+Ignition rewrites the `resource.json` manifests on every interaction, usually touching nothing
+but volatile metadata (modification timestamp, actor, signature). That churn is **meant to be
+visible** — real edits must show up in git — and it's undone, not hidden:
 
 ```bash
-scripts/setup.sh                                  # (re)installs the hooks, then
-bash scripts/git-hooks/skip-worktree-ignition-resources
+scripts/clean-ignition-resource-churn.sh          # dry run: lists volatile-only files
+scripts/clean-ignition-resource-churn.sh --apply  # restores them from HEAD
 ```
 
-To intentionally change a seed config and commit it:
+Files with real content changes (and anything staged) are never touched by the script.
+`git diff` already hides the volatile metadata: `scripts/setup.sh` wires a textconv driver
+(`scripts/git-diff/normalize-ignition-resource-json.py`) via `.gitattributes`. If diffs still
+show timestamp/signature noise, re-run `scripts/setup.sh`.
+
+The one exception is the machine-local `local-system-properties/config.json` (system UID, trial
+state — it belongs to this specific box). The hooks installed by `scripts/setup.sh` keep it
+`skip-worktree` so it never dirties the tree. To intentionally change that seed file and commit it:
 ```bash
 git update-index --no-skip-worktree <path>
 # edit, commit, push — the next pull re-applies skip-worktree

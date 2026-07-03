@@ -27,10 +27,10 @@ resources are `config/resources/<scope>/<module-id>/<resource-type>/<name>/{conf
 | Add a new identity provider (OIDC) | Gateway-level | `data/config/resources/core/ignition/identity-provider/<name>/config.json` | Yes |
 | Enable / disable a module | Gateway-level | `data/modules.json` (repo: `services/modules.json`) | Yes |
 | Install a new module (.modl) | Gateway-level binary | `data/modules/<module>.modl` | Yes / No |
-| Add a new gateway user (UI-managed) | Operational | `data/users.idb` (internal store) | **No** |
-| Change the gateway admin password | Operational | `data/users.idb` | **No** |
-| Tag values changing at runtime | Operational | Internal H2 in `data/db/` | **No** |
-| Wrapper logs filling up | Operational | `data/logs/` | **No** |
+| Add a new gateway user (UI-managed) | Operational | inside `data/db/config.idb` (the internal user store — there is no separate `users.idb`) | **No** |
+| Change the gateway admin password | Operational | inside `data/db/config.idb` | **No** |
+| Tag values changing at runtime | Operational | `data/config/ignition/tags/valueStore.idb` (masked by `.gitignore`) | **No** |
+| Wrapper logs filling up | Operational | `logs/` at the install root (outside `data/`) | **No** |
 
 If a participant classifies something incorrectly, walk them through the two questions:
 
@@ -41,7 +41,7 @@ These two questions handle ~99% of cases.
 
 ## Common stumbles
 
-- **"My new user shows up in `users.idb` — I should commit that, right?"** No. `users.idb` is the *whole* user database, including hashed passwords, last-login timestamps, lockout state. Commit it once and you've leaked everyone's session history. The right pattern is to define users via an identity provider (`data/config/resources/core/ignition/identity-provider/<name>/`), which gives you SSO and group sync, source-controllable. Lab-07 covers this properly.
+- **"I added a user in the UI — where did it land, and should I commit it?"** It landed inside the internal SQLite DB (`data/db/config.idb`) — there is no separate `users.idb` file. Never commit `db/`: the internal user tables in there hold hashed passwords, last-login timestamps, lockout state, and a `gwbk` backup carries the same data. The right pattern for source-controlled users is an identity provider (`data/config/resources/core/ignition/identity-provider/<name>/`), which gives you SSO and group sync.
 
 - **"Why isn't `modules/` in git?"** Because `.modl` files are 5-100 MB binary blobs and they're keyed by license/vendor. Pin versions in a manifest; install separately. (Lab-04-image-based revisits this in the context of derived Docker images.)
 
@@ -56,7 +56,7 @@ The lab runs three gateways but **Block A is all about `local`**. The `local` ga
 - Any file you put in `<repo>/projects/sample/` is *immediately* at `<gateway>/data/projects/sample/` — no `docker cp` needed.
 - Anything the local gateway writes to those paths (e.g., resource files from UI-driven changes) shows up *on your host*. Demonstrate this live: make a UI change, then `ls projects/` on the host. The new file is right there.
 
-The `data/db/`, `data/users.idb`, `data/logs/`, `data/temp/` paths stay inside the named volume `ignition-local-data:` — students don't see them by default. If asked, `docker exec lab04-ignition-local ls /usr/local/bin/ignition/data/` shows the full tree.
+The `data/db/`, `data/jar-cache/`, `data/metricsdb/`, `data/var/` paths stay inside the named volume `ignition-local-data:` — students don't see them by default. If asked, `docker exec lab04-ignition-local ls /usr/local/bin/ignition/data/` shows the full tree.
 
 The `dev` and `prod` gateways (`lab04-ignition-dev`, `lab04-ignition-prod`) use **named volumes for everything** — no bind mount on `projects/` or `config/`. That's deliberate: it matches how a real shared dev/prod environment works (you don't edit project files directly on the host; you ship them via CI). Block B is where students touch those. For Block A, leave them be.
 
@@ -78,11 +78,13 @@ Reasonable answer:
 ```gitignore
 # Operational state — never commit
 data/db/
-data/users.idb
-data/temp/
-data/logs/
-data/.metadata/
-data/local/
+data/jar-cache/
+data/metricsdb/
+data/var/
+data/config/resources/.resources/
+data/config/ignition/tags/*.idb
+data/config/local/
+data/config/resources/local/
 
 # Module binaries — manage separately
 data/modules/*.modl
@@ -96,14 +98,14 @@ data/modules/*.modl
 
 Things commonly missed:
 
-- `data/local/` (per-instance overrides)
-- `data/.metadata/` (internal markers)
+- `data/config/local/` and `data/config/resources/local/` (per-instance identity: keystores, UUID)
+- `data/config/ignition/tags/*.idb` (tag value stores hiding inside the versioned config tree)
 - Backup files (`*.gwbk`)
 - Module binaries (`*.modl`) — most participants will leave these in unless prompted
 
 ## Debrief crib
 
-- **"What surprised you?"** Common answer: that so much is *operational*, not config. Many Ignition teams have been committing `users.idb` for years.
+- **"What surprised you?"** Common answer: that so much is *operational*, not config — and that the user store (password hashes included) rides inside `db/config.idb` and every `gwbk`, which regularly end up in git without anyone realising.
 - **"Which bucket has the trickiest deploy?"** Gateway-level. Some changes hot-reload via scan; others need restart. The participant who notices this is set up well for Block B.
 - **"Smallest atomic change?"** A single view's JSON file. ~1 KB. Block B will deploy exactly this kind of change end-to-end.
 

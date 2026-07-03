@@ -1,6 +1,6 @@
 # Lab 04 — Ignition file-based deploy
 
-Day 3, Blocks A and B of the [CI/CD for Ignition Masterclass](https://github.com/mustry-academy/cicd-masterclass).
+Day 2 (afternoon), Blocks A and B of the [CI/CD for Ignition Masterclass](https://github.com/mustry-academy/cicd-masterclass).
 
 > Decode the Ignition 8.3 file structure, then build a file-based deploy pipeline that promotes project changes from a local working gateway, through a dev environment on push to `develop`, to a prod environment on a tag release cut from `main` — all with a hot scan, no gateway restarts. The pipeline follows **Git Flow**.
 
@@ -46,7 +46,7 @@ Login to any of them with the credentials from `.env` (`GATEWAY_ADMIN_USERNAME_L
 | A | Ignition 8.3 file structure decoded | [`exercises/block-a.md`](./exercises/block-a.md) |
 | B | File-based deploy mechanic | [`exercises/block-b.md`](./exercises/block-b.md) |
 
-> Blocks C and D of Day 3 are in separate labs ([image-based](https://github.com/mustry-academy/cicd-lab-05-ignition-image-based-deploy), [multi-gateway](https://github.com/mustry-academy/cicd-lab-06-multi-gateway-deploy)).
+> Image-based deploys and multi-gateway coordination come next, on Day 3, in separate labs ([image-based](https://github.com/mustry-academy/cicd-lab-05-ignition-image-based-deploy), [multi-gateway](https://github.com/mustry-academy/cicd-lab-06-multi-gateway-deploy)).
 
 ## Repo layout
 
@@ -79,9 +79,12 @@ cicd-lab-04-ignition-file-based-deploy/
 │   ├── teardown.sh                     ← stop the stack (with --volumes to wipe)
 │   ├── trigger-scan.sh                 ← curl the scan API (any gateway via --gateway)
 │   ├── lib.sh                          ← shared helpers
-│   └── git-hooks/                      ← skip-worktree hooks for Ignition state files
+│   ├── clean-ignition-resource-churn.sh ← undo volatile-only resource.json rewrites (dry-run / --apply)
+│   ├── git-diff/                       ← textconv normalizer that hides volatile metadata in diffs
+│   └── git-hooks/                      ← skip-worktree hooks for the machine-local config file
 ├── projects/                           ← project content (bind-mounted into `local` only)
-│   └── example-project/                ← a real Perspective project (views, templates)
+│   ├── example-project/                ← a real Perspective project (views, templates)
+│   └── packaging-site/                 ← a second project; proves one deploy ships every project under projects/
 ├── services/
 │   ├── config/                         ← gateway-level config (bind-mounted into `local`)
 │   │   └── resources/                  ← <scope>/<module-id>/<resource-type>/<name>/{config.json,resource.json}

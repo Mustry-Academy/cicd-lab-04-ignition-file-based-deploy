@@ -234,7 +234,7 @@ body{
 <div class="deck" id="deck">
 
 <!-- 1 · COVER -->
-<!-- Day 2 · afternoon per instructor brief. NOTE: README.md still says "Day 3"; align the README if this schedule holds. -->
+<!-- Day 2 · afternoon per instructor brief. README aligned to Day 2 PM. Labs 05/06 are Day 3 (forward-pointer badges below are correct). -->
 <section class="slide dark">
   <div class="topbar">
     <div class="on-dark brandrow">
@@ -269,7 +269,7 @@ body{
     </div>
     <ul class="checks" style="max-width:960px">
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>You already have:</b> git fluency, branching &amp; PRs done right, validation as a safety net, workflows/jobs/steps, and a self-hosted runner. Every one of those comes back today, unchanged.</span></li>
-      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>New today:</b> the Ignition 8.3 <span class="inlinecode">data/</span> directory decoded, the gateway scan API, <span class="inlinecode">.deployignore</span>, and a local → dev → prod promotion driven by Git Flow.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>New today:</b> the Ignition 8.3 <span class="inlinecode">data/</span> directory decoded, <span class="inlinecode">.deployignore</span>, and a local → dev → prod promotion driven by Git Flow. The scan API you met in Lab 02 returns in anger: per-gateway API keys, scoped permissions, and CI calling it instead of you.</span></li>
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Not today:</b> image-based deploys and multi-gateway coordination. That's Day 3 (Labs 05 and 06). Today is a deep dive: decode the file tree, then master the deploy pattern built directly on it.</span></li>
     </ul>
     <div class="callout">
@@ -321,14 +321,14 @@ body{
 │&nbsp;&nbsp;&nbsp;└── <span class="hl">.resources/</span><span class="ftag ops">operational</span> <span class="dim">(content-addressed blobs)</span><br>
 ├── <span class="hl">modules.json</span><span class="ftag gw">gateway</span> <span class="dim">(which modules are enabled)</span><br>
 ├── <span class="hl">modules/</span><span class="ftag gw">gateway · binaries</span> <span class="dim">(installed .modl files)</span><br>
-├── <span class="hl">db/</span> · <span class="hl">users.idb</span><span class="ftag ops">operational</span> <span class="dim">(internal stores)</span><br>
-└── <span class="hl">logs/</span> · <span class="hl">temp/</span> · <span class="hl">.metadata/</span><span class="ftag ops">operational</span>
+├── <span class="hl">db/</span><span class="ftag ops">operational</span> <span class="dim">(config.idb: internal SQLite DB, users included)</span><br>
+└── <span class="hl">jar-cache/</span> · <span class="hl">metricsdb/</span> · <span class="hl">var/</span><span class="ftag ops">operational</span>
       </div>
       <div>
         <ul class="checks">
           <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><span class="ftag proj" style="margin-left:0">project</span> per-project resources: views, scripts, page config. <b>This is what you deploy daily.</b></span></li>
           <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><span class="ftag gw" style="margin-left:0">gateway</span> cross-project config: DB connections, identity providers, tag providers, module enablement. Shared by everything on the gateway.</span></li>
-          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><span class="ftag ops" style="margin-left:0">operational</span> runtime state the gateway owns: internal DBs, users, logs, generated blobs. <b>Never versioned, never deployed.</b></span></li>
+          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><span class="ftag ops" style="margin-left:0">operational</span> runtime state the gateway owns: the internal DB (user store included), caches, generated blobs. <b>Never versioned, never deployed.</b></span></li>
         </ul>
         <div class="callout" style="margin-top:18px">
           <div class="lab" style="color:var(--blue)">In this lab</div>
@@ -381,8 +381,8 @@ body{
         <h4>Operational</h4>
         <div class="who">owner: the gateway · in git: NEVER</div>
         <ul>
-          <li>db/, users.idb</li>
-          <li>logs/, temp/, .metadata/</li>
+          <li>db/ (internal SQLite DB, users included)</li>
+          <li>jar-cache/, metricsdb/, var/</li>
           <li>.resources/ (blob store)</li>
         </ul>
         <div class="dep"><b>Deploy:</b> you don't. The gateway owns this state; <b>backups (gwbk)</b> are the recovery mechanism, not git.</div>
@@ -409,7 +409,7 @@ body{
       <span class="num">04</span>
       <div>
         <div class="title">Project resources: the real 8.3 shape</div>
-        <div class="lead">8.3 namespaces every project resource by <b>the module that owns it</b>. There is no flat <span class="inlinecode">views/</span> folder like 8.1 had, so expect longer paths.</div>
+        <div class="lead">Every project resource is namespaced by <b>the module that owns it</b>: first the module, then the resource type, then the name. Expect longer paths.</div>
       </div>
     </div>
     <div class="anat">
@@ -426,20 +426,23 @@ body{
     <div class="cols2" style="margin-top:20px">
       <ul class="checks">
         <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Every resource carries a sibling <span class="inlinecode">resource.json</span> manifest</b> (scope, version, files, signature). No manifest → the gateway won't register the resource.</span></li>
-        <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>The gateway <b>rewrites manifests on every interaction</b>, which is why this lab ships <b>skip-worktree git hooks</b> so they don't spam your <span class="inlinecode">git status</span>.</span></li>
+        <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>The gateway <b>rewrites manifests on every interaction</b>, which is why this lab ships <b>normalized diffs and a churn-undo script</b> so that noise never buries your real changes.</span></li>
         <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>Platform-owned resources live under the <span class="inlinecode">ignition/</span> namespace, including <b>script libraries as plain <span class="inlinecode">code.py</span> files</b>: diffable, reviewable, lintable like any other source.</span></li>
+        <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>One directory per project.</b> This repo ships <b>two</b> (<span class="inlinecode">example-project</span> + <span class="inlinecode">packaging-site</span>), side by side under <span class="inlinecode">projects/</span>. They share <b>one gateway config</b> (connections, tags, deployment modes). Later you'll see one deploy ship <b>both</b>.</span></li>
       </ul>
-      <div class="code"><pre><span class="cm"># the shipped example-project, for real:</span>
-projects/example-project/
-├── project.json
-├── com.inductiveautomation.perspective/
-│   ├── views/…/{view.json, resource.json}
-│   ├── page-config/{config.json, resource.json}
-│   └── session-props/{props.json, resource.json}
-└── ignition/
-    ├── global-props/{data.bin, resource.json}
-    └── script-python/&lt;pkg&gt;/&lt;name&gt;/{code.py, resource.json}
-        <span class="cm">e.g. common/util, domain/refrigeration, tests/…</span></pre></div>
+      <div class="code"><pre><span class="cm"># two projects, side by side under projects/:</span>
+projects/
+├── example-project/
+│   ├── project.json
+│   ├── com.inductiveautomation.perspective/
+│   │   ├── views/…/{view.json, resource.json}
+│   │   ├── page-config/{config.json, resource.json}
+│   │   └── session-props/{props.json, resource.json}
+│   └── ignition/
+│       └── script-python/&lt;pkg&gt;/&lt;name&gt;/{code.py, resource.json}
+└── packaging-site/            <span class="cm"># the second site, same shape</span>
+    ├── project.json
+    └── com.inductiveautomation.perspective/views/…</pre></div>
     </div>
   </div>
 
@@ -457,8 +460,8 @@ projects/example-project/
     <div class="sechead">
       <span class="num">05</span>
       <div>
-        <div class="title">Gateway config: scopes that inherit</div>
-        <div class="lead"><span class="inlinecode">config/resources/&lt;scope&gt;/&lt;module&gt;/&lt;type&gt;/&lt;name&gt;/{config.json, resource.json}</span>: scope first, then module-namespaced, just like projects. Scopes form an <b>inheritance chain</b>.</div>
+        <div class="title">Gateway config &amp; <em>deployment modes</em></div>
+        <div class="lead">Those <span class="mono">core / loc / dev / prd</span> scopes are Ignition 8.3's <b>deployment modes</b> feature: one config set holds every environment, and the gateway picks a mode at boot. <span class="inlinecode">config/resources/&lt;scope&gt;/&lt;module&gt;/&lt;type&gt;/&lt;name&gt;/{config.json, resource.json}</span>, scope first, then module-namespaced. Modes form an <b>inheritance chain</b>.</div>
       </div>
     </div>
     <div class="scopes">
@@ -488,10 +491,13 @@ core/ignition/database-connection/TimescaleDB/config.json
 loc/ignition/database-connection/TimescaleDB/config.json
   <span class="cmd2">…/ignition_loc</span>   <span class="cm"># same name, per-env override</span>
 dev/… → <span class="cmd2">…/ignition_dev</span>   ·   prd/… → <span class="cmd2">…/ignition_prd</span>
-loc/config-mode.json   <span class="cm"># scope descriptor {parent: "core"}</span></pre></div>
+loc/config-mode.json   <span class="cm"># scope descriptor {parent: "core"}</span>
+
+<span class="cm"># how a gateway picks its mode: a JVM arg at boot (docker-compose.yaml)</span>
+-Dignition.config.mode=<span class="cmd2">loc</span>   <span class="cm"># dev/prd gateways boot with dev / prd</span></pre></div>
       <div class="callout" style="margin-top:6px">
-        <div class="lab" style="color:var(--blue)">Same trick as env vars, but reviewable</div>
-        <p>In this repo, <b>loc / dev / prd each hold exactly one override</b>: the <code>TimescaleDB</code> connection's <code>connectURL</code>. A view queries "TimescaleDB", and <b>which database</b> that hits depends on the boot scope. One repo, three gateways, three historians, zero crosstalk.</p>
+        <div class="lab" style="color:var(--blue)">The mental model: same name, different reality</div>
+        <p>In this repo, <b>loc / dev / prd each hold exactly one override</b>: the <code>TimescaleDB</code> connection's <code>connectURL</code>. A view queries "TimescaleDB", and <b>which database</b> that hits depends on the boot mode. The real-plant version: a device named <code>PLC-01</code> is a <b>simulator in dev</b> and the <b>real PLC in prod</b>, same name, so your project never changes. One config set, one gateway backup, every environment.</p>
       </div>
     </div>
   </div>
@@ -510,22 +516,20 @@ loc/config-mode.json   <span class="cm"># scope descriptor {parent: "core"}</spa
     <div class="sechead">
       <span class="num">06</span>
       <div>
-        <div class="title">What must <em style="font-style:italic">never</em> be committed</div>
+        <div class="title">What should <em style="font-style:italic">never</em> be committed</div>
         <div class="lead">The operational bucket, spelled out. If any of these ever show up in <span class="inlinecode">git status</span>, your ignore rules are broken.</div>
       </div>
     </div>
     <table class="tbl" style="max-width:1000px">
       <tr><th>Path</th><th>What it is</th><th>Why it's radioactive</th></tr>
-      <tr><td><code>users.idb</code></td><td><b>The whole internal user DB</b></td><td>Hashed passwords, last-login timestamps, lockout state. Commit it once → you've leaked everyone's session history.</td></tr>
-      <tr><td><code>db/</code></td><td>Internal H2 store</td><td>Constantly rewritten at runtime; merge conflicts are meaningless. Backup via <b>gwbk</b>, not git.</td></tr>
       <tr><td><code>config/resources/.resources/</code></td><td>Content-addressed blob store (SHA-256 names)</td><td>Generated and churning, and it lives <b>inside</b> the versioned config tree. The gateway rebuilds it; committing it doubles your repo for nothing.</td></tr>
       <tr><td><code>config/ignition/tags/*.idb · *.digest.json · migration-log-*.md</code></td><td>More churn inside versioned trees</td><td>Tag value store, theme/font/icon digests, 8.3 migration logs. The shipped <code>.gitignore</code> masks all of these with <code>**/</code> patterns.</td></tr>
-      <tr><td><code>logs/ · temp/ · .metadata/</code></td><td>Runtime breadcrumbs</td><td>Regenerable noise. Often not even worth backing up.</td></tr>
+      <tr><td><code>jar-cache/ · metricsdb/ · var/</code></td><td>Runtime breadcrumbs</td><td>Regenerable noise. Often not even worth backing up. (Gateway logs live <i>outside</i> <code>data/</code>, at the install root.)</td></tr>
       <tr><td><code>config/resources/local/</code></td><td>Instance identity (OPC-UA keystores, UUID)</td><td>Belongs to <b>this specific box</b>. Promote it and you clone a gateway's identity onto another.</td></tr>
     </table>
     <div class="callout">
-      <div class="lab">Classroom confession</div>
-      <p>Many Ignition teams have been committing <code>users.idb</code> for years without realising what's inside. The right pattern for users is an <b>identity provider</b> (which <i>is</i> versionable config), and Lab 07 covers it properly.</p>
+      <div class="lab">Where users actually live</div>
+      <p>There is no separate users file: the internal user store, <b>password hashes included</b>, rides inside <code>db/config.idb</code>, and inside every <b>gwbk</b> backup. Put either in git and you've committed credentials. The versionable pattern for users is an <b>identity provider</b>, which is ordinary config under <code>config/resources/core/ignition/identity-provider/</code>.</p>
     </div>
   </div>
 
@@ -544,33 +548,33 @@ loc/config-mode.json   <span class="cm"># scope descriptor {parent: "core"}</spa
       <span class="num">07</span>
       <div>
         <div class="title">The gateway writes back: taming the churn</div>
-        <div class="lead">On <b>local</b>, your repo <i>is</i> the gateway's disk. That cuts both ways: every UI interaction rewrites manifests and config payloads <b>inside your working tree</b>. Untamed, <span class="inlinecode">git status</span> drowns in noise.</div>
+        <div class="lead">On <b>local</b>, your repo <i>is</i> the gateway's disk. That cuts both ways: every UI interaction rewrites manifests <b>inside your working tree</b>, usually touching nothing but a timestamp and a signature. The fix is to <b>undo</b> that noise, not to hide your files from git.</div>
       </div>
     </div>
     <div class="cols2">
       <ul class="checks">
-        <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>The shipped fix: skip-worktree hooks.</b> <span class="inlinecode">scripts/setup.sh</span> symlinks <span class="inlinecode">post-checkout</span> / <span class="inlinecode">post-merge</span> / <span class="inlinecode">post-rewrite</span> hooks that mark every tracked <span class="inlinecode">resource.json</span>, <span class="inlinecode">config.json</span> and <span class="inlinecode">config-mode.json</span> as <b>skip-worktree</b>, so the gateway can rewrite them without dirtying git.</span></li>
-        <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Want to change a seed config on purpose?</b> Un-skip it, edit, commit, and the next pull re-applies the skip automatically.</span></li>
-        <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>New files the gateway creates stay untracked</b>, and that's deliberate. You decide with <span class="inlinecode">git add</span> what becomes a versioned seed; from then on the hooks manage it.</span></li>
+        <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Diffs stay clean by construction.</b> <span class="inlinecode">.gitattributes</span> routes every <span class="inlinecode">resource.json</span> through a normalizer that strips the volatile metadata (timestamp, actor, signature), so <span class="inlinecode">git diff</span> only shows changes that matter.</span></li>
+        <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Volatile-only rewrites get undone.</b> <span class="inlinecode">scripts/clean-ignition-resource-churn.sh</span> compares each modified manifest against HEAD with the metadata stripped; if nothing real changed, <span class="inlinecode">--apply</span> restores it. Real edits (and anything staged) are never touched.</span></li>
+        <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>One exception: machine identity.</b> <span class="inlinecode">local-system-properties/config.json</span> belongs to this specific box, so the <span class="inlinecode">post-checkout</span> / <span class="inlinecode">post-merge</span> / <span class="inlinecode">post-rewrite</span> hooks keep just that file <b>skip-worktree</b>. New files the gateway creates stay untracked until you <span class="inlinecode">git add</span> them.</span></li>
       </ul>
       <div>
-        <div class="code"><pre><span class="cm"># installed by scripts/setup.sh:</span>
-scripts/git-hooks/
-├── post-checkout · post-merge · post-rewrite
-└── skip-worktree-ignition-resources
+        <div class="code"><pre><span class="cm"># wired up by scripts/setup.sh:</span>
+scripts/git-hooks/               <span class="cm"># skip-worktree, machine-local file only</span>
+scripts/git-diff/normalize-ignition-resource-json.py
+                                 <span class="cm"># textconv driver: clean diffs</span>
 
-<span class="cm"># deliberately edit a seed config:</span>
-git update-index --no-skip-worktree &lt;path&gt;
-<span class="cm"># edit, commit, push (next pull re-skips it)</span></pre></div>
+<span class="cm"># undo volatile-only manifest rewrites:</span>
+scripts/clean-ignition-resource-churn.sh          <span class="cm"># dry run</span>
+scripts/clean-ignition-resource-churn.sh --apply  <span class="cm"># restore from HEAD</span></pre></div>
         <div class="callout" style="margin-top:16px">
           <div class="lab">Symptom</div>
-          <p><i>"git status shows dozens of <code>config.json</code> / <code>resource.json</code> changes"</i> → the hooks aren't installed. Fix: re-run <code>scripts/setup.sh</code>, then <code>bash scripts/git-hooks/skip-worktree-ignition-resources</code>. Full story in <code>docs/TROUBLESHOOTING.md</code>.</p>
+          <p><i>"git status shows lots of <code>resource.json</code> changes"</i> → run <code>scripts/clean-ignition-resource-churn.sh</code>, check the list, then <code>--apply</code>. Diffs still full of timestamps, or the machine-local file dirty? Re-run <code>scripts/setup.sh</code>. Full story in <code>docs/TROUBLESHOOTING.md</code>.</p>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Versioned by you, rewritten by the gateway · the hooks keep the peace</span></div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Versioned by you, rewritten by the gateway · undo the churn, keep the edits</span></div>
 </section>
 
 <!-- 10 · SCAN VS RESTART -->
@@ -690,7 +694,7 @@ git update-index --no-skip-worktree &lt;path&gt;
 
   <div class="stage-wrap">
     <div class="vtitle">One repo → three gateways</div>
-    <p class="lead" style="text-align:center;margin:6px auto 0;color:#c4cfde">Git Flow decides <b style="color:#fff">which gateway</b> gets your files. The branch is the routing table.</p>
+    <p class="lead" style="text-align:center;margin:6px auto 0;color:#c4cfde">The pipelines decide <b style="color:#fff">which gateway</b> gets your files. A local runner subscribes and does the shipping.</p>
     <div class="viz" id="viz-promo"></div>
   </div>
 
@@ -742,7 +746,7 @@ git update-index --no-skip-worktree &lt;path&gt;
       <span class="num">11</span>
       <div>
         <div class="title"><span class="mono" style="font-size:34px">.deployignore</span>: what <em style="font-style:italic">not</em> to put on a gateway</div>
-        <div class="lead">gitignore-style patterns, read by the deploy workflows. Anything matched exists in the repo but <b>never lands on the gateway</b>.</div>
+        <div class="lead"><b>Not a standard, we made this up for our Ignition projects.</b> gitignore-style patterns that only our deploy workflow reads. Anything matched exists in the repo but <b>never lands on the gateway</b>.</div>
       </div>
     </div>
     <div class="cols2">
@@ -753,13 +757,12 @@ LICENSE
 docs/
 exercises/
 instructor-notes/
-scripts/
 tests/
 third-party-modules/
 db-init/
 services/config/local/   <span class="cm"># ← instance-bound scope!</span>
 .DS_Store
-docker-compose.yaml
+docker-compose.yaml <span class="cm"># ← unless you want it to run there with your settings</span>
 .env</pre></div>
       <div>
         <ul class="checks">
@@ -769,7 +772,7 @@ docker-compose.yaml
         </ul>
         <div class="callout" style="margin-top:16px">
           <div class="lab" style="color:var(--blue)">The ignore-file family</div>
-          <p><span class="inlinecode">.gitignore</span> keeps files <b>out of history</b> · <span class="inlinecode">.deployignore</span> keeps files <b>off the gateway</b> · <span class="inlinecode">.dockerignore</span> keeps files <b>out of the image</b>. Same syntax, three different blast radii.</p>
+          <p><span class="inlinecode">.gitignore</span> and <span class="inlinecode">.dockerignore</span> are real: Git and Docker read them natively. <span class="inlinecode">.deployignore</span> is <b>our invention</b> borrowing their syntax: only the prune step in our workflow knows it exists. Steal the pattern for your own pipelines, but don't expect any tool to honor it for free.</p>
         </div>
       </div>
     </div>
@@ -1085,7 +1088,7 @@ function bindControls(slideEl,ctrl){
     {on:[runner],t:'The <b>bundled runner</b> registers against <i>your fork</i> and polls GitHub for jobs. It shares the host\'s Docker socket, which is how it reaches inside the other containers. Lab convenience, not a production pattern.'},
     {on:[dev,fPushD,fShipD],t:'Merge a feature PR into <b>develop</b> → <b>deploy.yml</b> runs on the runner → wipe + docker cp + scan → the change is live on <b>dev</b> (:8089). Many small merges a day.'},
     {on:[prod,fTag,fShipP],t:'Merging to <b>main</b> ships <i>nothing</i>. Push a tag <b>vX.Y.Z</b> → <b>release.yml</b> ships that exact commit to <b>prod</b> (:8090). Prod always runs a named, re-deployable version.'},
-    {on:[],t:'The Git Flow routing table: <b>develop → dev</b> · <b>tag on main → prod</b> · <b>local outside the flow entirely</b>. The branch decides the gateway, and no human picks a target by hand.'}
+    {on:[],t:'The pipelines hold the routing: <b>deploy.yml → dev</b> · <b>release.yml → prod</b> · <b>local outside the flow entirely</b>. Your merge or tag just triggers them, and no human picks a target by hand.'}
   ];
   const all=[repo,local,runner,dev,prod,fBind,fPushD,fShipD,fTag,fShipP];
   controllers.promo={max:steps.length-1,render(s){

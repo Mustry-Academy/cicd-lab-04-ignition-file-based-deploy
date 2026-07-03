@@ -20,9 +20,9 @@ What you'll see when you `ls /usr/local/bin/ignition/data` inside the container:
 
 ### `projects/`
 
-Project-level. One subdirectory per Ignition project. In 8.3 a project's resources are
-**namespaced by the module that owns them** — there is no flat `views/`/`scripts/` directory like
-8.1 had. The real shape (from the shipped [`example-project`](../projects/example-project/)):
+Project-level. One subdirectory per Ignition project. A project's resources are
+**namespaced by the module that owns them**: first the module, then the resource type, then the
+name. The real shape (from the shipped [`example-project`](../projects/example-project/)):
 
 ```
 projects/
@@ -44,8 +44,9 @@ projects/
 ```
 
 The key 8.3 detail: **every resource folder carries a sibling `resource.json` manifest** next to its
-payload (`view.json`, etc.). That manifest is what the gateway reads to track the resource — and it's
-why this repo ships a skip-worktree git hook (the gateway rewrites these on every interaction).
+payload (`view.json`, etc.). That manifest is what the gateway reads to track the resource — and since
+the gateway rewrites it on every interaction (timestamps, signatures), this repo ships a normalized
+diff driver plus `scripts/clean-ignition-resource-churn.sh` to undo the volatile-only rewrites.
 
 This is the bread and butter of CI/CD for Ignition. The whole `projects/<name>/` directory is what the `deploy.yml` workflow ships onto the **dev** gateway (on push to `develop`) and what `release.yml` ships onto **prod** (on tag push from `main`) in Block B. On the **local** gateway it just sits there via bind mount — edit-and-scan, no copy step.
 
@@ -79,10 +80,51 @@ config/resources/core/
 ```
 
 `config.json` holds the actual settings; the sibling `resource.json` is the manifest the gateway
-rewrites on every change (hence skip-worktree). Resources here are *referenced* by projects but
-defined gateway-wide — a view might query a database, but the connection lives in
+rewrites on every change (hence the churn-undo script). Resources here are *referenced* by projects but
+defined gateway-wide. A view might query a database, but the connection lives in
 `core/ignition/database-connection/<name>/`. Move a project to a new gateway and you'd port the
 project; you'd also port the matching `core/` resources.
+
+### Deployment modes (this is the 8.3 feature behind those scopes)
+
+The `core` / `loc` / `dev` / `prd` scopes above are not a lab invention. They are Ignition 8.3's
+**deployment modes** feature. A deployment mode lets you keep **one** configuration set that
+contains the settings for *every* environment, and have the gateway pick the right variant at boot.
+You define any modes you like (development, staging, production, or custom); the common case is just
+dev and prod.
+
+The mental model that makes it click: **the same resource name resolves to different settings per
+mode.** A device named `PLC-01` can be a **simulator** in development and the **real Modbus device**
+in production, under the same name, so your projects never change. A database connection keeps its
+name but points at the dev database in `dev` and the prod database in `prd`. Because it is all one
+config set, one gateway backup carries every environment's settings, and you stop tracking a pile of
+per-gateway differences by hand.
+
+On disk that is exactly what you see in this repo:
+
+```
+config/resources/
+├── core/                                   ← shared baseline, inherited by every mode
+│   └── ignition/database-connection/TimescaleDB/config.json
+├── loc/  ignition/database-connection/TimescaleDB/config.json   ← local override
+├── dev/  ignition/database-connection/TimescaleDB/config.json   ← dev override
+└── prd/  ignition/database-connection/TimescaleDB/config.json   ← prod override
+```
+
+The **same** `database-connection/TimescaleDB` resource carries a **different `config.json` under
+each mode**, all inheriting `core`. Each scope has a `config-mode.json` descriptor declaring its
+parent (so `loc`/`dev`/`prd` inherit `core`, which inherits `external`). The gateway selects the
+active mode at boot with `-Dignition.config.mode=<scope>`. A good way to *see* it: diff the local
+and prod copies of the same connection.
+
+```bash
+diff services/config/resources/loc/ignition/database-connection/TimescaleDB/config.json \
+     services/config/resources/prd/ignition/database-connection/TimescaleDB/config.json
+```
+
+Everything one mode does *not* override falls through to `core`. This is a platform feature, not
+tied to any deploy strategy: it works the same whether you deploy by copying files (this lab) or by
+baking an image (Lab 05).
 
 ### `modules.json`
 
@@ -107,16 +149,22 @@ Gateway-level binaries. `.modl` files for each installed module.
 - **In git?** Generally **no**. Modules are large binary artifacts. Pin module *versions* in a manifest (e.g., a separate `module-versions.txt`); install modules separately via your runner setup or a custom Docker image.
 - For lab 04, the host bind mount on `modules.json` enables modules at startup; the gateway downloads/installs the matching `.modl` files automatically.
 
-### `db/`, `users.idb`
+### `db/`
 
-**Operational.** Internal H2 / SQLite stores. The gateway is constantly reading and writing these.
+**Operational.** The internal SQLite database (`config.idb`, plus `autobackup/` copies). The gateway
+is constantly reading and writing it — and it holds the **internal user store**: password hashes,
+last-login timestamps, lockout state. There is no separate `users.idb` file; the user tables live
+inside `config.idb`, which is one more reason this directory must never be committed. (A `gwbk`
+backup carries the same data — keep those out of git too.)
 
 - **In git?** Absolutely **no**.
 - **Backup story?** Gateway-level backup (`gwbk` file), not git.
 
-### `logs/`, `temp/`, `.metadata/`
+### `jar-cache/`, `metricsdb/`, `var/`
 
-**Operational.** Runtime breadcrumbs.
+**Operational.** Runtime breadcrumbs: the launcher jar cache, the metrics store, module runtime
+state. Note that gateway logs live *outside* `data/` entirely, at the install root
+(`/usr/local/bin/ignition/logs/` in the container).
 
 - **In git?** No.
 - **Backup?** Often you don't even back these up — they're regenerable.

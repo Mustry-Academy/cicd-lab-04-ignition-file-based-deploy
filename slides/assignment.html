@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lab 04 · Assignment: Decode the disk &amp; ship a file-based deploy</title>
+<title>Lab 04 · Assignment: The data/ directory &amp; a file-based deploy pipeline</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -166,7 +166,7 @@ body{
   </div>
   <div class="cover">
     <div class="eyebrow">The assignment · breakout rooms</div>
-    <div class="big">Decode the disk, then <em>ship it</em>.</div>
+    <div class="big">Know every file in <span class="mono" style="color:#dbe4f0">data/</span>, then build the <em>file-based deploy</em>.</div>
     <div class="sub">Two blocks. In Block A you become the person who can point at any file in an Ignition gateway's <span class="mono" style="color:#dbe4f0">data/</span> directory and say what it is, who owns it, and whether it belongs in git. In Block B you wire that knowledge into GitHub Actions: a PR merged into <span class="mono" style="color:#dbe4f0">develop</span> lands on the dev gateway, a tag on <span class="mono" style="color:#dbe4f0">main</span> lands on prod. Hot scan, no restarts.</div>
     <div class="for">
       <span>Floating to help</span>
@@ -214,7 +214,7 @@ body{
       <div class="pcard">
         <div class="pn">BLOCK A · WE DO</div>
         <h4>Find the file</h4>
-        <p>The marker trick: touch a marker, make a UI change, <span class="inlinecode">find -newer</span> the file the gateway wrote.</p>
+        <p>Add a database connection, then catch the file the gateway wrote: touch a marker, <span class="inlinecode">find -newer</span>.</p>
         <div class="gate">exercises/block-a.md · We do</div>
       </div>
       <div class="pcard p1">
@@ -244,56 +244,19 @@ body{
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Block A before Block B</span></div>
 </section>
 
-<!-- 4 · BLOCK A · WE DO 1 -->
+<!-- 4 · BLOCK A · WE DO -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
     <div class="stage">Block A · we do · together</div>
   </div>
   <div class="body">
-    <div class="sechead"><span class="num warm">BLOCK A · WE DO 1</span><div><div class="title">The marker trick: catch the gateway writing</div><div class="lead">Every UI click writes a file somewhere under <span class="inlinecode">data/</span>. Set a timestamp marker, click, then ask <span class="inlinecode">find</span> what's newer.</div></div></div>
+    <div class="sechead"><span class="num warm">BLOCK A · WE DO</span><div><div class="title">Add a database connection, find where it lands</div><div class="lead">The marker trick: set a timestamp marker, make the change in the UI, then ask <span class="inlinecode">find</span> what's newer. Watch the connection land under <span class="inlinecode">config/resources/&lt;scope&gt;/</span>.</div></div></div>
     <div class="cols2">
       <div class="steps">
-        <div class="step"><div class="ix t">1</div><div class="tx">List every top-level entry of <span class="inlinecode">data/</span>, noting which <b>bucket</b> each is. (Operational paths only show via <span class="inlinecode">docker exec</span>; they live in the named volume, not the host bind mount.)</div></div>
-        <div class="step"><div class="ix t">2</div><div class="tx"><b>Set the marker.</b> Do this <i>before</i> every UI change you want to trace.</div></div>
-        <div class="step"><div class="ix t">3</div><div class="tx">In the local gateway UI (<span class="inlinecode">:8088</span>): <b>Config → Networking → Web Server</b> → change <i>Idle Timeout</i> (default 300). Save.</div></div>
-        <div class="step"><div class="ix t">4</div><div class="tx"><b>Find what changed</b>, then <span class="inlinecode">cat</span> the file. You'll see a <span class="inlinecode">config.json</span> plus the gateway rewriting a sibling <span class="inlinecode">resource.json</span> manifest.</div></div>
-      </div>
-      <div>
-        <div class="code"><pre><span class="cm"># 1: the full tree, from inside the container</span>
-docker exec -it lab04-ignition-local bash -lc \
-  "ls -la /usr/local/bin/ignition/data"
-
-<span class="cm"># 2: the marker</span>
-docker exec lab04-ignition-local touch /tmp/marker
-
-<span class="cm"># 4: what did the UI change write?</span>
-docker exec lab04-ignition-local find \
-  /usr/local/bin/ignition/data/config \
-  -newer /tmp/marker -type f 2>/dev/null</pre></div>
-        <div class="goal" style="margin-top:18px">
-          <span class="badge">Bind mount</span>
-          <p>Because <b>local</b> bind-mounts <span class="inlinecode">./services/config/</span>, that file also just appeared <b>in your repo on the host</b>. Run <span class="inlinecode">git status</span> and see.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Block A we-do 1 of 2</span></div>
-</section>
-
-<!-- 5 · BLOCK A · WE DO 2 -->
-<section class="slide">
-  <div class="topbar">
-    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">Block A · we do · together</div>
-  </div>
-  <div class="body">
-    <div class="sechead"><span class="num warm">BLOCK A · WE DO 2</span><div><div class="title">Add a database connection, find where it lands</div><div class="lead">A gateway-level change this time. Watch it land under <span class="inlinecode">config/resources/&lt;scope&gt;/</span>.</div></div></div>
-    <div class="cols2">
-      <div class="steps">
-        <div class="step"><div class="ix t">1</div><div class="tx">Re-touch the marker (<span class="inlinecode">docker exec lab04-ignition-local touch /tmp/marker</span>).</div></div>
+        <div class="step"><div class="ix t">1</div><div class="tx"><b>Set the marker</b> (<span class="inlinecode">docker exec lab04-ignition-local touch /tmp/marker</span>). Re-touch it <i>before</i> every change you want to trace.</div></div>
         <div class="step"><div class="ix t">2</div><div class="tx">UI: <b>Config → Databases → Connections → New</b>. Postgres datasource → host <span class="inlinecode">timescaledb</span>, port <span class="inlinecode">5432</span>, db <span class="inlinecode">ignition_loc</span>, user/pass from <span class="inlinecode">.env</span> (default <span class="inlinecode">ignition</span>/<span class="inlinecode">ignition</span>). Save.</div></div>
-        <div class="step"><div class="ix t">3</div><div class="tx">Run the <span class="inlinecode">find -newer</span> again. The connection lands at <span class="inlinecode">config/resources/&lt;scope&gt;/ignition/database-connection/&lt;name&gt;/config.json</span>.</div></div>
+        <div class="step"><div class="ix t">3</div><div class="tx">Run the <span class="inlinecode">find -newer</span>. The connection lands at <span class="inlinecode">config/resources/&lt;scope&gt;/ignition/database-connection/&lt;name&gt;/config.json</span>. Because <b>local</b> bind-mounts <span class="inlinecode">./services/config/</span>, it also just appeared <b>in your repo on the host</b>: run <span class="inlinecode">git status</span>.</div></div>
         <div class="step"><div class="ix t">4</div><div class="tx"><b>Answer out loud:</b> gateway-level or project-level? Would you commit it? Which scope did it land in, and why does that matter for dev vs prod?</div></div>
       </div>
       <div>
@@ -314,10 +277,10 @@ docker exec lab04-ignition-local cat &lt;path-you-found&gt;</pre></div>
       </div>
     </div>
   </div>
-  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Block A we-do 2 of 2 → now go solo</span></div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Block A we-do → now go solo</span></div>
 </section>
 
-<!-- 6 · BLOCK A · YOU DO -->
+<!-- 5 · BLOCK A · YOU DO -->
 <section class="slide dark">
   <div class="topbar">
     <div class="on-dark brandrow"><img class="logo-img" src="logos/OriginalLight.png" alt="Mustry Solutions"></div>
@@ -334,13 +297,13 @@ docker exec lab04-ignition-local cat &lt;path-you-found&gt;</pre></div>
     </ul>
     <div class="goal" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.14);border-left-color:var(--good)">
       <span class="badge" style="background:var(--good)">Done when</span>
-      <p style="color:#c4cfde">Without peeking: you can name each <span class="mono" style="color:#dbe4f0">data/</span> entry's bucket · find any UI change's file with the marker trick · state the 8.3 path shape for a view <b style="color:#fff">and</b> a config resource · explain why <span class="mono" style="color:#dbe4f0">users.idb</span> and <span class="mono" style="color:#dbe4f0">.resources/</span> are never committed.</p>
+      <p style="color:#c4cfde">You can find any UI change's file with the marker trick · say for each of your three changes which bucket it's in and whether you'd commit it · state the 8.3 path shape for a view <b style="color:#fff">and</b> a config resource · explain why <span class="mono" style="color:#dbe4f0">db/</span> and <span class="mono" style="color:#dbe4f0">.resources/</span> are never committed.</p>
     </div>
   </div>
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>exercises/block-a.md · You do, answers in your notes</span></div>
 </section>
 
-<!-- 7 · BLOCK A · STRETCH -->
+<!-- 6 · BLOCK A · STRETCH -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
@@ -350,17 +313,18 @@ docker exec lab04-ignition-local cat &lt;path-you-found&gt;</pre></div>
     <div class="sechead"><span class="num warm">OPTIONAL · A</span><div><div class="title">Stretch: draft the <span class="mono" style="font-size:30px">.gitignore</span></div><div class="lead">You now know the operational bucket. Turn that knowledge into ignore patterns: the precursor to <span class="inlinecode">.deployignore</span>, which Block B puts to work.</div></div></div>
     <div class="cols2">
       <div class="steps">
-        <div class="step"><div class="ix t">1</div><div class="tx">From memory, draft a starter <span class="inlinecode">.gitignore</span> for an Ignition project repo. Cover the <b>operational bucket</b>: logs, internal DBs, idb, temp, metadata.</div></div>
+        <div class="step"><div class="ix t">1</div><div class="tx">From memory, draft a starter <span class="inlinecode">.gitignore</span> for an Ignition project repo. Cover the <b>operational bucket</b>: the internal DB, tag value stores, caches, blob stores.</div></div>
         <div class="step"><div class="ix t">2</div><div class="tx">Compare with the shipped <span class="inlinecode">.gitignore</span> in this repo. <b>What did you miss? What did the shipped one miss?</b></div></div>
-        <div class="step"><div class="ix t">3</div><div class="tx">Commonly forgotten: <span class="inlinecode">config/resources/local/</span> (instance identity), <span class="inlinecode">*.gwbk</span> (backups), <span class="inlinecode">*.modl</span> (module binaries), <span class="inlinecode">.metadata/</span>.</div></div>
+        <div class="step"><div class="ix t">3</div><div class="tx">Commonly forgotten: <span class="inlinecode">config/resources/local/</span> (instance identity), <span class="inlinecode">*.gwbk</span> (backups), <span class="inlinecode">*.modl</span> (module binaries), <span class="inlinecode">tags/*.idb</span> (tag value stores inside the versioned config tree).</div></div>
       </div>
       <div>
         <div class="code"><pre><span class="cm"># a reasonable answer looks something like:</span>
 data/db/
-data/users.idb
-data/temp/
-data/logs/
-data/.metadata/
+data/jar-cache/
+data/metricsdb/
+data/var/
+data/config/resources/.resources/
+data/config/ignition/tags/*.idb
 data/config/resources/local/
 data/modules/*.modl
 *.gwbk
@@ -375,7 +339,7 @@ data/modules/*.modl
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Stretch · optional · then on to Block B</span></div>
 </section>
 
-<!-- 8 · BLOCK B · PRE-FLIGHT -->
+<!-- 7 · BLOCK B · PRE-FLIGHT -->
 <section class="slide dark">
   <div class="topbar">
     <div class="on-dark brandrow"><img class="logo-img" src="logos/OriginalLight.png" alt="Mustry Solutions"></div>
@@ -397,7 +361,7 @@ git checkout -b develop &amp;&amp; git push -u origin develop</pre></div>
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>exercises/block-b.md · Pre-flight</span></div>
 </section>
 
-<!-- 9 · BLOCK B · WE DO -->
+<!-- 8 · BLOCK B · WE DO -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
@@ -435,7 +399,7 @@ scripts/trigger-scan.sh both --gateway dev</pre></div>
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Block B we-do → now automate it</span></div>
 </section>
 
-<!-- 10 · BLOCK B · YOU DO · PARTS 1-2 -->
+<!-- 9 · BLOCK B · YOU DO · PARTS 1-2 -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
@@ -465,7 +429,7 @@ docker compose logs --tail 50 github-runner
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Parts 1-2 of 5</span></div>
 </section>
 
-<!-- 11 · BLOCK B · YOU DO · PART 3 -->
+<!-- 10 · BLOCK B · YOU DO · PART 3 -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
@@ -504,7 +468,7 @@ git push -u origin feature/tweak-view
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Part 3 of 5</span></div>
 </section>
 
-<!-- 12 · BLOCK B · YOU DO · PART 4 -->
+<!-- 11 · BLOCK B · YOU DO · PART 4 -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
@@ -536,7 +500,7 @@ git push origin v0.1.0        <span class="cm"># ← release.yml fires</span></p
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Part 4 of 5</span></div>
 </section>
 
-<!-- 13 · BLOCK B · YOU DO · PART 5 -->
+<!-- 12 · BLOCK B · YOU DO · PART 5 -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
@@ -565,7 +529,7 @@ docker compose up -d ignition-dev  <span class="cm"># recovery</span></pre></div
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Part 5 of 5 → definition of done</span></div>
 </section>
 
-<!-- 14 · STRETCH · MODULES PUZZLE -->
+<!-- 13 · STRETCH · MODULES PUZZLE -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
@@ -594,7 +558,7 @@ docker cp ./services/config/. …:$DATA/config/
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Stretch · optional · the limits of the scan</span></div>
 </section>
 
-<!-- 15 · DONE -->
+<!-- 14 · DONE -->
 <section class="slide dark">
   <div class="topbar">
     <div class="on-dark brandrow"><img class="logo-img" src="logos/OriginalLight.png" alt="Mustry Solutions"></div>
@@ -619,7 +583,7 @@ docker cp ./services/config/. …:$DATA/config/
 </div>
 
 <div class="hud"><div class="bar" id="bar"></div></div>
-<div class="pager" id="pager">01 / 15</div>
+<div class="pager" id="pager">01 / 14</div>
 <div class="hint" id="hint">↑ ↓ / scroll to navigate</div>
 
 <script>

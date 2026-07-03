@@ -174,6 +174,7 @@ You **don't** need to set `IGNITION_URL` or `IGNITION_CONTAINER` variables unles
 3. Merge the PR into `develop`. [`deploy.yml`](../.github/workflows/deploy.yml) fires because of the `paths:` filter (and only on `develop`).
 4. Watch the workflow run. The interesting step is **Ship projects and config into gateway container** — this is the `docker cp` half. Then **Trigger gateway scan** posts to `/data/api/v1/scan/{projects,config}`.
 5. Verify in http://localhost:8089 — the view's height should match what you pushed.
+6. **Multi-project check.** This repo ships **two** projects: `example-project` and `packaging-site`. The deploy step copies `./projects/.` (the whole directory), so a single merge deploys **both** projects at once. Confirm the dev gateway (http://localhost:8089, Config → Projects) now lists **both**, even though your PR only touched a view in one of them. One deploy, every project, because the unit of deploy is the `projects/` tree, not a single project.
 
 ### Part 4 — Release to prod via `main` + tag (10 min)
 

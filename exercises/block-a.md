@@ -1,9 +1,10 @@
 # Block A — Ignition 8.3 file structure decoded
 
 **Duration:** ~90 minutes
-* 20 min demo
-* 20 min we-do
-* 30 min you-do
+* 15 min demo
+* 15 min we-do (marker + find-newer)
+* 15 min we-do ("everything is a file" tour: connections, tags, deployment modes, CSS)
+* 25 min you-do
 * 15 min debrief
 * ~5 min buffer
 
@@ -39,20 +40,20 @@ docker exec -it lab04-ignition-local bash -lc "ls /usr/local/bin/ignition/data"
 
 Tour, in order:
 
-1. **`projects/<name>/`** — project-level state. One directory per project. Inside: `project.json` + module-namespaced resource folders, e.g. `com.inductiveautomation.perspective/views/pages/<Page>/{view.json, resource.json}` and `ignition/`. (8.3 namespaces by owning module — there's no flat `views/`/`scripts/` folder.) *This is the thing you'll deploy via file-based CI/CD.*
+1. **`projects/<name>/`** — project-level state. One directory per project. Inside: `project.json` + module-namespaced resource folders, e.g. `com.inductiveautomation.perspective/views/pages/<Page>/{view.json, resource.json}` and `ignition/`. *This is the thing you'll deploy via file-based CI/CD.*
 2. **`config/resources/<scope>/`** — gateway-level config, organized scope-first (`core`, `loc`/`dev`/`prd`, `local`) then by module: `core/ignition/database-connection/<name>/`, `identity-provider/<name>/`, `tag-provider/<name>/`. Shared across all projects.
 3. **`config/`** root — gateway-level non-resource config (small).
 4. **`modules.json`** — which modules the gateway has enabled. Gateway-level. (Repo source: `services/modules.json`.)
 5. **`modules/`** — the actual installed module binaries (`.modl` files). Almost never committed to git; usually managed separately.
-6. **`db/`, `users.idb`** — internal H2 / SQLite stores. **Operational state.** Never commit.
-7. **`logs/`, `temp/`, `.metadata/`, `.resources/`** — runtime / generated stuff (the last is Ignition's content-addressed blob store). Never commit.
+6. **`db/`** — the internal SQLite DB (`config.idb`), which includes the internal user store (password hashes, lockout state). **Operational state.** Never commit.
+7. **`jar-cache/`, `metricsdb/`, `var/`, `.resources/`** — runtime / generated stuff (the last is Ignition's content-addressed blob store). Never commit. (Gateway logs live outside `data/`, at the install root.)
 
 The instructor sketches the three-bucket model:
 
 ```
 PROJECT-LEVEL     GATEWAY-LEVEL              OPERATIONAL
-projects/<x>/     config/resources/          db/, users.idb, logs/, temp/
-                  modules.json               .metadata/
+projects/<x>/     config/resources/          db/, jar-cache/,
+                  modules.json               metricsdb/, var/
                   modules/                   (anything that changes at runtime
                                               without you touching the gateway)
 ```
@@ -67,7 +68,7 @@ The deploy story is different for each bucket:
 
 Following along on your own gateway:
 
-1. `docker exec -it lab04-ignition-local bash -lc "ls -la /usr/local/bin/ignition/data"` — list every top-level entry. Note what each is. (Operational paths like `db/`, `logs/`, `.metadata/` live in the container's named volume, so you'll only see them via `docker exec`, not on the host bind mount.)
+1. `docker exec -it lab04-ignition-local bash -lc "ls -la /usr/local/bin/ignition/data"` — list every top-level entry. Note what each is. (Operational paths like `db/`, `jar-cache/`, `metricsdb/` live in the container's named volume, so you'll only see them via `docker exec`, not on the host bind mount.)
 2. **Set a marker** so you can spot which files a UI change touches:
    ```bash
    docker exec lab04-ignition-local touch /tmp/marker
@@ -81,6 +82,30 @@ Following along on your own gateway:
 6. In the gateway UI, **Config → Databases → Connections → New**. Add a Postgres datasource pointing at host `timescaledb`, port `5432`, db `ignition_loc`, user/password from your `.env` (`POSTGRES_USER` / `POSTGRES_PASSWORD`, default `ignition` / `ignition`). Save. The hostname `timescaledb` is the compose service name — the local gateway resolves it on the lab's docker network.
 7. Repeat step 4 (re-touch the marker first) — find the new files. The connection lands at `config/resources/<scope>/ignition/database-connection/<name>/config.json`. Gateway-level or project-level?
 
+## We do: "everything is a file in git" (the guided tour)
+
+The point of this section: prove that the things people assume live "inside Ignition somewhere" are all plain files you can read, diff, and commit. Do these from the repo root on your host (no gateway needed, these are already on disk under `services/` and `projects/`).
+
+1. **Every database connection is a file.** Open `services/config/resources/core/ignition/database-connection/TimescaleDB/config.json`. This is the whole connection: JDBC URL, pool sizes, the (encrypted) password. Nothing hidden in a gateway database.
+
+2. **Every PLC / device connection is a file.** Open `services/config/resources/core/com.inductiveautomation.opcua/device/Simulator/config.json` and `.../ignition/opc-connection/Ignition OPC UA Server/config.json`. The lab ships a **simulator** device on disk; in a real plant this same file would describe your Modbus / OPC-UA PLC. Point being: your PLC wiring is version-controlled, reviewable config, not clicks in a UI.
+
+3. **Tags are files too.** Open `services/config/resources/core/ignition/tag-definition/example-tags/tags.json` (and `udts.json` for the UDT definitions). Tag providers, tags, and UDTs all serialize to JSON on disk. (Note the runtime *values* live in `services/config/ignition/tags/valueStore.idb`, which is operational and never committed, the definitions are, the live values are not.)
+
+4. **Deployment modes: one config set, many environments.** This is an Ignition 8.3 platform feature, not a lab trick. The scopes you saw (`core`, `loc`, `dev`, `prd`) are **deployment modes**: the same resource name resolves to different settings per mode, and the gateway picks the mode at boot with `-Dignition.config.mode=<scope>`. See it directly:
+   ```bash
+   diff services/config/resources/loc/ignition/database-connection/TimescaleDB/config.json \
+        services/config/resources/prd/ignition/database-connection/TimescaleDB/config.json
+   ```
+   Exactly one line differs: the `connectURL` points at `ignition_loc` vs `ignition_prd`. Same connection *name*, same everything else (that falls through to `core`), one per-mode override. The real-world version of this: a device named `PLC-01` is a **simulator in dev** and the **real device in prod**, under one name, so your project code never changes. One gateway backup carries every mode.
+
+5. **Where is the CSS "hidden"?** In Perspective, styling lives in a few honest places, all of them files:
+   - **Inline component styles** live right in the view: open `projects/example-project/com.inductiveautomation.perspective/views/pages/refrigeration/view.json` and find the `style` props on components.
+   - **Style classes** (reusable named styles, the closest thing to a CSS class) are a *project resource* under `com.inductiveautomation.perspective/style-classes/<name>/` when a project defines them. This repo styles inline, so it has none, but that is where they land.
+   - **Themes** (the gateway-wide look) are gateway-level theme CSS the gateway generates under `data/` (you saw `theme/font/icon digests` in the operational churn). Theme *authoring* files, when you customize a theme, are gateway config.
+
+   The takeaway: there is no secret CSS store. It is inline in views, or a style-class resource, or a gateway theme file, all readable, all diffable.
+
 ## You do (30 min)
 
 Solo. Make a series of changes in the gateway UI and answer: **which bucket is each in, and where does it live on disk?**
@@ -92,9 +117,11 @@ Pick three changes from this list (or invent your own). For each note:
 - **Bucket**: project-level / gateway-level / operational
 - **One sentence: would you commit this to git?**
 
+> This repo ships **two** projects under `projects/`: `example-project` and `packaging-site`. As you make changes, notice that each project is a self-contained directory, and that the gateway config (connections, tags, deployment modes) is **shared** across both. That split, per-project resources vs one shared gateway config, is the whole point of the project-level vs gateway-level buckets.
+
 Suggested changes:
 
-1. Create a new **Perspective view** in a project (you may need to create a project first via the Designer; if you don't have the Designer installed, **simulate** by creating `projects/sample/com.inductiveautomation.perspective/views/Hello/{view.json, resource.json}` with the minimal 8.3 content from [`docs/ignition-file-structure.md`](../docs/ignition-file-structure.md) — note the `resource.json` manifest is required in 8.3)
+1. Add a **Perspective view** to one of the two projects. Simulate on disk by creating `projects/packaging-site/com.inductiveautomation.perspective/views/pages/<Name>/{view.json, resource.json}` with the minimal 8.3 content from [`docs/ignition-file-structure.md`](../docs/ignition-file-structure.md). Note the `resource.json` manifest is required in 8.3, and that this lands under *one* project only, unlike a gateway resource.
 2. Change the **gateway timezone** (Config → System → Time)
 3. Add a **new user** to the gateway (Config → Security → Users)
 4. Add a **new tag provider** (Config → Tags → Realtime Tag Providers)
@@ -107,11 +134,13 @@ You're finished with Block A when you can, without peeking:
 - [ ] List the top-level `data/` entries and say which **bucket** each is (project / gateway / operational).
 - [ ] Make a UI change and **find the file it wrote** on disk with the `/tmp/marker` + `find -newer` trick.
 - [ ] State the real 8.3 path shape for a view (`projects/<x>/com.inductiveautomation.perspective/views/...` + `resource.json`) and a config resource (`config/resources/<scope>/<module>/<type>/<name>/config.json`).
-- [ ] Explain why `users.idb` and `.resources/` must **not** be committed.
+- [ ] Point at the on-disk file for a database connection, a PLC/device connection, and a tag definition, and explain why "it's all in git" follows.
+- [ ] Explain **deployment modes** in one sentence (one config set, per-mode overrides selected at boot) and name what differs between the `loc` and `prd` `TimescaleDB` connection.
+- [ ] Explain why `db/` and `.resources/` must **not** be committed.
 
 ## Stretch challenge `[OPTIONAL]`
 
-Draft a starter `.gitignore` for an Ignition project repo. Include patterns for the **operational** bucket (logs, db, idb, temp). Compare with the shipped [`.gitignore`](../.gitignore). What did you miss? What did the shipped one miss?
+Draft a starter `.gitignore` for an Ignition project repo. Include patterns for the **operational** bucket (the internal DB, tag value stores, caches, blob stores). Compare with the shipped [`.gitignore`](../.gitignore). What did you miss? What did the shipped one miss?
 
 This is the precursor to `.dockerignore` (lab-04-image-based) and `.deployignore` (Block B of *this* lab — already shipped in the repo for you to study).
 

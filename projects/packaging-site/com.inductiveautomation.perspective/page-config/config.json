@@ -1,0 +1,13 @@
+{
+  "pages": {
+    "/": {
+      "title": "Packaging",
+      "viewPath": "pages/packaging"
+    },
+    "/packaging": {
+      "title": "Packaging",
+      "viewPath": "pages/packaging"
+    }
+  },
+  "sharedDocks": {}
+}

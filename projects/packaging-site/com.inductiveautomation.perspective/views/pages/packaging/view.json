@@ -1,0 +1,67 @@
+{
+  "custom": {},
+  "params": {},
+  "props": {
+    "defaultSize": {
+      "height": 920,
+      "width": 1440
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "HeaderLabel"
+        },
+        "position": {
+          "grow": 0,
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "fontSize": "24px",
+            "fontWeight": 700,
+            "padding": "16px"
+          },
+          "text": "Packaging Site Overview"
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "StatusCard"
+        },
+        "position": {
+          "grow": 1,
+          "shrink": 1
+        },
+        "props": {
+          "style": {
+            "margin": "16px"
+          }
+        },
+        "type": "ia.container.flex",
+        "children": [
+          {
+            "meta": {
+              "name": "LineStateLabel"
+            },
+            "props": {
+              "text": "Line state: idle"
+            },
+            "type": "ia.display.label"
+          }
+        ]
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "style": {
+        "flexDirection": "column"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}
