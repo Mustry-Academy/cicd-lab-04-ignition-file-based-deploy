@@ -105,15 +105,36 @@ jobs:
           done < .deployignore
 
       - name: Ship projects and config into gateway container
+        # Wipe only projects/ so a deleted-in-repo view also disappears from the
+        # gateway. Do NOT wipe config/: the gateway owns state that lives there —
+        # the API token this deploy authenticates its scan with, and the
+        # per-instance identity under resources/local/ (UUID, keystores). Wiping
+        # config/ deletes the scan token (next step 401s) and clones one
+        # gateway's identity onto another. docker cp merges config/ on top of
+        # what the gateway owns; resources/local/ is pruned via .deployignore.
         run: |
           set -euo pipefail
           docker exec "$IGNITION_CONTAINER" sh -c \
-            "rm -rf $GATEWAY_DATA_PATH/projects/* $GATEWAY_DATA_PATH/config/*"
+            "rm -rf $GATEWAY_DATA_PATH/projects/*"
           docker cp ./projects/.        "$IGNITION_CONTAINER:$GATEWAY_DATA_PATH/projects/"
           docker cp ./services/config/. "$IGNITION_CONTAINER:$GATEWAY_DATA_PATH/config/"
 
       - name: Trigger gateway scan
-        run: scripts/trigger-scan.sh both
+        # Call the scan API inline rather than scripts/trigger-scan.sh: the prune
+        # step above removes scripts/ (it is in .deployignore), so that script is
+        # not on disk in this job.
+        run: |
+          set -euo pipefail
+          for what in projects config; do
+            code="$(curl -sS -o /dev/null -w '%{http_code}' -X POST \
+              -H "X-Ignition-API-Token: $IGNITION_API_KEY" \
+              "$IGNITION_URL/data/api/v1/scan/$what")"
+            echo "scan $what -> HTTP $code"
+            if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then
+              echo "scan $what failed (HTTP $code)" >&2
+              exit 1
+            fi
+          done
 
       - name: Smoke-check gateway health
         run: |

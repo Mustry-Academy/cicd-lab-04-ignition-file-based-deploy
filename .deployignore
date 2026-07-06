@@ -22,6 +22,9 @@ tests/
 third-party-modules/
 db-init/
 services/config/local/
+# Per-instance identity (UUID, OPC-UA keystores, machine-local system props).
+# Must never be copied onto another gateway — each instance owns its own.
+services/config/resources/local/
 
 # OS noise
 .DS_Store
