@@ -53,7 +53,7 @@ git update-index --no-skip-worktree <path>
 - Container up? `docker compose ps github-runner` and `docker logs github-runner` (look for
   *"Listening for Jobs"*).
 - `RUNNER_REPO_URL` in `.env` must point at **your fork**, not the upstream.
-- `RUNNER_GITHUB_PAT` must be a real PAT with `repo` scope — the `.env.example` placeholder won't
+- `gh` must be installed and authenticated (`gh auth status`) so `setup.sh` can mint the registration token; re-run `scripts/setup.sh` after fixing it —
   register. After editing `.env`: `docker compose restart github-runner`.
 - In your fork: *Settings → Actions → Runners* should list it online with the `self-hosted, lab04`
   labels.
@@ -78,7 +78,7 @@ This lab uses Git Flow — the branch decides the gateway:
 ## The deploy ran but my change isn't visible
 
 - Are you looking at the right gateway? `local` = :8088, `dev` = :8089, `prod` = :8090.
-- Did the scan return HTTP 200? `scripts/trigger-scan.sh` pretty-prints the response with a
+- Did the scan return HTTP 200? `scripts/scan.sh` pretty-prints the response with a
   `lastScanTimestamp`. Files on disk without a successful scan = gateway hasn't reloaded.
 - Module enable/disable (`services/modules.json`) needs a **restart**, not a scan:
   `docker compose restart ignition-dev`.

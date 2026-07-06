@@ -27,7 +27,7 @@ scripts/setup.sh    # idempotent — brings up the stack and waits for all three
 curl -fsS http://localhost:8088/StatusPing
 ```
 
-Open <http://localhost:8088> (the `local` gateway) in your browser. Login: `admin` / `lab04password` (or whatever you set as `GATEWAY_ADMIN_PASSWORD_LOCAL` in `.env`). The dev and prod gateways (`:8089` / `:8090`) come up too but stay empty until the deploy part.
+Open <http://localhost:8088> (the `local` gateway) in your browser. Login: `admin` / `password` (or whatever you set as `GATEWAY_ADMIN_PASSWORD_LOCAL` in `.env`). The dev and prod gateways (`:8089` / `:8090`) come up too but stay empty until the deploy part.
 
 Before you start the deploy part, get these in place (they take a few minutes and the #1 "nothing deploys" cause is a missing `develop` branch):
 
@@ -37,7 +37,7 @@ Before you start the deploy part, get these in place (they take a few minutes an
   git checkout -b develop && git push -u origin develop
   ```
   Optionally set it as the fork's **default branch** (*Settings → Branches*) so feature PRs target it by default.
-- **A GitHub Personal Access Token with `repo` scope** in `.env` as `RUNNER_GITHUB_PAT`, with `RUNNER_REPO_URL` pointed at **your fork**. The bundled `github-runner` container uses it to auto-register.
+- **The GitHub CLI (`gh`), installed and authenticated** (`gh auth login`), with `RUNNER_REPO_URL` in `.env` pointed at **your fork**. `setup.sh` mints the runner's short-lived registration token with `gh` and hands it to the bundled `github-runner` container — no Personal Access Token to create or store (same as Lab 03).
 - **An Ignition API key per gateway you want to scan.** Generate each in the gateway UI: *Config → Security → API Keys → New*, scoped to `Project Scan` and `Config Scan`. Copy the value once — you can't read it back. Drop them into `.env` as `IGNITION_API_KEY_LOCAL` / `_DEV` / `_PROD`.
 - **GitHub Environments** for the deploy workflows: `lab-gateway-dev` for `deploy.yml`, `lab-gateway-prod` for `release.yml`. Each needs a secret `IGNITION_API_KEY` (the value from the matching gateway).
 
@@ -200,7 +200,7 @@ cat > "$VIEW/resource.json" <<'EOF'
 EOF
 
 # Trigger a project scan on the local gateway:
-scripts/trigger-scan.sh projects --gateway local
+scripts/scan.sh projects --gateway local
 ```
 
 In the local gateway UI (http://localhost:8088), the `sample` project should now appear (Config → Projects, or the Perspective project launcher).
@@ -210,7 +210,7 @@ Now edit a view and ship it to dev by hand — this is exactly what `deploy.yml`
 1. Change `projects/sample/com.inductiveautomation.perspective/views/Hello/view.json` (e.g., `width: 800` → `width: 1200`).
 2. Scan the **local** gateway — local sees the change via bind mount immediately; the scan tells it to notice:
    ```bash
-   scripts/trigger-scan.sh both --gateway local
+   scripts/scan.sh both --gateway local
    ```
    Verify in http://localhost:8088 — the view's width should match.
 3. Copy the same change to **dev** manually:
@@ -222,7 +222,7 @@ Now edit a view and ship it to dev by hand — this is exactly what `deploy.yml`
      "rm -rf /usr/local/bin/ignition/data/projects/*"
    docker cp ./projects/.        lab04-ignition-dev:/usr/local/bin/ignition/data/projects/
    docker cp ./services/config/. lab04-ignition-dev:/usr/local/bin/ignition/data/config/
-   scripts/trigger-scan.sh both --gateway dev
+   scripts/scan.sh both --gateway dev
    ```
    Verify in http://localhost:8089 — the same view should appear, the same width.
 4. Inspect `.deployignore`. Notice it excludes `README.md`, `LICENSE`, the `.github/` directory, `docs/`, `scripts/`, and the per-instance `services/config/resources/local/`. For each pattern, say **why the gateway shouldn't have that file**.
@@ -262,7 +262,7 @@ docker compose logs --tail 50 github-runner   # look for "Listening for Jobs"
 In your fork on GitHub, *Settings → Actions → Runners* should show the runner online with the `self-hosted, lab04` labels. If it's not there:
 
 - `RUNNER_REPO_URL` in `.env` must point at your fork (not the upstream).
-- `RUNNER_GITHUB_PAT` must be a real PAT with `repo` scope (the example placeholder won't work).
+- `gh` must be installed and authenticated (`gh auth status`) so `setup.sh` could mint the registration token — re-run `scripts/setup.sh` after fixing it.
 - Restart it: `docker compose restart github-runner`.
 
 ### Part 2.2 — GitHub environments + secrets (10 min)

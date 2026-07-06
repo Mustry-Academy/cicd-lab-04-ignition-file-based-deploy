@@ -238,7 +238,7 @@ body{
     </div>
     <div class="goal">
       <span class="badge">Why this order</span>
-      <p>The deploy part automates <b>exactly</b> what you do by hand in the file-structure we-do. Start the deploy prerequisites early: <b>fork with Actions enabled, a <span class="inlinecode">develop</span> branch, a PAT in <span class="inlinecode">.env</span>, an API key per gateway</b>. The #1 "nothing deploys" cause is a missing <span class="inlinecode">develop</span> branch.</p>
+      <p>The deploy part automates <b>exactly</b> what you do by hand in the file-structure we-do. Start the deploy prerequisites early: <b>fork with Actions enabled, a <span class="inlinecode">develop</span> branch, <span class="inlinecode">gh</span> authenticated, an API key per gateway</b>. The #1 "nothing deploys" cause is a missing <span class="inlinecode">develop</span> branch.</p>
     </div>
   </div>
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>File structure before deploy</span></div>
@@ -351,7 +351,7 @@ data/modules/*.modl
     <ul class="checks" style="max-width:960px;margin-top:20px">
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Fork with Actions enabled.</b> Forks ship with workflows <b>disabled</b>, so open your fork's <i>Actions</i> tab and click "enable" or nothing will ever trigger.</span></li>
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>A <span class="mono" style="color:#dbe4f0">develop</span> branch</b>, Git Flow's integration branch. Optionally make it the fork's default branch so PRs target it automatically.</span></li>
-      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>A GitHub PAT with <span class="mono" style="color:#dbe4f0">repo</span> scope</b> in <span class="mono" style="color:#dbe4f0">.env</span> as <span class="mono" style="color:#dbe4f0">RUNNER_GITHUB_PAT</span>, and <span class="mono" style="color:#dbe4f0">RUNNER_REPO_URL</span> pointing at <b>your fork</b>. The bundled runner auto-registers with it.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>The GitHub CLI (<span class="mono" style="color:#dbe4f0">gh</span>) authenticated</b>, with <span class="mono" style="color:#dbe4f0">RUNNER_REPO_URL</span> pointing at <b>your fork</b>. <span class="mono" style="color:#dbe4f0">setup.sh</span> mints the runner's registration token with <span class="mono" style="color:#dbe4f0">gh</span> — no PAT.</span></li>
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>An API key per gateway</b>: each gateway's UI → <i>Config → Security → API Keys → New</i>, scoped to <b>Project Scan + Config Scan</b> only. Copy immediately, because you can't read it back. Into <span class="mono" style="color:#dbe4f0">.env</span> as <span class="mono" style="color:#dbe4f0">IGNITION_API_KEY_LOCAL/_DEV/_PROD</span>.</span></li>
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Two GitHub environments</b>: <span class="mono" style="color:#dbe4f0">lab-gateway-dev</span> and <span class="mono" style="color:#dbe4f0">lab-gateway-prod</span>, set up in Part 2.</span></li>
     </ul>
@@ -378,7 +378,7 @@ git checkout -b develop &amp;&amp; git push -u origin develop</pre></div>
       </div>
       <div>
         <div class="code"><pre><span class="cm"># 2 (local): files already there, just scan</span>
-scripts/trigger-scan.sh both --gateway local
+scripts/scan.sh both --gateway local
 
 <span class="cm"># 3 (dev): wipe, copy, scan (deploy.yml does exactly this)</span>
 docker exec lab04-ignition-dev sh -c \
@@ -388,7 +388,7 @@ docker cp ./projects/. \
   lab04-ignition-dev:/usr/local/bin/ignition/data/projects/
 docker cp ./services/config/. \
   lab04-ignition-dev:/usr/local/bin/ignition/data/config/
-scripts/trigger-scan.sh both --gateway dev</pre></div>
+scripts/scan.sh both --gateway dev</pre></div>
         <div class="goal" style="margin-top:16px">
           <span class="badge">No sample project?</span>
           <p>If you skipped the demo, use any view under the shipped <span class="inlinecode">projects/example-project/</span> instead. The flow is identical.</p>
@@ -410,7 +410,7 @@ scripts/trigger-scan.sh both --gateway dev</pre></div>
     <div class="cols2">
       <div class="steps">
         <div class="step"><div class="ix p">1</div><div class="tx"><b>Verify the runner</b> (it's part of the compose stack). Then check your fork: <i>Settings → Actions → Runners</i> must show it <b>online</b> with labels <span class="inlinecode">self-hosted, lab04</span>.</div></div>
-        <div class="step"><div class="ix p">2</div><div class="tx">Not there? Three checks: <span class="inlinecode">RUNNER_REPO_URL</span> points at <b>your fork</b> · <span class="inlinecode">RUNNER_GITHUB_PAT</span> is a real PAT (not the placeholder) · <span class="inlinecode">docker compose restart github-runner</span>.</div></div>
+        <div class="step"><div class="ix p">2</div><div class="tx">Not there? Three checks: <span class="inlinecode">RUNNER_REPO_URL</span> points at <b>your fork</b> · <span class="inlinecode">gh</span> was authenticated when you ran setup (it mints the token) · <span class="inlinecode">docker compose restart github-runner</span>.</div></div>
         <div class="step"><div class="ix p">3</div><div class="tx"><b>Create environment</b> <span class="inlinecode">lab-gateway-dev</span> (<i>Settings → Environments</i>) with secret <span class="inlinecode">IGNITION_API_KEY</span> = the key you generated <b>on the dev gateway</b> (:8089).</div></div>
         <div class="step"><div class="ix p">4</div><div class="tx">Repeat: <span class="inlinecode">lab-gateway-prod</span> with the key from the <b>prod gateway</b> (:8090). Leave <span class="inlinecode">IGNITION_URL</span> / <span class="inlinecode">IGNITION_CONTAINER</span> unset; the defaults match the bundled runner.</div></div>
       </div>

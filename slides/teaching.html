@@ -767,7 +767,7 @@ docker-compose.yaml <span class="cm"># ← unless you want it to run there with 
       <div>
         <ul class="checks">
           <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Mostly hygiene:</b> a stray <span class="inlinecode">README.md</span> inside <span class="inlinecode">data/projects/</span> is harmless noise, but noise accumulates, and some lab files could shadow real resources.</span></li>
-          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Sometimes safety:</b> <span class="inlinecode">.env</span> holds your PAT and API keys. <span class="inlinecode">services/config/local/</span> is instance identity. Neither may ever reach a shared gateway.</span></li>
+          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Sometimes safety:</b> <span class="inlinecode">.env</span> holds your API keys. <span class="inlinecode">services/config/local/</span> is instance identity. Neither may ever reach a shared gateway.</span></li>
           <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>The lab's prune step handles <b>literal paths</b> and <b>bare-name globs</b>, not full gitignore semantics (no <span class="inlinecode">!</span> negation). Keep patterns simple.</span></li>
         </ul>
         <div class="callout" style="margin-top:16px">
@@ -836,7 +836,7 @@ docker cp ./services/config/. "$IGNITION_CONTAINER:$DATA/config/"</pre></div>
       </div>
     </div>
     <div class="cols2">
-      <div class="code"><pre><span class="cm"># what scripts/trigger-scan.sh does under the hood</span>
+      <div class="code"><pre><span class="cm"># what scripts/scan.sh does under the hood</span>
 curl -X POST \
   -H <span class="cmd2">"X-Ignition-API-Token: $IGNITION_API_KEY"</span> \
   http://localhost:8088/data/api/v1/scan/projects
@@ -846,7 +846,7 @@ curl -X POST \
   http://localhost:8088/data/api/v1/scan/config
 
 <span class="cm"># the lab wrapper picks key + URL per gateway from .env</span>
-scripts/trigger-scan.sh both --gateway dev</pre></div>
+scripts/scan.sh both --gateway dev</pre></div>
       <div>
         <ul class="checks">
           <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Keys are per-gateway, not per-URL.</b> Generate each in <i>that gateway's</i> UI (Config → Security → API Keys). The dev key will never authenticate against prod.</span></li>

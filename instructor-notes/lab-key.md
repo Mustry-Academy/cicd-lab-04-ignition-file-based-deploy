@@ -93,7 +93,7 @@ Commonly missed: `data/config/local/` and `data/config/resources/local/` (per-in
 
 Before students move to part 2:
 
-- Remind them part 2 uses the bundled `github-runner` container — needs a GitHub PAT (`repo` scope) in `.env` as `RUNNER_GITHUB_PAT` and `RUNNER_REPO_URL` pointed at their fork.
+- Remind them part 2 uses the bundled `github-runner` container — needs `gh` installed and authenticated (`gh auth login`) and `RUNNER_REPO_URL` in `.env` pointed at their fork. `setup.sh` mints the registration token via `gh`; no PAT.
 - Have them generate an API key in each gateway UI now (local first). Store in `.env` as `IGNITION_API_KEY_LOCAL/_DEV/_PROD` and as environment-scoped secrets on the `lab-gateway-dev` / `lab-gateway-prod` GitHub environments.
 - Have them create the Git Flow `develop` branch in their fork now — a missing branch is the #1 "nothing deployed" stumble.
 
@@ -134,7 +134,7 @@ on:
       - "projects/**"
       - "services/config/**"
       - ".deployignore"
-      - "scripts/trigger-scan.sh"
+      - "scripts/scan.sh"
       - "scripts/lib.sh"
       - ".github/workflows/deploy.yml"
   workflow_dispatch:                # let humans trigger manually for testing
@@ -172,7 +172,7 @@ jobs:
           docker cp ./services/config/. "$IGNITION_CONTAINER:$GATEWAY_DATA_PATH/config/"
       - name: Trigger gateway scan
         run: |
-          # Inline curl, NOT scripts/trigger-scan.sh: the prune step removed
+          # Inline curl, NOT scripts/scan.sh: the prune step removed
           # scripts/ (it is in .deployignore), so the script is not on disk here.
           for what in projects config; do
             curl -sS -X POST -H "X-Ignition-API-Token: $IGNITION_API_KEY" \
@@ -188,7 +188,7 @@ Highlights for the grade:
 - **`paths:` filter.** Docs-only changes don't retrigger the deploy.
 - **`concurrency` block.** `cancel-in-progress: false` queues a new run rather than cancelling an in-flight one — cancellation mid-`docker cp` would leave a partial state.
 - **Don't wipe `config/`.** The gateway's own state lives under `config/` — the API token the scan authenticates with, and per-instance identity under `resources/local/`. Wiping it (an earlier version did) deletes the scan token so the next step 401s, and copies one gateway's identity onto another. Wipe only `projects/`; merge `config/` on top; exclude `resources/local/` in `.deployignore`.
-- **Inline scan, not the script.** The prune step deletes `scripts/` (it's in `.deployignore` and nothing ships it), so the scan must not depend on `scripts/trigger-scan.sh`. `trigger-scan.sh` stays for manual/local use.
+- **Inline scan, not the script.** The prune step deletes `scripts/` (it's in `.deployignore` and nothing ships it), so the scan must not depend on `scripts/scan.sh`. `scan.sh` stays for manual/local use.
 - **`environment:` scoping.** Secrets scoped to `lab-gateway-dev`. A repo-level `IGNITION_API_KEY` won't be picked up — deliberate. Environments give per-target secrets and deploy history for free.
 - **Verify + smoke-check.** Cheap; catch missing key / stopped container before any file moves, and a broken gateway after.
 
@@ -198,7 +198,7 @@ Highlights for the grade:
 
 - **"I merged my PR but nothing deployed."** (a) They merged into `main` instead of `develop` — only `develop` triggers `deploy.yml`; (b) their fork has no `develop` branch, so the PR targeted `main`. Fix: create `develop`, ideally set it as the fork's default branch.
 - **"I pushed to `main` and expected prod to update."** Merging into `main` deploys nothing — prod is reached by **tagging**. By design: prod always runs a named version.
-- **"My runner isn't picking up jobs."** Container running (`docker compose ps github-runner`), `RUNNER_REPO_URL` points at the **fork**, `RUNNER_GITHUB_PAT` is a real PAT. `docker compose logs github-runner` surfaces it.
+- **"My runner isn't picking up jobs."** Container running (`docker compose ps github-runner`), `RUNNER_REPO_URL` points at the **fork**, and `gh` was authenticated when they ran `setup.sh` (it mints the token). `docker compose logs github-runner` surfaces it.
 - **"The deploy ran but my change isn't visible."** Did `Ship` succeed (docker cp output)? Did the scan return HTTP 200? Are they looking at **dev** (8089) or **local** (8088)?
 - **"The scan step 403'd (or 401'd)."** 403 = the API key's role lacks Project/Config Scan **or** the gateway's Read/Write permissions (Config → Security → General Settings) don't admit the token's security level (`Authenticated`). 401 = the token isn't recognized — historically caused by the deploy wiping `config/` and deleting the token; the fixed workflow no longer wipes `config/`, so a token generated on the gateway survives.
 - **"`Context access might be invalid` warnings."** Cosmetic — the VS Code Actions extension can't verify `vars.X`/`secrets.X` until the environment exists. Goes away once created.
@@ -212,7 +212,7 @@ The most teaching-rich segment.
 
 **Target container not running** — Verify step fails with "container is in state 'exited', expected 'running'". No-op, safe. Recovery: `docker compose up -d ignition-dev`, re-run. Lesson: fail fast at the right step; `docker cp` against a stopped container still writes to the volume, which desyncs on next start.
 
-**Runner offline** — Workflow queues forever, no logs. Gateway unchanged. Recovery: `docker compose restart github-runner`. Lesson: self-hosted has operational cost — keep the runner alive across reboots, PAT expirations.
+**Runner offline** — Workflow queues forever, no logs. Gateway unchanged. Recovery: `docker compose restart github-runner`. Lesson: self-hosted has operational cost — keep the runner alive across reboots and registration-token expirations.
 
 **Partial ship (runner killed mid-`docker cp`)** — Some files new, some missing; gateway sees inconsistent state. Possibly broken (a view referencing a not-yet-landed script). Recovery: re-run; the wipe-projects-then-cp converges on the working tree's state. Lesson: the strongest argument for image-based deploys (atomic) when the failure mode matters.
 
@@ -235,5 +235,5 @@ Payoff (foreshadows Lab 05): file-based + scan is great for what changes daily (
 
 ## Wrap-up
 
-- Have them stop the **runner container only** if not continuing (`docker compose stop github-runner`). The PAT stays in `.env` until they `git clean` or rotate it.
+- Have them stop the **runner container only** if not continuing (`docker compose stop github-runner`). Nothing secret lingers in `.env` — the registration token was short-lived and minted by `gh` at setup time.
 - Lab-05 (image-based) is the natural continuation — same stack, different deploy mechanism.
