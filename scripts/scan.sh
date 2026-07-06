@@ -10,10 +10,10 @@
 # rewritten to local human-readable time when jq is available.
 #
 # Usage:
-#   scripts/trigger-scan.sh                          # both, against local
-#   scripts/trigger-scan.sh projects                 # projects only
-#   scripts/trigger-scan.sh both --gateway dev       # both, against dev gateway
-#   scripts/trigger-scan.sh --gateway prod config    # config only, against prod
+#   scripts/scan.sh                          # both, against local
+#   scripts/scan.sh projects                 # projects only
+#   scripts/scan.sh both --gateway dev       # both, against dev gateway
+#   scripts/scan.sh --gateway prod config    # config only, against prod
 #
 # Gateways:
 #   local   http://localhost:8088   (default — student's bind-mounted gateway)
@@ -30,6 +30,7 @@
 
 set -euo pipefail
 
+# shellcheck source=lib.sh
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"
 
 # ---- tunables -------------------------------------------------------------
@@ -41,20 +42,16 @@ CURL_MAX_TIME=30   # seconds; protects against a hung gateway
 
 target="both"
 gateway="local"
-positional_set=0
-gateway_set=0
 
 while [ $# -gt 0 ]; do
   case "$1" in
     --gateway=*)
       gateway="${1#*=}"
-      gateway_set=1
       shift
       ;;
     --gateway)
       [ $# -ge 2 ] || { echo "ERROR: --gateway requires a value" >&2; exit 2; }
       gateway="$2"
-      gateway_set=1
       shift 2
       ;;
     -h|--help)
@@ -67,7 +64,6 @@ while [ $# -gt 0 ]; do
       ;;
     projects|config|both)
       target="$1"
-      positional_set=1
       shift
       ;;
     *)

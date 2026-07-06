@@ -48,7 +48,7 @@ The `local` gateway sits outside Git Flow entirely — it's your bind-mounted sc
 - **Not pruning lab files.** Without `.deployignore`, your `README.md` ends up at `<gateway>/data/projects/<name>/README.md` — harmless, but accumulates noise. Lab files like `tests/` could be more dangerous (they might shadow real Ignition resources).
 - **Forgetting the scan.** The files are on disk inside the container but the gateway hasn't noticed. Symptom: "my change isn't picked up; the file is right there." Solution: hit the scan endpoint.
 - **Triggering a scan when a restart is what's needed.** Module changes, Java args, memory limits — these need a restart, not a scan. See the table in [`ignition-file-structure.md`](./ignition-file-structure.md).
-- **Wrong API key for the wrong gateway.** Each lab gateway has its own API key. `IGNITION_API_KEY_LOCAL` won't authenticate against `ignition-dev`. The workflow's environment-scoped secrets get this right automatically; manual `trigger-scan.sh` calls need the matching `--gateway` flag.
+- **Wrong API key for the wrong gateway.** Each lab gateway has its own API key. `IGNITION_API_KEY_LOCAL` won't authenticate against `ignition-dev`. The workflow's environment-scoped secrets get this right automatically; manual `scan.sh` calls need the matching `--gateway` flag.
 - **Partial copies.** If the runner crashes between copying view A and view B, the gateway scans a half-state and may serve broken views. Two-phase mitigations exist (write to a staging dir, then atomically swap) but for most labs, "fix forward by re-running the deploy" is fine.
 
 ## File-based vs image-based: when each fits

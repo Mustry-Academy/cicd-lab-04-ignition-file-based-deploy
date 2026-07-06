@@ -120,7 +120,7 @@ jobs:
           docker cp ./services/config/. "$IGNITION_CONTAINER:$GATEWAY_DATA_PATH/config/"
 
       - name: Trigger gateway scan
-        # Call the scan API inline rather than scripts/trigger-scan.sh: the prune
+        # Call the scan API inline rather than scripts/scan.sh: the prune
         # step above removes scripts/ (it is in .deployignore), so that script is
         # not on disk in this job.
         run: |

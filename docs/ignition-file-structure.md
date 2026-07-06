@@ -216,7 +216,7 @@ cat > "projects/sample/com.inductiveautomation.perspective/views/Hello/resource.
 EOF
 ```
 
-After triggering a project scan against the local gateway (`scripts/trigger-scan.sh projects --gateway local`), the `sample` project shows up in the gateway. It won't look like much — that's the point. (Note: `scope` `G` = gateway/global; the manifest is what makes the resource visible to the scan.)
+After triggering a project scan against the local gateway (`scripts/scan.sh projects --gateway local`), the `sample` project shows up in the gateway. It won't look like much — that's the point. (Note: `scope` `G` = gateway/global; the manifest is what makes the resource visible to the scan.)
 
 ## What changes when
 
@@ -232,7 +232,7 @@ Some changes require **only** a scan; others require a **restart**.
 | Change gateway memory (`-m` arg) | ✗ — needs restart |
 | Change Java args | ✗ — needs restart |
 
-The shipped `scripts/trigger-scan.sh` only handles the scan-able cases. For the restart cases, the deploy needs an extra step (`docker compose restart ignition-local` / `-dev` / `-prod` in the lab; `Restart-Service` or `systemctl restart` on a real host).
+The shipped `scripts/scan.sh` only handles the scan-able cases. For the restart cases, the deploy needs an extra step (`docker compose restart ignition-local` / `-dev` / `-prod` in the lab; `Restart-Service` or `systemctl restart` on a real host).
 
 ## Further reading
 
