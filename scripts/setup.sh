@@ -123,8 +123,9 @@ install_git_hooks() {
         local target="$repo_hooks_dir/$hook"
         ln -sf "$source_dir/$hook" "$target"
     done
-    [ -x "$source_dir/skip-worktree-ignition-resources" ] && \
+    if [ -x "$source_dir/skip-worktree-ignition-resources" ]; then
         "$source_dir/skip-worktree-ignition-resources" || true
+    fi
 }
 
 install_git_hooks
