@@ -89,5 +89,5 @@ This lab uses Git Flow — the branch decides the gateway:
 scripts/validate.sh    # JSON parse + .deployignore syntax + actionlint — mirrors CI
 ```
 
-Still stuck? The instructor answer keys ([block-a-key.md](../instructor-notes/block-a-key.md),
-[block-b-key.md](../instructor-notes/block-b-key.md)) have a deeper failure-mode walkthrough.
+Still stuck? The instructor answer key ([lab-key.md](../instructor-notes/lab-key.md)) has a
+deeper failure-mode walkthrough.

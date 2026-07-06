@@ -1,6 +1,6 @@
 # File-based deploy pattern — cheat sheet
 
-Reference reading for Block B. The complete pattern in five steps, the tradeoffs vs image-based, and the failure modes.
+Reference reading for the deploy part of the lab. The complete pattern in five steps, the tradeoffs vs image-based, and the failure modes.
 
 ## The pattern in five steps
 

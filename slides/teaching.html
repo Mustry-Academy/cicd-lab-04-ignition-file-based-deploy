@@ -240,7 +240,7 @@ body{
     <div class="on-dark brandrow">
       <img class="logo-img logo-lg" src="logos/OriginalLight.png" alt="Mustry Solutions">
     </div>
-    <div class="stage on-dark">Lab 04 · Day 2 · Afternoon · Blocks A &amp; B</div>
+    <div class="stage on-dark">Lab 04 · Day 2 · Afternoon · Parts 1 &amp; 2</div>
   </div>
 
   <div class="cover">
@@ -286,10 +286,10 @@ body{
 <section class="slide dark">
   <div class="topbar">
     <div class="on-dark brandrow"><img class="logo-img" src="logos/OriginalLight.png" alt="Mustry Solutions"></div>
-    <div class="stage on-dark">Block A · the file structure</div>
+    <div class="stage on-dark">File structure</div>
   </div>
   <div class="divider">
-    <div class="eyebrow">Block A</div>
+    <div class="eyebrow">Part 1</div>
     <div class="q">What does Ignition actually write to <em>disk</em>?</div>
     <div class="sub2">Everything the gateway is lives under <span class="mono" style="color:#dbe4f0">data/</span>. If you can classify any file in there, you know how to version it, deploy it, and roll it back. Let's open the box.</div>
   </div>
@@ -300,7 +300,7 @@ body{
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">Block A · the file structure</div>
+    <div class="stage">File structure</div>
   </div>
 
   <div class="body">
@@ -345,7 +345,7 @@ body{
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">Block A · the mental model</div>
+    <div class="stage">File structure · the mental model</div>
   </div>
 
   <div class="body">
@@ -353,7 +353,7 @@ body{
       <span class="num">03</span>
       <div>
         <div class="title">The three-bucket model</div>
-        <div class="lead">The one artifact to take home from Block A. Each bucket has a different owner, and a completely different deploy story.</div>
+        <div class="lead">The one artifact to take home from the file-structure part. Each bucket has a different owner, and a completely different deploy story.</div>
       </div>
     </div>
     <div class="buckets">
@@ -394,14 +394,14 @@ body{
     </div>
   </div>
 
-  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Which bucket? The Block A exam question</span></div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Which bucket? The file-structure exam question</span></div>
 </section>
 
 <!-- 6 · PROJECT RESOURCES IN 8.3 -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">Block A · project resources</div>
+    <div class="stage">File structure · project resources</div>
   </div>
 
   <div class="body">
@@ -453,7 +453,7 @@ projects/
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">Block A · gateway config</div>
+    <div class="stage">File structure · gateway config</div>
   </div>
 
   <div class="body">
@@ -509,7 +509,7 @@ loc/config-mode.json   <span class="cm"># scope descriptor {parent: "core"}</spa
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">Block A · the never list</div>
+    <div class="stage">File structure · the never list</div>
   </div>
 
   <div class="body">
@@ -533,14 +533,14 @@ loc/config-mode.json   <span class="cm"># scope descriptor {parent: "core"}</spa
     </div>
   </div>
 
-  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>gitignore the operational bucket · the Block A stretch</span></div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>gitignore the operational bucket · the file-structure stretch</span></div>
 </section>
 
 <!-- 9 · THE GATEWAY WRITES BACK -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">Block A · living with the gateway</div>
+    <div class="stage">File structure · living with the gateway</div>
   </div>
 
   <div class="body">
@@ -581,7 +581,7 @@ scripts/clean-ignition-resource-churn.sh --apply  <span class="cm"># restore fro
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">Block A → Block B · the hinge</div>
+    <div class="stage">File structure → deploy · the hinge</div>
   </div>
 
   <div class="body">
@@ -603,7 +603,7 @@ scripts/clean-ignition-resource-churn.sh --apply  <span class="cm"># restore fro
     </table>
     <div class="callout">
       <div class="lab" style="color:var(--blue)">Remember this line</div>
-      <p><b>Scan owns everything that changes daily</b> (views, scripts, connections). When a scan isn't enough, the pipeline needs an <b>extra, disruptive step</b>: <code>docker compose restart ignition-dev</code> in this lab, <code>systemctl restart</code> on a real host. You'll hit the <code>modules.json</code> case yourself in the Block B stretch.</p>
+      <p><b>Scan owns everything that changes daily</b> (views, scripts, connections). When a scan isn't enough, the pipeline needs an <b>extra, disruptive step</b>: <code>docker compose restart ignition-dev</code> in this lab, <code>systemctl restart</code> on a real host. You'll hit the <code>modules.json</code> case yourself in the deploy stretch.</p>
     </div>
   </div>
 
@@ -614,10 +614,10 @@ scripts/clean-ignition-resource-churn.sh --apply  <span class="cm"># restore fro
 <section class="slide dark">
   <div class="topbar">
     <div class="on-dark brandrow"><img class="logo-img" src="logos/OriginalLight.png" alt="Mustry Solutions"></div>
-    <div class="stage on-dark">Block B · the deploy pattern</div>
+    <div class="stage on-dark">File-based deploy</div>
   </div>
   <div class="divider">
-    <div class="eyebrow">Block B</div>
+    <div class="eyebrow">Part 2</div>
     <div class="q">If everything is a file… deployment is a <em>copy</em>.</div>
     <div class="sub2">No SSH, no gwbk import, no remote desktop into the SCADA server. Files land on disk, one HTTP call tells the gateway to look, and it hot-reloads. Five steps, end to end.</div>
   </div>
@@ -628,7 +628,7 @@ scripts/clean-ignition-resource-churn.sh --apply  <span class="cm"># restore fro
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">Block B · the pattern</div>
+    <div class="stage">File-based deploy · the pattern</div>
   </div>
 
   <div class="body">
@@ -689,7 +689,7 @@ scripts/clean-ignition-resource-churn.sh --apply  <span class="cm"># restore fro
 <section class="slide dark">
   <div class="topbar">
     <div class="on-dark brandrow"><img class="logo-img" src="logos/OriginalLight.png" alt="Mustry Solutions"></div>
-    <div class="stage on-dark">Block B · topology</div>
+    <div class="stage on-dark">File-based deploy · topology</div>
   </div>
 
   <div class="stage-wrap">
@@ -709,7 +709,7 @@ scripts/clean-ignition-resource-churn.sh --apply  <span class="cm"># restore fro
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">Block B · the repo map</div>
+    <div class="stage">File-based deploy · the repo map</div>
   </div>
 
   <div class="body">
@@ -738,7 +738,7 @@ scripts/clean-ignition-resource-churn.sh --apply  <span class="cm"># restore fro
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">Block B · pruning</div>
+    <div class="stage">File-based deploy · pruning</div>
   </div>
 
   <div class="body">
@@ -785,7 +785,7 @@ docker-compose.yaml <span class="cm"># ← unless you want it to run there with 
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">Block B · the ship step</div>
+    <div class="stage">File-based deploy · the ship step</div>
   </div>
 
   <div class="body">
@@ -824,7 +824,7 @@ docker cp ./services/config/. "$IGNITION_CONTAINER:$DATA/config/"</pre></div>
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">Block B · the scan API</div>
+    <div class="stage">File-based deploy · the scan API</div>
   </div>
 
   <div class="body">
@@ -868,7 +868,7 @@ scripts/trigger-scan.sh both --gateway dev</pre></div>
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">Block B · where it bites</div>
+    <div class="stage">File-based deploy · where it bites</div>
   </div>
 
   <div class="body">
@@ -914,7 +914,7 @@ scripts/trigger-scan.sh both --gateway dev</pre></div>
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">Block B · the shipped workflows</div>
+    <div class="stage">File-based deploy · the shipped workflows</div>
   </div>
 
   <div class="body">
@@ -953,14 +953,14 @@ scripts/trigger-scan.sh both --gateway dev</pre></div>
     <div class="eyebrow">Now we make it real</div>
     <div class="title" style="max-width:24ch;color:#fff">Next: watch a change ride from your editor to a <em style="font-style:normal;color:var(--peri2)">prod</em> gateway.</div>
     <ul class="checks" style="max-width:940px;margin-top:22px">
-      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>We-do (Block A).</b> Live tour of <span class="mono" style="color:#dbe4f0">data/</span> from inside the container, plus the marker trick: touch a marker, click in the UI, <span class="mono" style="color:#dbe4f0">find -newer</span> the file it wrote.</span></li>
-      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>We-do (Block B).</b> A view created on disk by hand, scanned into the local gateway, then shipped to dev with the exact <span class="mono" style="color:#dbe4f0">docker cp</span> commands the workflow automates.</span></li>
-      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>You-do (breakout rooms).</b> Block A: classify real UI changes into buckets. Block B: wire your fork's runner, merge a PR into <span class="mono" style="color:#dbe4f0">develop</span> → <b>dev</b>, tag <span class="mono" style="color:#dbe4f0">v0.1.0</span> → <b>prod</b>. Then break a deploy on purpose.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>We-do (part 1).</b> Live tour of <span class="mono" style="color:#dbe4f0">data/</span> from inside the container, plus the marker trick: touch a marker, click in the UI, <span class="mono" style="color:#dbe4f0">find -newer</span> the file it wrote.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>We-do (part 2).</b> A view created on disk by hand, scanned into the local gateway, then shipped to dev with the exact <span class="mono" style="color:#dbe4f0">docker cp</span> commands the workflow automates.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>You-do (breakout rooms).</b> Part 1: classify real UI changes into buckets. Part 2: wire your fork's runner, merge a PR into <span class="mono" style="color:#dbe4f0">develop</span> → <b>dev</b>, tag <span class="mono" style="color:#dbe4f0">v0.1.0</span> → <b>prod</b>. Then break a deploy on purpose.</span></li>
     </ul>
     <p class="lead" style="font-size:13.5px;color:#8fa0b6;margin-top:22px">Day 3 teaser: everything a scan <i>can't</i> apply (modules, the gateway baseline) gets baked into images. Lab 05.</p>
   </div>
 
-  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Next → We-do, then exercises/block-a.md</span></div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Next → We-do, then exercises/lab.md</span></div>
 </section>
 
 </div>

@@ -158,16 +158,16 @@ body{
 <div class="deck" id="deck">
 
 <!-- 1 · COVER -->
-<!-- Day 2 · afternoon per instructor brief. You-do slots per the exercise files: Block A 30 min, Block B 40 min. -->
+<!-- Day 2 · afternoon per instructor brief. You-do slots per the exercise files: Part 1 30 min, Part 2 40 min. -->
 <section class="slide dark">
   <div class="topbar">
     <div class="on-dark brandrow"><img class="logo-img logo-lg" src="logos/OriginalLight.png" alt="Mustry Solutions"></div>
-    <div class="stage on-dark">Lab 04 · The assignment · Blocks A &amp; B</div>
+    <div class="stage on-dark">Lab 04 · The assignment · Parts 1 &amp; 2</div>
   </div>
   <div class="cover">
     <div class="eyebrow">The assignment · breakout rooms</div>
     <div class="big">Know every file in <span class="mono" style="color:#dbe4f0">data/</span>, then build the <em>file-based deploy</em>.</div>
-    <div class="sub">Two blocks. In Block A you become the person who can point at any file in an Ignition gateway's <span class="mono" style="color:#dbe4f0">data/</span> directory and say what it is, who owns it, and whether it belongs in git. In Block B you wire that knowledge into GitHub Actions: a PR merged into <span class="mono" style="color:#dbe4f0">develop</span> lands on the dev gateway, a tag on <span class="mono" style="color:#dbe4f0">main</span> lands on prod. Hot scan, no restarts.</div>
+    <div class="sub">Two parts. In the first part you become the person who can point at any file in an Ignition gateway's <span class="mono" style="color:#dbe4f0">data/</span> directory and say what it is, who owns it, and whether it belongs in git. In the second part you wire that knowledge into GitHub Actions: a PR merged into <span class="mono" style="color:#dbe4f0">develop</span> lands on the dev gateway, a tag on <span class="mono" style="color:#dbe4f0">main</span> lands on prod. Hot scan, no restarts.</div>
     <div class="for">
       <span>Floating to help</span>
       <span class="pill"><b>Sam</b></span>
@@ -189,7 +189,7 @@ body{
     <div class="sechead"><span class="num">READ FIRST</span><div><div class="title">How this works</div></div></div>
     <ul class="checks" style="max-width:940px">
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Share your screen</b> in your breakout room. This is a "look over your shoulder" class, so we'll drop in where it's useful.</span></li>
-      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Work in your fork.</b> The self-hosted runner registers against <i>your</i> fork, not the upstream. The exercise files are the source of truth: <span class="inlinecode">exercises/block-a.md</span> and <span class="inlinecode">exercises/block-b.md</span>.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Work in your fork.</b> The self-hosted runner registers against <i>your</i> fork, not the upstream. The exercise file is the source of truth: <span class="inlinecode">exercises/lab.md</span>.</span></li>
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Run <span class="inlinecode">scripts/setup.sh</span> first</b> (it's idempotent). It brings up three gateways + TimescaleDB + the runner and waits until everything is RUNNING (cold start takes a few minutes).</span></li>
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Trial mode is fine.</b> Each gateway runs a 2-hour trial. Reset via <i>Gateway → Config → Licensing → Reset Trial</i>: unlimited, and you'll do it three times if all gateways stay up.</span></li>
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Answer keys exist</b> (<span class="inlinecode">instructor-notes/</span>), but <b>don't peek</b> before you've done the solo work. The classification skill <i>is</i> the lesson.</span></li>
@@ -199,7 +199,7 @@ body{
       <p>Stuck for more than a couple of minutes? <b>Say so in the room.</b> Also: <span class="inlinecode">docs/TROUBLESHOOTING.md</span> covers the common stack / runner / deploy failures.</p>
     </div>
   </div>
-  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Block A → Block B, in order</span></div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Part 1 → Part 2, in order</span></div>
 </section>
 
 <!-- 3 · THE PLAN -->
@@ -212,25 +212,25 @@ body{
     <div class="sechead"><span class="num">THE PLAN</span><div><div class="title">Four stops, in order</div></div></div>
     <div class="pmap">
       <div class="pcard">
-        <div class="pn">BLOCK A · WE DO</div>
+        <div class="pn">PART 1 · WE DO</div>
         <h4>Find the file</h4>
         <p>Add a database connection, then catch the file the gateway wrote: touch a marker, <span class="inlinecode">find -newer</span>.</p>
-        <div class="gate">exercises/block-a.md · We do</div>
+        <div class="gate">exercises/lab.md · We do</div>
       </div>
       <div class="pcard p1">
-        <div class="pn">BLOCK A · YOU DO</div>
+        <div class="pn">PART 1 · YOU DO</div>
         <h4>Classify 3 changes</h4>
         <p>Pick three gateway changes. For each: what changed, where on disk, which bucket, commit it or not?</p>
         <div class="gate">gate → definition of done ✅</div>
       </div>
       <div class="pcard p2">
-        <div class="pn">BLOCK B · WE DO</div>
+        <div class="pn">PART 2 · WE DO</div>
         <h4>Deploy by hand</h4>
         <p>Edit a view → scan local → <span class="inlinecode">docker cp</span> to dev → scan dev. The workflow, done manually once.</p>
-        <div class="gate">exercises/block-b.md · We do</div>
+        <div class="gate">exercises/lab.md · We do</div>
       </div>
       <div class="pcard p3">
-        <div class="pn">BLOCK B · YOU DO</div>
+        <div class="pn">PART 2 · YOU DO</div>
         <h4>Wire it into Actions</h4>
         <p>Runner online → environments + secrets → PR to <span class="inlinecode">develop</span> ships dev → tag ships prod → break one on purpose.</p>
         <div class="gate">Parts 1 → 5</div>
@@ -238,20 +238,20 @@ body{
     </div>
     <div class="goal">
       <span class="badge">Why this order</span>
-      <p>Block B automates <b>exactly</b> what you do by hand in Block A/We-do. Start the Block B prerequisites early: <b>fork with Actions enabled, a <span class="inlinecode">develop</span> branch, a PAT in <span class="inlinecode">.env</span>, an API key per gateway</b>. The #1 "nothing deploys" cause is a missing <span class="inlinecode">develop</span> branch.</p>
+      <p>The deploy part automates <b>exactly</b> what you do by hand in the file-structure we-do. Start the deploy prerequisites early: <b>fork with Actions enabled, a <span class="inlinecode">develop</span> branch, a PAT in <span class="inlinecode">.env</span>, an API key per gateway</b>. The #1 "nothing deploys" cause is a missing <span class="inlinecode">develop</span> branch.</p>
     </div>
   </div>
-  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Block A before Block B</span></div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>File structure before deploy</span></div>
 </section>
 
-<!-- 4 · BLOCK A · WE DO -->
+<!-- 4 · PART 1 · WE DO -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">Block A · we do · together</div>
+    <div class="stage">File structure · we do · together</div>
   </div>
   <div class="body">
-    <div class="sechead"><span class="num warm">BLOCK A · WE DO</span><div><div class="title">Add a database connection, find where it lands</div><div class="lead">The marker trick: set a timestamp marker, make the change in the UI, then ask <span class="inlinecode">find</span> what's newer. Watch the connection land under <span class="inlinecode">config/resources/&lt;scope&gt;/</span>.</div></div></div>
+    <div class="sechead"><span class="num warm">PART 1 · WE DO</span><div><div class="title">Add a database connection, find where it lands</div><div class="lead">The marker trick: set a timestamp marker, make the change in the UI, then ask <span class="inlinecode">find</span> what's newer. Watch the connection land under <span class="inlinecode">config/resources/&lt;scope&gt;/</span>.</div></div></div>
     <div class="cols2">
       <div class="steps">
         <div class="step"><div class="ix t">1</div><div class="tx"><b>Set the marker</b> (<span class="inlinecode">docker exec lab04-ignition-local touch /tmp/marker</span>). Re-touch it <i>before</i> every change you want to trace.</div></div>
@@ -277,17 +277,17 @@ docker exec lab04-ignition-local cat &lt;path-you-found&gt;</pre></div>
       </div>
     </div>
   </div>
-  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Block A we-do → now go solo</span></div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>File structure we-do → now go solo</span></div>
 </section>
 
-<!-- 5 · BLOCK A · YOU DO -->
+<!-- 5 · PART 1 · YOU DO -->
 <section class="slide dark">
   <div class="topbar">
     <div class="on-dark brandrow"><img class="logo-img" src="logos/OriginalLight.png" alt="Mustry Solutions"></div>
-    <div class="stage on-dark">Block A · you do · solo · 30 min</div>
+    <div class="stage on-dark">File structure · you do · solo · 30 min</div>
   </div>
   <div class="body">
-    <div class="eyebrow">Block A · solo · which bucket, where on disk?</div>
+    <div class="eyebrow">Part 1 · solo · which bucket, where on disk?</div>
     <div class="title" style="color:#fff">Make three changes. Classify every one.</div>
     <p class="lead">Pick <b style="color:#fff">three</b> from the list (or invent your own, where at least one of your own is worth more). For each, note: <b style="color:#fff">what you changed · where it lives on disk (relative to <span class="mono">data/</span>) · which bucket · would you commit it, one sentence why</b>.</p>
     <ul class="checks" style="max-width:980px;margin-top:20px">
@@ -300,17 +300,17 @@ docker exec lab04-ignition-local cat &lt;path-you-found&gt;</pre></div>
       <p style="color:#c4cfde">You can find any UI change's file with the marker trick · say for each of your three changes which bucket it's in and whether you'd commit it · state the 8.3 path shape for a view <b style="color:#fff">and</b> a config resource · explain why <span class="mono" style="color:#dbe4f0">db/</span> and <span class="mono" style="color:#dbe4f0">.resources/</span> are never committed.</p>
     </div>
   </div>
-  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>exercises/block-a.md · You do, answers in your notes</span></div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>exercises/lab.md · You do, answers in your notes</span></div>
 </section>
 
-<!-- 6 · BLOCK A · STRETCH -->
+<!-- 6 · PART 1 · STRETCH -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">Block A · optional stretch</div>
+    <div class="stage">File structure · optional stretch</div>
   </div>
   <div class="body">
-    <div class="sechead"><span class="num warm">OPTIONAL · A</span><div><div class="title">Stretch: draft the <span class="mono" style="font-size:30px">.gitignore</span></div><div class="lead">You now know the operational bucket. Turn that knowledge into ignore patterns: the precursor to <span class="inlinecode">.deployignore</span>, which Block B puts to work.</div></div></div>
+    <div class="sechead"><span class="num warm">OPTIONAL · 1</span><div><div class="title">Stretch: draft the <span class="mono" style="font-size:30px">.gitignore</span></div><div class="lead">You now know the operational bucket. Turn that knowledge into ignore patterns: the precursor to <span class="inlinecode">.deployignore</span>, which the deploy part puts to work.</div></div></div>
     <div class="cols2">
       <div class="steps">
         <div class="step"><div class="ix t">1</div><div class="tx">From memory, draft a starter <span class="inlinecode">.gitignore</span> for an Ignition project repo. Cover the <b>operational bucket</b>: the internal DB, tag value stores, caches, blob stores.</div></div>
@@ -333,20 +333,20 @@ data/modules/*.modl
     </div>
     <div class="goal">
       <span class="badge">Debrief question</span>
-      <p>Which bucket has the <b>trickiest deploy story</b>? Hint: it's the one that <i>sometimes</i> needs a restart, and it frames everything in Block B.</p>
+      <p>Which bucket has the <b>trickiest deploy story</b>? Hint: it's the one that <i>sometimes</i> needs a restart, and it frames everything in the deploy part.</p>
     </div>
   </div>
-  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Stretch · optional · then on to Block B</span></div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Stretch · optional · then on to the deploy part</span></div>
 </section>
 
-<!-- 7 · BLOCK B · PRE-FLIGHT -->
+<!-- 7 · PART 2 · PRE-FLIGHT -->
 <section class="slide dark">
   <div class="topbar">
     <div class="on-dark brandrow"><img class="logo-img" src="logos/OriginalLight.png" alt="Mustry Solutions"></div>
-    <div class="stage on-dark">Block B · pre-flight</div>
+    <div class="stage on-dark">File-based deploy · pre-flight</div>
   </div>
   <div class="body">
-    <div class="eyebrow">Block B · before anything can deploy</div>
+    <div class="eyebrow">Part 2 · before anything can deploy</div>
     <div class="title" style="color:#fff;max-width:22ch">Pre-flight: five things your fork needs</div>
     <ul class="checks" style="max-width:960px;margin-top:20px">
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Fork with Actions enabled.</b> Forks ship with workflows <b>disabled</b>, so open your fork's <i>Actions</i> tab and click "enable" or nothing will ever trigger.</span></li>
@@ -358,17 +358,17 @@ data/modules/*.modl
     <div class="code" style="max-width:640px;margin-top:18px"><pre><span class="cm"># the develop branch, one-time</span>
 git checkout -b develop &amp;&amp; git push -u origin develop</pre></div>
   </div>
-  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>exercises/block-b.md · Pre-flight</span></div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>exercises/lab.md · Pre-flight</span></div>
 </section>
 
-<!-- 8 · BLOCK B · WE DO -->
+<!-- 8 · PART 2 · WE DO -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">Block B · we do · together</div>
+    <div class="stage">File-based deploy · we do · together</div>
   </div>
   <div class="body">
-    <div class="sechead"><span class="num warm">BLOCK B · WE DO</span><div><div class="title">The deploy, by hand, once</div><div class="lead">Everything <span class="inlinecode">deploy.yml</span> automates, done manually so the workflow holds no mysteries.</div></div></div>
+    <div class="sechead"><span class="num warm">PART 2 · WE DO</span><div><div class="title">The deploy, by hand, once</div><div class="lead">Everything <span class="inlinecode">deploy.yml</span> automates, done manually so the workflow holds no mysteries.</div></div></div>
     <div class="cols2">
       <div class="steps">
         <div class="step"><div class="ix t">1</div><div class="tx">Edit <span class="inlinecode">projects/sample/…/views/Hello/view.json</span> (e.g. <span class="inlinecode">width: 800 → 1200</span>). It's <b>already on the local gateway's disk</b> via the bind mount.</div></div>
@@ -396,14 +396,14 @@ scripts/trigger-scan.sh both --gateway dev</pre></div>
       </div>
     </div>
   </div>
-  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Block B we-do → now automate it</span></div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Deploy we-do → now automate it</span></div>
 </section>
 
-<!-- 9 · BLOCK B · YOU DO · PARTS 1-2 -->
+<!-- 9 · PART 2 · YOU DO · PARTS 1-2 -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">Block B · you do · parts 1-2</div>
+    <div class="stage">File-based deploy · you do · parts 1-2</div>
   </div>
   <div class="body">
     <div class="sechead"><span class="num p" style="background:var(--peri)">PARTS 1-2</span><div><div class="title">Runner online + environments &amp; secrets</div><div class="lead">15 min. The plumbing between your fork and your gateways.</div></div></div>
@@ -429,11 +429,11 @@ docker compose logs --tail 50 github-runner
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Parts 1-2 of 5</span></div>
 </section>
 
-<!-- 10 · BLOCK B · YOU DO · PART 3 -->
+<!-- 10 · PART 2 · YOU DO · PART 3 -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">Block B · you do · part 3</div>
+    <div class="stage">File-based deploy · you do · part 3</div>
   </div>
   <div class="body">
     <div class="sechead"><span class="num p" style="background:var(--peri)">PART 3</span><div><div class="title">Ship to dev via <span class="mono" style="font-size:30px">develop</span></div><div class="lead">15 min. A real PR rides the pipeline: feature branch → PR → CI → merge → deploy.yml → dev gateway.</div></div></div>
@@ -468,11 +468,11 @@ git push -u origin feature/tweak-view
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Part 3 of 5</span></div>
 </section>
 
-<!-- 11 · BLOCK B · YOU DO · PART 4 -->
+<!-- 11 · PART 2 · YOU DO · PART 4 -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">Block B · you do · part 4</div>
+    <div class="stage">File-based deploy · you do · part 4</div>
   </div>
   <div class="body">
     <div class="sechead"><span class="num p" style="background:var(--peri)">PART 4</span><div><div class="title">Release to prod: <span class="mono" style="font-size:30px">main</span> + a tag</div><div class="lead">10 min. The Git Flow release: bring <span class="inlinecode">develop</span> to <span class="inlinecode">main</span>, then tag. <b>The tag, not the merge, is what ships.</b></div></div></div>
@@ -500,11 +500,11 @@ git push origin v0.1.0        <span class="cm"># ← release.yml fires</span></p
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Part 4 of 5</span></div>
 </section>
 
-<!-- 12 · BLOCK B · YOU DO · PART 5 -->
+<!-- 12 · PART 2 · YOU DO · PART 5 -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">Block B · you do · part 5</div>
+    <div class="stage">File-based deploy · you do · part 5</div>
   </div>
   <div class="body">
     <div class="sechead"><span class="num p" style="background:var(--peri)">PART 5</span><div><div class="title">Break a deploy on purpose</div><div class="lead">~5 min, optional but strongly encouraged, because reading the failure is half the lesson. Pick one.</div></div></div>
@@ -533,10 +533,10 @@ docker compose up -d ignition-dev  <span class="cm"># recovery</span></pre></div
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">Block B · optional stretch</div>
+    <div class="stage">File-based deploy · optional stretch</div>
   </div>
   <div class="body">
-    <div class="sechead"><span class="num warm">OPTIONAL · B</span><div><div class="title">Stretch: the <span class="mono" style="font-size:30px">modules.json</span> puzzle</div><div class="lead">Gateway config ships the same way projects do… but not <b>every</b> gateway change rides that path. Two things to discover.</div></div></div>
+    <div class="sechead"><span class="num warm">OPTIONAL · 2</span><div><div class="title">Stretch: the <span class="mono" style="font-size:30px">modules.json</span> puzzle</div><div class="lead">Gateway config ships the same way projects do… but not <b>every</b> gateway change rides that path. Two things to discover.</div></div></div>
     <div class="cols2">
       <div class="steps">
         <div class="step"><div class="ix t">1</div><div class="tx"><b>It doesn't ship.</b> <span class="inlinecode">services/modules.json</span> is a <b>sibling</b> of <span class="inlinecode">services/config/</span>, and the workflows <span class="inlinecode">docker cp ./services/config/.</span> only. Open <span class="inlinecode">deploy.yml</span> and confirm from the <span class="inlinecode">docker cp</span> targets. (In this lab it's bind-mounted into all three gateways instead.)</div></div>

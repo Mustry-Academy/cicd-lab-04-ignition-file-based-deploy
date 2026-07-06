@@ -1,6 +1,6 @@
 # Lab 04 — Ignition file-based deploy
 
-Day 2 (afternoon), Blocks A and B of the [CI/CD for Ignition Masterclass](https://github.com/mustry-academy/cicd-masterclass).
+Day 2 (afternoon) of the [CI/CD for Ignition Masterclass](https://github.com/mustry-academy/cicd-masterclass).
 
 > Decode the Ignition 8.3 file structure, then build a file-based deploy pipeline that promotes project changes from a local working gateway, through a dev environment on push to `develop`, to a prod environment on a tag release cut from `main` — all with a hot scan, no gateway restarts. The pipeline follows **Git Flow**.
 
@@ -41,10 +41,10 @@ Login to any of them with the credentials from `.env` (`GATEWAY_ADMIN_USERNAME_L
 
 ## Lab structure
 
-| Block | Topic | Exercise |
-|---|---|---|
-| A | Ignition 8.3 file structure decoded | [`exercises/block-a.md`](./exercises/block-a.md) |
-| B | File-based deploy mechanic | [`exercises/block-b.md`](./exercises/block-b.md) |
+The lab is one exercise in two ordered parts — see [`exercises/lab.md`](./exercises/lab.md):
+
+1. **Ignition 8.3 file structure decoded** — know every file in `data/`: what it is, who owns it, whether it belongs in git.
+2. **File-based deploy mechanic** — ship project changes local → dev → prod, hot scan, no restarts.
 
 > Image-based deploys and multi-gateway coordination come next, on Day 3, in separate labs ([image-based](https://github.com/mustry-academy/cicd-lab-05-ignition-image-based-deploy), [multi-gateway](https://github.com/mustry-academy/cicd-lab-06-multi-gateway-deploy)).
 
@@ -65,15 +65,13 @@ cicd-lab-04-ignition-file-based-deploy/
 │   ├── actionlint.yaml                 ← declares the self-hosted `lab04` runner label
 │   └── pull_request_template.md
 ├── exercises/
-│   ├── block-a.md
-│   └── block-b.md
+│   └── lab.md                          ← the lab, in two ordered parts
 ├── db-init/                            ← timescaledb initialisation: create ignition_dev and ignition_prd databases
 ├── docs/                               ← reference reading
 │   ├── ignition-file-structure.md
 │   └── file-based-deploy-pattern.md
-├── instructor-notes/                   ← answer keys (read after solo work)
-│   ├── block-a-key.md
-│   └── block-b-key.md
+├── instructor-notes/                   ← answer key (read after solo work)
+│   └── lab-key.md
 ├── scripts/
 │   ├── setup.sh                        ← bootstraps the whole stack
 │   ├── teardown.sh                     ← stop the stack (with --volumes to wipe)
@@ -156,7 +154,7 @@ Both deploy workflows need:
 
 Add **required reviewers** on the `lab-gateway-prod` environment if you want a manual approval gate on tag releases — common pattern, no workflow change required.
 
-Block B walks through the end-to-end setup.
+The deploy part of [`exercises/lab.md`](./exercises/lab.md) walks through the end-to-end setup.
 
 ## Licence
 

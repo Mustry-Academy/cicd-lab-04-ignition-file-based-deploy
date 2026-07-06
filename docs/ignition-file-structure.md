@@ -1,6 +1,6 @@
 # Ignition 8.3 file structure — cheat sheet
 
-Reference reading for Block A. Everything Ignition stores on disk, organized by *who owns it* and *whether it belongs in git*.
+Reference reading for the file-structure part of the lab. Everything Ignition stores on disk, organized by *who owns it* and *whether it belongs in git*.
 
 ## The three buckets
 
@@ -12,7 +12,7 @@ Everything inside an Ignition gateway's `data/` directory falls into one of thre
 | **Gateway-level** | Cross-project config: DB connections, identity providers, tag history connections, enabled modules | The application (versioned, but smaller scope) | **Yes** |
 | **Operational** | Runtime state: internal DBs, logs, temp, metadata, runtime users | The gateway (gateway owns this, full stop) | **No** |
 
-The whole point of Block A is to internalize this split. If you can answer "which bucket?" for any file in `data/`, you'll know how to version, deploy, and roll back.
+The whole point of the file-structure part is to internalize this split. If you can answer "which bucket?" for any file in `data/`, you'll know how to version, deploy, and roll back.
 
 ## The `data/` directory, top to bottom
 
@@ -48,7 +48,7 @@ payload (`view.json`, etc.). That manifest is what the gateway reads to track th
 the gateway rewrites it on every interaction (timestamps, signatures), this repo ships a normalized
 diff driver plus `scripts/clean-ignition-resource-churn.sh` to undo the volatile-only rewrites.
 
-This is the bread and butter of CI/CD for Ignition. The whole `projects/<name>/` directory is what the `deploy.yml` workflow ships onto the **dev** gateway (on push to `develop`) and what `release.yml` ships onto **prod** (on tag push from `main`) in Block B. On the **local** gateway it just sits there via bind mount — edit-and-scan, no copy step.
+This is the bread and butter of CI/CD for Ignition. The whole `projects/<name>/` directory is what the `deploy.yml` workflow ships onto the **dev** gateway (on push to `develop`) and what `release.yml` ships onto **prod** (on tag push from `main`) in the deploy part. On the **local** gateway it just sits there via bind mount — edit-and-scan, no copy step. This is what the deploy part of the lab builds.
 
 ### `config/`
 
@@ -196,12 +196,12 @@ These two questions correctly classify ~99% of `data/` contents.
 
 ## Minimal example for the lab
 
-Block A's "you do" suggests creating a project on disk manually if you don't have the Designer installed. In 8.3 a view must live under its owning module's namespace **and** carry a sibling `resource.json` manifest, or the gateway won't register it. Minimal viable structure:
+The lab's solo work suggests creating a project on disk manually if you don't have the Designer installed. In 8.3 a view must live under its owning module's namespace **and** carry a sibling `resource.json` manifest, or the gateway won't register it. Minimal viable structure:
 
 ```bash
 mkdir -p "projects/sample/com.inductiveautomation.perspective/views/Hello"
 cat > projects/sample/project.json <<'EOF'
-{"title":"Sample","description":"Demo project for Block A","enabled":true,"inheritable":false,"parent":""}
+{"title":"Sample","description":"Demo project","enabled":true,"inheritable":false,"parent":""}
 EOF
 cat > "projects/sample/com.inductiveautomation.perspective/views/Hello/view.json" <<'EOF'
 {
