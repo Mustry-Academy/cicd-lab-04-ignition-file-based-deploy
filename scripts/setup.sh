@@ -22,6 +22,7 @@
 
 set -euo pipefail
 
+# shellcheck source=lib.sh
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"
 cd "$PROJECT_ROOT"
 
@@ -155,6 +156,49 @@ ensure_env_file() {
 
 ensure_env_file
 
+# ---- Runner registration token (no PAT — minted via gh, like Lab 03) ------
+# The bundled github-runner registers with a short-lived registration token
+# rather than a Personal Access Token. We mint that token here with the GitHub
+# CLI, export it, and let `docker compose up` hand it to the runner container.
+# gh is optional: without it the gateways still come up, only the runner stays
+# unregistered until you install gh and re-run setup.
+ensure_runner_token() {
+    local repo_url owner_repo
+    repo_url="$(env_value RUNNER_REPO_URL)"
+    if [ -z "$repo_url" ] || printf '%s' "$repo_url" | grep -q '<your-github-user>'; then
+        echo -e "${YELLOW}RUNNER_REPO_URL is not pointed at your fork in .env — skipping runner registration.${NC}"
+        echo "  Set RUNNER_REPO_URL=https://github.com/<you>/cicd-lab-04-ignition-file-based-deploy in .env,"
+        echo "  then re-run scripts/setup.sh to register the runner."
+        return 0
+    fi
+    if ! command -v gh > /dev/null 2>&1; then
+        echo -e "${YELLOW}GitHub CLI (gh) not installed — skipping runner registration.${NC}"
+        echo "  Install gh (https://cli.github.com), run 'gh auth login', then re-run setup."
+        return 0
+    fi
+    if ! gh auth status > /dev/null 2>&1; then
+        echo -e "${YELLOW}gh is not authenticated — skipping runner registration.${NC}"
+        echo "  Run 'gh auth login', then re-run scripts/setup.sh."
+        return 0
+    fi
+    # https://github.com/<owner>/<repo>(.git) -> <owner>/<repo>
+    owner_repo="${repo_url#https://github.com/}"
+    owner_repo="${owner_repo#git@github.com:}"
+    owner_repo="${owner_repo%.git}"
+    owner_repo="${owner_repo%/}"
+    echo -e "${GREEN}Minting a runner registration token via gh for ${owner_repo}...${NC}"
+    if RUNNER_TOKEN="$(gh api -X POST "repos/${owner_repo}/actions/runners/registration-token" --jq .token 2> /dev/null)" \
+        && [ -n "$RUNNER_TOKEN" ]; then
+        export RUNNER_TOKEN
+        echo -e "${GREEN}  runner token ready.${NC}"
+    else
+        echo -e "${YELLOW}  couldn't mint a token — is ${owner_repo} your fork, and do you have access?${NC}"
+        echo "  The stack will still come up; fix access and re-run setup to register the runner."
+    fi
+}
+
+ensure_runner_token
+
 # ---- Start the stack ------------------------------------------------------
 existing_id="$(docker compose ps -q ignition-local 2>/dev/null || true)"
 if [ -n "$existing_id" ]; then
@@ -205,8 +249,8 @@ done
 # Local has projects on disk from the bind mount; dev/prod start empty by
 # design (workflows will populate them).
 initial_scan() {
-    if [ ! -x "$SCRIPT_DIR/trigger-scan.sh" ]; then
-        echo -e "${YELLOW}scripts/trigger-scan.sh missing or not executable, skipping initial scan.${NC}"
+    if [ ! -x "$SCRIPT_DIR/scan.sh" ]; then
+        echo -e "${YELLOW}scripts/scan.sh missing or not executable, skipping initial scan.${NC}"
         return 0
     fi
 
@@ -216,15 +260,15 @@ initial_scan() {
         echo "  Create one in the local gateway UI (http://localhost:8088):"
         echo "    Config → Security → API Keys → New (with Project Scan + Config Scan permission)"
         echo "  Drop the value into .env as IGNITION_API_KEY_LOCAL=<value>, then run:"
-        echo "    scripts/trigger-scan.sh both --gateway local"
+        echo "    scripts/scan.sh both --gateway local"
         return 0
     fi
 
     echo -e "${GREEN}Triggering initial scan on local gateway...${NC}"
-    if ! "$SCRIPT_DIR/trigger-scan.sh" both --gateway local; then
+    if ! "$SCRIPT_DIR/scan.sh" both --gateway local; then
         echo ""
         echo -e "${YELLOW}Initial scan failed (likely the key lacks scan permission).${NC}"
-        echo "  Fix the role for the API key, then run:  scripts/trigger-scan.sh both --gateway local"
+        echo "  Fix the role for the API key, then run:  scripts/scan.sh both --gateway local"
     fi
 }
 
@@ -269,7 +313,7 @@ fi
 echo "Useful commands:"
 echo "  docker compose ps                          # check container state"
 echo "  docker logs -f lab04-ignition-local        # tail local gateway logs"
-echo "  scripts/trigger-scan.sh both               # rescan local (default)"
-echo "  scripts/trigger-scan.sh both --gateway dev # rescan dev"
+echo "  scripts/scan.sh both               # rescan local (default)"
+echo "  scripts/scan.sh both --gateway dev # rescan dev"
 echo "  scripts/teardown.sh                        # stop the stack"
 echo "  scripts/teardown.sh --volumes              # stop and wipe persistent data"

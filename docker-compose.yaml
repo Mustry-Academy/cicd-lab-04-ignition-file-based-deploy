@@ -99,7 +99,7 @@ services:
     environment:
       <<: *ignition-env
       GATEWAY_ADMIN_USERNAME: "${GATEWAY_ADMIN_USERNAME_LOCAL:-admin}"
-      GATEWAY_ADMIN_PASSWORD: "${GATEWAY_ADMIN_PASSWORD_LOCAL:-lab04password}"
+      GATEWAY_ADMIN_PASSWORD: "${GATEWAY_ADMIN_PASSWORD_LOCAL:-password}"
     command: >
       -n lab04-local
       -m 1024
@@ -133,7 +133,7 @@ services:
     environment:
       <<: *ignition-env
       GATEWAY_ADMIN_USERNAME: "${GATEWAY_ADMIN_USERNAME_DEV:-admin}"
-      GATEWAY_ADMIN_PASSWORD: "${GATEWAY_ADMIN_PASSWORD_DEV:-lab04password}"
+      GATEWAY_ADMIN_PASSWORD: "${GATEWAY_ADMIN_PASSWORD_DEV:-password}"
     command: >
       -n lab04-dev
       -m 1024
@@ -167,7 +167,7 @@ services:
     environment:
       <<: *ignition-env
       GATEWAY_ADMIN_USERNAME: "${GATEWAY_ADMIN_USERNAME_PROD:-admin}"
-      GATEWAY_ADMIN_PASSWORD: "${GATEWAY_ADMIN_PASSWORD_PROD:-lab04password}"
+      GATEWAY_ADMIN_PASSWORD: "${GATEWAY_ADMIN_PASSWORD_PROD:-password}"
     command: >
       -n lab04-prod
       -m 1024
@@ -215,11 +215,16 @@ services:
       - default
 
   # --- self-hosted GitHub Actions runner -------------------------------------
-  # Auto-registers against the repo set in RUNNER_REPO_URL using a GitHub PAT
-  # (RUNNER_GITHUB_PAT, must have `repo` scope). The runner sits on the lab's
-  # compose network, so it reaches the gateways by service name
-  # (ignition-local, ignition-dev, ignition-prod) — see the IGNITION_URL
-  # defaults in .github/workflows/deploy.yml and release.yml.
+  # Registers against the repo set in RUNNER_REPO_URL using a short-lived
+  # registration token (RUNNER_TOKEN). scripts/setup.sh mints that token for you
+  # with the GitHub CLI (`gh api ... /actions/runners/registration-token`) — the
+  # same no-PAT method Lab 03 uses — so you never create or store a Personal
+  # Access Token. The token is only needed for the initial registration; the
+  # runner keeps its credential across restarts.
+  #
+  # The runner sits on the lab's compose network, so it reaches the gateways by
+  # service name (ignition-local, ignition-dev, ignition-prod) — see the
+  # IGNITION_URL defaults in .github/workflows/deploy.yml and release.yml.
   #
   # Why /var/run/docker.sock is mounted: deploy.yml and release.yml use
   # `docker cp` and `docker exec` to push project files INTO the dev/prod
@@ -232,7 +237,7 @@ services:
     restart: unless-stopped
     environment:
       REPO_URL: "${RUNNER_REPO_URL}"
-      ACCESS_TOKEN: "${RUNNER_GITHUB_PAT}"
+      RUNNER_TOKEN: "${RUNNER_TOKEN:-}"
       RUNNER_NAME: "${RUNNER_NAME:-lab04-runner}"
       RUNNER_SCOPE: repo
       LABELS: "self-hosted,lab04"
