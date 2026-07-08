@@ -266,10 +266,9 @@ initial_scan() {
 
     load_api_key_from_env local
     if is_placeholder_api_key; then
-        echo -e "${YELLOW}No real API key for the local gateway in .env yet — skipping initial scan.${NC}"
-        echo "  Create one in the local gateway UI (http://localhost:8088):"
-        echo "    Config → Security → API Keys → New (with Project Scan + Config Scan permission)"
-        echo "  Drop the value into .env as IGNITION_API_KEY_LOCAL=<value>, then run:"
+        echo -e "${YELLOW}No API key in .env yet — skipping initial scan.${NC}"
+        echo "  The lab ships a pre-provisioned token; copy the IGNITION_API_KEY_* lines"
+        echo "  from .env.example into .env, then run:"
         echo "    scripts/scan.sh both --gateway local"
         return 0
     fi
@@ -310,14 +309,12 @@ echo "  Username: ${ACTUAL_PG_USER:-ignition}  Password: ${ACTUAL_PG_PASS:-(see 
 echo ""
 if is_placeholder_api_key; then
     echo -e "${YELLOW}Next steps:${NC}"
-    echo "  For each gateway you want to scan via the API:"
-    echo "    1. Open the gateway URL and log in."
-    echo "    2. Create an API key (Config → Security → API Keys → New) with a role"
-    echo "       that includes Project Scan + Config Scan."
-    echo "    3. Drop the value into .env as IGNITION_API_KEY_<LOCAL|DEV|PROD>=<value>"
-    echo "  4. The deploy/release workflows take their keys from GitHub secrets on"
-    echo "     the lab-gateway-dev / lab-gateway-prod environments — set those too"
-    echo "     when you're ready to run CI."
+    echo "  The lab ships a pre-provisioned API token (services/config/.../api-token/cicd);"
+    echo "  copy the IGNITION_API_KEY_* lines from .env.example into .env — the same key"
+    echo "  works on all three gateways."
+    echo "  The deploy/release workflows take their keys from GitHub secrets on"
+    echo "  the lab-gateway-dev / lab-gateway-prod environments — set those too"
+    echo "  when you're ready to run CI."
     echo ""
 fi
 echo "Useful commands:"

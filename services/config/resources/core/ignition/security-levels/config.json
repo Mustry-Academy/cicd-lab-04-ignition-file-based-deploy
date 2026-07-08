@@ -12,6 +12,23 @@
           ],
           "description": "Represents the roles that a user has.",
           "name": "Roles"
+        },
+        {
+          "children": [
+            {
+              "children": [],
+              "name": "Access"
+            },
+            {
+              "children": [],
+              "name": "Read"
+            },
+            {
+              "children": [],
+              "name": "Write"
+            }
+          ],
+          "name": "APIToken"
         }
       ],
       "description": "Represents a user who has been authenticated by the system.",

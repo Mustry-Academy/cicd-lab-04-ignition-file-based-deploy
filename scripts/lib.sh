@@ -97,19 +97,13 @@ load_api_key_from_env() {
   export IGNITION_API_KEY
 }
 
-# Returns 0 if IGNITION_API_KEY is empty OR matches one of the placeholder
-# values committed in .env.example (i.e. the user hasn't replaced it yet).
+# Returns 0 if IGNITION_API_KEY is empty or an obvious placeholder. Note:
+# .env.example ships a REAL key (it matches the pre-provisioned `cicd` token
+# committed in services/config), so equality with .env.example does NOT mean
+# "not configured" — only empty / replace-me values do.
 is_placeholder_api_key() {
-  if [ -z "${IGNITION_API_KEY:-}" ]; then
-    return 0
-  fi
-  local key
-  for key in IGNITION_API_KEY IGNITION_API_KEY_LOCAL IGNITION_API_KEY_DEV IGNITION_API_KEY_PROD; do
-    local example_value
-    example_value="$(env_value "$key" "$PROJECT_ROOT/.env.example")"
-    if [ -n "$example_value" ] && [ "$IGNITION_API_KEY" = "$example_value" ]; then
-      return 0
-    fi
-  done
-  return 1
+  case "${IGNITION_API_KEY:-}" in
+    ''|*replace-me*) return 0 ;;
+    *) return 1 ;;
+  esac
 }

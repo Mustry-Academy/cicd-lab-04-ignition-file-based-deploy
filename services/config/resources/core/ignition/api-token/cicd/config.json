@@ -3,7 +3,34 @@
     "secureChannelRequired": false,
     "securityLevels": [
       {
-        "children": [],
+        "children": [
+          {
+            "children": [
+              {
+                "children": [],
+                "name": "Administrator"
+              }
+            ],
+            "name": "Roles"
+          },
+          {
+            "children": [
+              {
+                "children": [],
+                "name": "Access"
+              },
+              {
+                "children": [],
+                "name": "Read"
+              },
+              {
+                "children": [],
+                "name": "Write"
+              }
+            ],
+            "name": "APIToken"
+          }
+        ],
         "description": "Represents a user who has been authenticated by the system.",
         "name": "Authenticated"
       }
@@ -12,6 +39,6 @@
     "type": "basic-token"
   },
   "settings": {
-    "tokenHash": "I2Uev8AyUub7aPGXy9QYphObEpe36DSBViVY9_Pz8cQ"
+    "tokenHash": "P1focYSoRzErQ0DzEjSbwt4EJn3oyI3QWO7XNBlrXAk"
   }
 }
