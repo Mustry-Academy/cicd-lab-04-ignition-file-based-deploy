@@ -134,7 +134,7 @@ body{
 .ftree .dim{color:#7d93ad}
 .ftree .hl{color:#fff;font-weight:600}
 .ftag{display:inline-block;font-family:'IBM Plex Mono';font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;border-radius:5px;padding:2px 8px;margin-left:10px;vertical-align:1px}
-.ftag.proj{background:rgba(37,99,235,.28);color:#a8bef7}
+.ftag.proj{background:rgba(37,99,235,.55);color:#eaf0ff}
 .ftag.gw{background:rgba(59,189,180,.22);color:#5fd6cd}
 .ftag.ops{background:rgba(217,119,6,.24);color:#f0b765}
 
@@ -264,13 +264,13 @@ body{
     <div class="sechead">
       <span class="num">01</span>
       <div>
-        <div class="title">Ignition finally enters the chat</div>
-        <div class="lead">Labs 01 to 03 deliberately stayed on a generic Python stack, so you could learn Git, PRs, linters and GitHub Actions without the Ignition file format adding noise. The plumbing is solid. <b>Today we point it at three real gateways.</b></div>
+        <div class="title">Decoding Ignition 8.3 on disk, then deploying it</div>
+        <div class="lead">You have used Ignition since Lab 02, but always through Git and the UI, never looking at what the gateway writes to disk. <b>Today we open that box.</b> First we decode the 8.3 <span class="inlinecode">data/</span> file tree, then we build a deploy pattern directly on top of it.</div>
       </div>
     </div>
     <ul class="checks" style="max-width:960px">
-      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>You already have:</b> git fluency, branching &amp; PRs done right, validation as a safety net, workflows/jobs/steps, and a self-hosted runner. Every one of those comes back today, unchanged.</span></li>
-      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>New today:</b> the Ignition 8.3 <span class="inlinecode">data/</span> directory decoded, <span class="inlinecode">.deployignore</span>, and a local → dev → prod promotion driven by Git Flow. The scan API you met in Lab 02 returns in anger: per-gateway API keys, scoped permissions, and CI calling it instead of you.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>You already have:</b> git fluency, branching &amp; PRs done right, validation as a safety net, workflows/jobs/steps, a self-hosted runner, and Ignition under version control from Lab 02. Every one of those comes back today.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>New today:</b> the Ignition 8.3 <span class="inlinecode">data/</span> directory decoded file by file, <span class="inlinecode">.deployignore</span>, and a local → dev → prod promotion driven by Git Flow. The scan API returns in anger: per-gateway API keys, scoped permissions, and CI calling it instead of you.</span></li>
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Not today:</b> image-based deploys and multi-gateway coordination. That's Day 3 (Labs 05 and 06). Today is a deep dive: decode the file tree, then master the deploy pattern built directly on it.</span></li>
     </ul>
     <div class="callout">
@@ -280,7 +280,7 @@ body{
     </div>
   </div>
 
-  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Labs 01 to 03 built the plumbing · today it meets the gateway</span></div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Ignition since Lab 02 · today we decode its files &amp; deploy them</span></div>
 </section>
 
 <!-- 3 · DIVIDER · WHAT'S ON DISK -->
@@ -342,115 +342,7 @@ body{
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>docker exec -it lab04-ignition-local bash</span></div>
 </section>
 
-<!-- 5 · THE THREE BUCKETS -->
-<section class="slide">
-  <div class="topbar">
-    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">File structure · the mental model</div>
-  </div>
-
-  <div class="body">
-    <div class="sechead">
-      <span class="num">03</span>
-      <div>
-        <div class="title">The three-bucket model</div>
-        <div class="lead">The one artifact to take home from the file-structure part. Each bucket has a different owner, and a completely different deploy story.</div>
-      </div>
-    </div>
-    <div class="buckets">
-      <div class="bucket">
-        <h4>Project-level</h4>
-        <div class="who">owner: the application · in git: YES</div>
-        <ul>
-          <li>projects/&lt;name&gt;/</li>
-          <li>views, scripts, page config</li>
-          <li>project.json descriptor</li>
-        </ul>
-        <div class="dep"><b>Deploy:</b> copy → <b>project scan</b>. Hot reload, no restart. The bread and butter of daily CI/CD.</div>
-      </div>
-      <div class="bucket b2">
-        <h4>Gateway-level</h4>
-        <div class="who">owner: the application · in git: YES</div>
-        <ul>
-          <li>config/resources/&lt;scope&gt;/</li>
-          <li>modules.json</li>
-          <li>modules/ (binaries, usually not in git)</li>
-        </ul>
-        <div class="dep"><b>Deploy:</b> copy → <b>config scan</b>… but <b>some changes need a restart</b> (modules, JVM args). The tricky bucket.</div>
-      </div>
-      <div class="bucket b3">
-        <h4>Operational</h4>
-        <div class="who">owner: the gateway · in git: NEVER</div>
-        <ul>
-          <li>db/ (internal SQLite DB, users included)</li>
-          <li>jar-cache/, metricsdb/, var/</li>
-          <li>.resources/ (blob store)</li>
-        </ul>
-        <div class="dep"><b>Deploy:</b> you don't. The gateway owns this state; <b>backups (gwbk)</b> are the recovery mechanism, not git.</div>
-      </div>
-    </div>
-    <div class="callout">
-      <div class="lab" style="color:var(--blue)">The two questions that classify ~99% of files</div>
-      <p><b>1.</b> Would this file be different on a teammate's identical clone? → if yes, it's <b>operational</b>. &nbsp; <b>2.</b> Would I want this file in git history? → if yes, it's <b>versioned</b>.</p>
-    </div>
-  </div>
-
-  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Which bucket? The file-structure exam question</span></div>
-</section>
-
-<!-- 6 · PROJECT RESOURCES IN 8.3 -->
-<section class="slide">
-  <div class="topbar">
-    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">File structure · project resources</div>
-  </div>
-
-  <div class="body">
-    <div class="sechead">
-      <span class="num">04</span>
-      <div>
-        <div class="title">Project resources: the real 8.3 shape</div>
-        <div class="lead">Every project resource is namespaced by <b>the module that owns it</b>: first the module, then the resource type, then the name. Expect longer paths.</div>
-      </div>
-    </div>
-    <div class="anat">
-      <div class="path">
-        <span class="seg sA">projects/&lt;name&gt;/</span><span class="seg sB">com.inductiveautomation.perspective/</span><span class="seg sC">views/pages/&lt;Page&gt;/</span><span class="seg sD">{view.json · resource.json}</span>
-      </div>
-      <div class="legend">
-        <span><span class="sw" style="background:rgba(37,99,235,.7)"></span>project root + <span class="mono">project.json</span> descriptor</span>
-        <span><span class="sw" style="background:rgba(59,189,180,.7)"></span>owning module's namespace</span>
-        <span><span class="sw" style="background:rgba(147,169,240,.7)"></span>resource type + name</span>
-        <span><span class="sw" style="background:rgba(217,119,6,.7)"></span>payload + manifest</span>
-      </div>
-    </div>
-    <div class="cols2" style="margin-top:20px">
-      <ul class="checks">
-        <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Every resource carries a sibling <span class="inlinecode">resource.json</span> manifest</b> (scope, version, files, signature). No manifest → the gateway won't register the resource.</span></li>
-        <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>The gateway <b>rewrites manifests on every interaction</b>, which is why this lab ships <b>normalized diffs and a churn-undo script</b> so that noise never buries your real changes.</span></li>
-        <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>Platform-owned resources live under the <span class="inlinecode">ignition/</span> namespace, including <b>script libraries as plain <span class="inlinecode">code.py</span> files</b>: diffable, reviewable, lintable like any other source.</span></li>
-        <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>One directory per project.</b> This repo ships <b>two</b> (<span class="inlinecode">example-project</span> + <span class="inlinecode">packaging-site</span>), side by side under <span class="inlinecode">projects/</span>. They share <b>one gateway config</b> (connections, tags, deployment modes). Later you'll see one deploy ship <b>both</b>.</span></li>
-      </ul>
-      <div class="code"><pre><span class="cm"># two projects, side by side under projects/:</span>
-projects/
-├── example-project/
-│   ├── project.json
-│   ├── com.inductiveautomation.perspective/
-│   │   ├── views/…/{view.json, resource.json}
-│   │   ├── page-config/{config.json, resource.json}
-│   │   └── session-props/{props.json, resource.json}
-│   └── ignition/
-│       └── script-python/&lt;pkg&gt;/&lt;name&gt;/{code.py, resource.json}
-└── packaging-site/            <span class="cm"># the second site, same shape</span>
-    ├── project.json
-    └── com.inductiveautomation.perspective/views/…</pre></div>
-    </div>
-  </div>
-
-  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>docs/ignition-file-structure.md has the full cheat sheet</span></div>
-</section>
-
-<!-- 7 · GATEWAY CONFIG + SCOPES -->
+<!-- 5 · GATEWAY CONFIG + SCOPES -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
@@ -799,8 +691,13 @@ docker-compose.yaml <span class="cm"># ← unless you want it to run there with 
     </div>
     <div class="cols2">
       <div class="code"><pre><span class="cm"># the "Ship" step from deploy.yml ($DATA = GATEWAY_DATA_PATH)</span>
-docker exec "$IGNITION_CONTAINER" sh -c \
-  "rm -rf $DATA/projects/* $DATA/config/*"
+docker exec "$IGNITION_CONTAINER" sh -c '
+  rm -rf $DATA/projects/*
+  <span class="cm"># wipe config/, but keep the identity dirs .deployignore protects</span>
+  find $DATA/config -mindepth 1 -maxdepth 1 \
+    ! -name local ! -name resources -exec rm -rf {} +
+  find $DATA/config/resources -mindepth 1 -maxdepth 1 \
+    ! -name local -exec rm -rf {} +'
 
 docker cp ./projects/.        "$IGNITION_CONTAINER:$DATA/projects/"
 docker cp ./services/config/. "$IGNITION_CONTAINER:$DATA/config/"</pre></div>
@@ -808,6 +705,7 @@ docker cp ./services/config/. "$IGNITION_CONTAINER:$DATA/config/"</pre></div>
         <ul class="checks">
           <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Why wipe first?</b> <span class="inlinecode">docker cp</span> has no <span class="inlinecode">--delete</span>. Without the wipe, a view you deleted from the repo <b>keeps living on the gateway</b>, forever.</span></li>
           <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>Wipe-then-copy gives you <b>"deleted in repo → deleted on gateway"</b>: the same semantics <span class="inlinecode">rsync --delete</span> would give a bind-mount setup.</span></li>
+          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Wipe repo-owned, spare gateway-owned.</b> The two dirs kept back, <span class="inlinecode">config/local/</span> and <span class="inlinecode">config/resources/local/</span> (UUID, OPC-UA keystores), are exactly what <span class="inlinecode">.deployignore</span> prunes, so they're never copied back. Wiping them would strip the gateway's identity. Everything else, including the scan API token, is committed and copied fresh.</span></li>
           <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>It is not atomic.</b> A runner killed mid-copy leaves a partial tree. Two mitigations here. Deploys are idempotent, so you <b>re-run and it converges</b>, and the workflows' <span class="inlinecode">concurrency</span> group <b>queues instead of cancelling</b>, so CI never kills its own copy.</span></li>
         </ul>
         <div class="callout" style="margin-top:16px">
@@ -923,7 +821,7 @@ scripts/scan.sh both --gateway dev</pre></div>
       <span class="num">15</span>
       <div>
         <div class="title">Two workflows, one pattern</div>
-        <div class="lead"><span class="inlinecode">deploy.yml</span> and <span class="inlinecode">release.yml</span> run the <b>same six steps</b>: checkout → verify → prune → ship → scan → smoke-check. Diff them and the only differences are <b>the trigger and the target</b>. That's the whole deployment policy.</div>
+        <div class="lead"><span class="inlinecode">deploy.yml</span> and <span class="inlinecode">release.yml</span> run the <b>same five steps</b>: checkout → prune → ship → scan → verify. Diff them and the only differences are <b>the trigger and the target</b>. That's the whole deployment policy.</div>
       </div>
     </div>
     <table class="tbl" style="max-width:1080px">

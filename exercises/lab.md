@@ -215,11 +215,18 @@ Now edit a view and ship it to dev by hand — this is exactly what `deploy.yml`
    Verify in http://localhost:8088 — the view's width should match.
 3. Copy the same change to **dev** manually:
    ```bash
-   # Wipe only projects/ (so a deleted-in-repo view disappears). Do NOT wipe
-   # config/: the gateway owns state there (its scan API token, its per-instance
-   # identity under resources/local/). docker cp merges config/ on top.
-   docker exec lab04-ignition-dev sh -c \
-     "rm -rf /usr/local/bin/ignition/data/projects/*"
+   # Wipe-then-copy projects/ AND config/ (so a deleted-in-repo resource
+   # disappears from the gateway too), but keep the two identity dirs
+   # .deployignore protects and never copies back: config/local/ and
+   # config/resources/local/ (UUID, OPC-UA keystores). Everything else under
+   # config/ is repo-owned, incl. the scan API token, so it's copied fresh.
+   docker exec lab04-ignition-dev sh -c '
+     D=/usr/local/bin/ignition/data
+     rm -rf $D/projects/*
+     find $D/config -mindepth 1 -maxdepth 1 \
+       ! -name local ! -name resources -exec rm -rf {} +
+     find $D/config/resources -mindepth 1 -maxdepth 1 \
+       ! -name local -exec rm -rf {} +'
    docker cp ./projects/.        lab04-ignition-dev:/usr/local/bin/ignition/data/projects/
    docker cp ./services/config/. lab04-ignition-dev:/usr/local/bin/ignition/data/config/
    scripts/scan.sh both --gateway dev

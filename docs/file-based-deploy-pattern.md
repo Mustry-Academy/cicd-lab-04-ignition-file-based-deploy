@@ -18,7 +18,7 @@ Reference reading for the deploy part of the lab. The complete pattern in five s
 3. **Prune** the working tree per `.deployignore` — exclude lab files, READMEs, secrets, anything that shouldn't reach the gateway.
 4. **Ship** the files into the target gateway's container. How depends on the gateway:
    - **`local`** uses a bind mount on `./projects/` and `./services/config/`, so the files are already on disk inside the gateway. No copy step needed.
-   - **`dev` / `prod`** use named volumes. The workflows `docker exec ... rm -rf` to wipe the destination, then `docker cp` the working tree in. This wipe-then-copy gives you "deleted in repo → deleted in gateway" semantics that `rsync --delete` would have given you with a bind mount.
+   - **`dev` / `prod`** use named volumes. The workflows `docker exec ... rm -rf` to wipe the destination (`projects/` and `config/`, sparing only the identity dirs `.deployignore` protects — `config/local/`, `config/resources/local/`), then `docker cp` the working tree in. This wipe-then-copy gives you "deleted in repo → deleted in gateway" semantics that `rsync --delete` would have given you with a bind mount.
 5. **Trigger** a project + config scan via `POST /data/api/v1/scan/{projects,config}` with that gateway's API key.
 
 That's it. No SSH, no SCP, no remote shell. The gateway has an HTTP API that picks up disk changes.

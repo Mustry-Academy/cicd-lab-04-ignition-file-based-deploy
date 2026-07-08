@@ -382,9 +382,14 @@ git checkout -b develop &amp;&amp; git push -u origin develop</pre></div>
 scripts/scan.sh both --gateway local
 
 <span class="cm"># 3 (dev): wipe, copy, scan (deploy.yml does exactly this)</span>
-docker exec lab04-ignition-dev sh -c \
-  "rm -rf /usr/local/bin/ignition/data/projects/* \
-          /usr/local/bin/ignition/data/config/*"
+<span class="cm"># wipe projects/ + config/, but keep the identity dirs .deployignore protects</span>
+docker exec lab04-ignition-dev sh -c '
+  D=/usr/local/bin/ignition/data
+  rm -rf $D/projects/*
+  find $D/config -mindepth 1 -maxdepth 1 \
+    ! -name local ! -name resources -exec rm -rf {} +
+  find $D/config/resources -mindepth 1 -maxdepth 1 \
+    ! -name local -exec rm -rf {} +'
 docker cp ./projects/. \
   lab04-ignition-dev:/usr/local/bin/ignition/data/projects/
 docker cp ./services/config/. \

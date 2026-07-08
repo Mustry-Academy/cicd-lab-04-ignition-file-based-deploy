@@ -121,7 +121,7 @@ If any is missing — especially #7 — push them to complete. The failure cases
 1. **Commit:** developer edits a view on a `feature/*` branch, opens a PR **into `develop`**. PR merges into `develop`.
 2. **Checkout:** the bundled runner picks up the push to `develop`, checks out the merged commit.
 3. **Prune:** the runner reads `.deployignore` and removes those files from the working tree before they can ship.
-4. **Ship:** `docker exec` wipes the target's `projects/` dir (only), then `docker cp` writes the working tree into the gateway's container.
+4. **Ship:** `docker exec` wipes the target's `projects/` and `config/` dirs — preserving only the gateway-owned identity subtrees `.deployignore` protects (`config/local/`, `config/resources/local/`) — then `docker cp` writes the working tree into the gateway's container.
 5. **Scan:** an inline `POST /data/api/v1/scan/{projects,config}` against the gateway. Gateway re-reads disk.
 
 ## The shipped `deploy.yml`, annotated
@@ -161,13 +161,20 @@ jobs:
       - name: Prune working tree per .deployignore  # in-checkout rm -rf for matched paths/names
       - name: Ship projects and config into gateway container
         run: |
-          # Wipe ONLY projects/ — a deleted-in-repo view then disappears.
-          # Do NOT wipe config/: the gateway owns state there (the scan API
-          # token, and per-instance identity under resources/local/). Wiping it
-          # deletes the token the next step authenticates with (401), and clones
-          # one gateway's identity onto another. docker cp merges config/ on top;
-          # resources/local/ is pruned via .deployignore so it never ships.
-          docker exec "$IGNITION_CONTAINER" sh -c "rm -rf $GATEWAY_DATA_PATH/projects/*"
+          # Wipe-then-copy: projects/ AND config/, so a deleted-in-repo resource
+          # disappears from the gateway too. Preserve ONLY the identity subtrees
+          # .deployignore prunes (and thus never copies back): config/local/ and
+          # config/resources/local/ — UUID, OPC-UA keystores, machine-local props.
+          # Everything else under config/ is repo-owned, incl. the scan API token
+          # (resources/core/ignition/api-token/), so it is wiped and copied fresh.
+          docker exec "$IGNITION_CONTAINER" sh -c "
+            set -eu
+            rm -rf '$GATEWAY_DATA_PATH/projects/'*
+            find '$GATEWAY_DATA_PATH/config' -mindepth 1 -maxdepth 1 \
+              ! -name local ! -name resources -exec rm -rf {} +
+            find '$GATEWAY_DATA_PATH/config/resources' -mindepth 1 -maxdepth 1 \
+              ! -name local -exec rm -rf {} +
+          "
           docker cp ./projects/.        "$IGNITION_CONTAINER:$GATEWAY_DATA_PATH/projects/"
           docker cp ./services/config/. "$IGNITION_CONTAINER:$GATEWAY_DATA_PATH/config/"
       - name: Trigger gateway scan
@@ -187,7 +194,7 @@ Highlights for the grade:
 - **`branches: [develop]`.** Only merges into the integration branch deploy to dev. A push to `main` does *not* deploy — prod is reached by tagging (`release.yml`). Most common point of confusion.
 - **`paths:` filter.** Docs-only changes don't retrigger the deploy.
 - **`concurrency` block.** `cancel-in-progress: false` queues a new run rather than cancelling an in-flight one — cancellation mid-`docker cp` would leave a partial state.
-- **Don't wipe `config/`.** The gateway's own state lives under `config/` — the API token the scan authenticates with, and per-instance identity under `resources/local/`. Wiping it (an earlier version did) deletes the scan token so the next step 401s, and copies one gateway's identity onto another. Wipe only `projects/`; merge `config/` on top; exclude `resources/local/` in `.deployignore`.
+- **Wipe `config/`, but spare what `.deployignore` prunes.** The wipe deletes everything under `projects/` and `config/` *except* the two identity subtrees `.deployignore` protects: `config/local/` and `config/resources/local/` (UUID, OPC-UA keystores, machine-local props). Those are pruned from the working tree, so a blanket `rm -rf config/*` would delete them with nothing to copy back — stripping the gateway's identity. The scan API token lives at `config/resources/core/ignition/api-token/` and **is** committed, so it gets wiped and copied back fresh each deploy. The rule: **wipe = repo-owned; preserve = whatever `.deployignore` prunes.**
 - **Inline scan, not the script.** The prune step deletes `scripts/` (it's in `.deployignore` and nothing ships it), so the scan must not depend on `scripts/scan.sh`. `scan.sh` stays for manual/local use.
 - **`environment:` scoping.** Secrets scoped to `lab-gateway-dev`. A repo-level `IGNITION_API_KEY` won't be picked up — deliberate. Environments give per-target secrets and deploy history for free.
 - **Verify + smoke-check.** Cheap; catch missing key / stopped container before any file moves, and a broken gateway after.
@@ -200,7 +207,7 @@ Highlights for the grade:
 - **"I pushed to `main` and expected prod to update."** Merging into `main` deploys nothing — prod is reached by **tagging**. By design: prod always runs a named version.
 - **"My runner isn't picking up jobs."** Container running (`docker compose ps github-runner`), `RUNNER_REPO_URL` points at the **fork**, and `gh` was authenticated when they ran `setup.sh` (it mints the token). `docker compose logs github-runner` surfaces it.
 - **"The deploy ran but my change isn't visible."** Did `Ship` succeed (docker cp output)? Did the scan return HTTP 200? Are they looking at **dev** (8089) or **local** (8088)?
-- **"The scan step 403'd (or 401'd)."** 403 = the API key's role lacks Project/Config Scan **or** the gateway's Read/Write permissions (Config → Security → General Settings) don't admit the token's security level (`Authenticated`). 401 = the token isn't recognized — historically caused by the deploy wiping `config/` and deleting the token; the fixed workflow no longer wipes `config/`, so a token generated on the gateway survives.
+- **"The scan step 403'd (or 401'd)."** 403 = the API key's role lacks Project/Config Scan **or** the gateway's Read/Write permissions (Config → Security → General Settings) don't admit the token's security level (`Authenticated`). 401 = the token isn't recognized. The deploy wipes and re-copies `config/`, including the API token under `config/resources/core/ignition/api-token/` — that works only because the token is **committed to the repo**, so it's copied back with the same hash each deploy. If someone generates a fresh token in the gateway UI but doesn't commit it, the next deploy wipes it and the scan 401s. Fix: commit the token resource (or generate the CI token, export it into the repo, and keep it there).
 - **"`Context access might be invalid` warnings."** Cosmetic — the VS Code Actions extension can't verify `vars.X`/`secrets.X` until the environment exists. Goes away once created.
 - **"My `.deployignore` patterns aren't working."** The prune logic handles literal paths (with a `/`) and bare-name globs. It does NOT handle full gitignore semantics (`!` negations, `**/` deep globs). Keep patterns simple; if they need more, switch to `rsync --exclude-from`.
 
@@ -214,7 +221,7 @@ The most teaching-rich segment.
 
 **Runner offline** — Workflow queues forever, no logs. Gateway unchanged. Recovery: `docker compose restart github-runner`. Lesson: self-hosted has operational cost — keep the runner alive across reboots and registration-token expirations.
 
-**Partial ship (runner killed mid-`docker cp`)** — Some files new, some missing; gateway sees inconsistent state. Possibly broken (a view referencing a not-yet-landed script). Recovery: re-run; the wipe-projects-then-cp converges on the working tree's state. Lesson: the strongest argument for image-based deploys (atomic) when the failure mode matters.
+**Partial ship (runner killed mid-`docker cp`)** — Some files new, some missing; gateway sees inconsistent state. Possibly broken (a view referencing a not-yet-landed script). Recovery: re-run; the wipe-then-copy converges on the working tree's state. Lesson: the strongest argument for image-based deploys (atomic) when the failure mode matters.
 
 ## Rollback discussion
 

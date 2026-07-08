@@ -105,17 +105,27 @@ jobs:
           done < .deployignore
 
       - name: Ship projects and config into gateway container
-        # Wipe only projects/ so a deleted-in-repo view also disappears from the
-        # gateway. Do NOT wipe config/: the gateway owns state that lives there —
-        # the API token this deploy authenticates its scan with, and the
-        # per-instance identity under resources/local/ (UUID, keystores). Wiping
-        # config/ deletes the scan token (next step 401s) and clones one
-        # gateway's identity onto another. docker cp merges config/ on top of
-        # what the gateway owns; resources/local/ is pruned via .deployignore.
+        # Wipe-then-copy so a deleted-in-repo resource also disappears from the
+        # gateway ("deleted in repo → deleted on gateway"). We wipe projects/ AND
+        # config/, but preserve the two subtrees the gateway owns and that
+        # .deployignore prunes (so they are NOT copied back): config/local/ and
+        # config/resources/local/ — per-instance identity (UUID, OPC-UA
+        # keystores, machine-local system props). Wiping those would strip the
+        # gateway's identity, since nothing restores them. Everything else under
+        # config/ IS repo-owned (including the scan API token under
+        # resources/core/ignition/api-token/), so it is wiped and copied fresh.
         run: |
           set -euo pipefail
-          docker exec "$IGNITION_CONTAINER" sh -c \
-            "rm -rf $GATEWAY_DATA_PATH/projects/*"
+          docker exec "$IGNITION_CONTAINER" sh -c "
+            set -eu
+            rm -rf '$GATEWAY_DATA_PATH/projects/'*
+            find '$GATEWAY_DATA_PATH/config' -mindepth 1 -maxdepth 1 \
+              ! -name local ! -name resources -exec rm -rf {} +
+            if [ -d '$GATEWAY_DATA_PATH/config/resources' ]; then
+              find '$GATEWAY_DATA_PATH/config/resources' -mindepth 1 -maxdepth 1 \
+                ! -name local -exec rm -rf {} +
+            fi
+          "
           docker cp ./projects/.        "$IGNITION_CONTAINER:$GATEWAY_DATA_PATH/projects/"
           docker cp ./services/config/. "$IGNITION_CONTAINER:$GATEWAY_DATA_PATH/config/"
 
