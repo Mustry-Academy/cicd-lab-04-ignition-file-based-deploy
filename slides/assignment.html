@@ -392,7 +392,7 @@ docker compose logs --tail 50 github-runner
     <div class="stage">File-based deploy · you do · part 3</div>
   </div>
   <div class="body">
-    <div class="sechead"><span class="num p" style="background:var(--peri)">PART 3</span><div><div class="title">Ship to dev via <span class="mono" style="font-size:30px">main</span></div><div class="lead">15 min. A real PR rides the pipeline: feature branch → PR → CI → merge → deploy.yml → dev gateway.</div></div></div>
+    <div class="sechead"><span class="num p" style="background:var(--peri)">PART 3</span><div><div class="title">Ship to the development environment via the <span class="mono" style="font-size:30px">main</span> branch</div><div class="lead">15 min. A real PR rides the pipeline: feature branch → PR → CI → merge → deploy.yml → dev gateway.</div></div></div>
     <div class="cols2">
       <div class="steps">
         <div class="step"><div class="ix p">1</div><div class="tx"><b>One-time:</b> the sample project must be <i>committed</i> to <span class="inlinecode">main</span> (the We-do left it untracked).</div></div>
@@ -484,36 +484,7 @@ docker compose up -d ignition-dev  <span class="cm"># recovery</span></pre></div
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Part 5 of 5 → definition of done</span></div>
 </section>
 
-<!-- 13 · STRETCH · MODULES PUZZLE -->
-<section class="slide">
-  <div class="topbar">
-    <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">File-based deploy · optional stretch</div>
-  </div>
-  <div class="body">
-    <div class="sechead"><span class="num warm">OPTIONAL · 2</span><div><div class="title">Stretch: the <span class="mono" style="font-size:30px">modules.json</span> puzzle</div><div class="lead">Gateway config ships the same way projects do… but not <b>every</b> gateway change rides that path. Two things to discover.</div></div></div>
-    <div class="cols2">
-      <div class="steps">
-        <div class="step"><div class="ix t">1</div><div class="tx"><b>It doesn't ship.</b> <span class="inlinecode">services/modules.json</span> is a <b>sibling</b> of <span class="inlinecode">services/config/</span>, and the workflows <span class="inlinecode">docker cp ./services/config/.</span> only. Open <span class="inlinecode">deploy.yml</span> and confirm from the <span class="inlinecode">docker cp</span> targets. (In this lab it's bind-mounted into all three gateways instead.)</div></div>
-        <div class="step"><div class="ix t">2</div><div class="tx"><b>A scan can't apply it anyway.</b> Even with a new <span class="inlinecode">modules.json</span> on the gateway, module enable/disable needs a <b>restart</b> (<span class="inlinecode">docker compose restart ignition-dev</span>), unlike views and DB connections, which hot-reload.</div></div>
-        <div class="step"><div class="ix t">3</div><div class="tx"><b>Chew on this:</b> why does copy + scan work beautifully for views and database connections, but not for modules? List everything else a scan could never apply (memory, Java args, module binaries…) and bring the list to the debrief.</div></div>
-      </div>
-      <div>
-        <div class="code"><pre><span class="cm"># deploy.yml ships exactly two trees:</span>
-docker cp ./projects/. …:$DATA/projects/
-docker cp ./services/config/. …:$DATA/config/
-<span class="cm"># modules.json is not under either one.</span></pre></div>
-        <div class="goal" style="margin-top:18px;border-left-color:var(--peri)">
-          <span class="badge" style="background:var(--peri);color:var(--navy)">Restart ≠ scan</span>
-          <p>A restart drops Perspective sessions and takes the gateway down for a minute or more. Deploys that need one are a <b>different beast</b>: plan them, announce them, keep them rare, and keep the daily scan lane free of them.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Stretch · optional · the limits of the scan</span></div>
-</section>
-
-<!-- 14 · DONE -->
+<!-- 13 · DONE -->
 <section class="slide dark">
   <div class="topbar">
     <div class="on-dark brandrow"><img class="logo-img" src="logos/OriginalLight.png" alt="Mustry Solutions"></div>
@@ -529,7 +500,7 @@ docker cp ./services/config/. …:$DATA/config/
     </ul>
     <div class="goal" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.14);border-left-color:var(--peri2)">
       <span class="badge" style="background:var(--peri2);color:var(--navy)">Day 3</span>
-      <p style="color:#c4cfde"><b style="color:#fff">Baking this into images</b>: Lab 05. Bring your <span class="mono" style="color:#dbe4f0">modules.json</span> answer from the stretch.</p>
+      <p style="color:#c4cfde"><b style="color:#fff">Baking this into images</b>: Lab 05.</p>
     </div>
   </div>
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Lab 04 complete</span></div>
@@ -538,7 +509,7 @@ docker cp ./services/config/. …:$DATA/config/
 </div>
 
 <div class="hud"><div class="bar" id="bar"></div></div>
-<div class="pager" id="pager">01 / 14</div>
+<div class="pager" id="pager">01 / 13</div>
 <div class="hint" id="hint">↑ ↓ / scroll to navigate</div>
 
 <script>
