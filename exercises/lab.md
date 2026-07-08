@@ -208,25 +208,14 @@ Now edit a view and ship it to dev by hand — this is exactly what `deploy.yml`
    scripts/scan.sh both --gateway local
    ```
    Verify in http://localhost:8088 — the view's width should match.
-3. Copy the same change to **dev** manually:
+3. Copy the same change to **dev** manually. Dev started empty, so there is nothing to wipe — just copy the project over and scan:
    ```bash
-   # Wipe-then-copy projects/ AND config/ (so a deleted-in-repo resource
-   # disappears from the gateway too), but keep the two identity dirs
-   # .deployignore protects and never copies back: config/local/ and
-   # config/resources/local/ (UUID, OPC-UA keystores). Everything else under
-   # config/ is repo-owned, incl. the scan API token, so it's copied fresh.
-   docker exec lab04-ignition-dev sh -c '
-     D=/usr/local/bin/ignition/data
-     rm -rf $D/projects/*
-     find $D/config -mindepth 1 -maxdepth 1 \
-       ! -name local ! -name resources -exec rm -rf {} +
-     find $D/config/resources -mindepth 1 -maxdepth 1 \
-       ! -name local -exec rm -rf {} +'
-   docker cp ./projects/.        lab04-ignition-dev:/usr/local/bin/ignition/data/projects/
-   docker cp ./services/config/. lab04-ignition-dev:/usr/local/bin/ignition/data/config/
-   scripts/scan.sh both --gateway dev
+   docker cp ./projects/. lab04-ignition-dev:/usr/local/bin/ignition/data/projects/
+   scripts/scan.sh projects --gateway dev
    ```
    Verify in http://localhost:8089 — the same view should appear, the same width.
+
+   `deploy.yml` does one more thing before copying: it **wipes** `projects/` and `config/` on the target (sparing the identity dirs `.deployignore` protects), so a resource deleted in the repo disappears from the gateway too. You'll read that step line by line in the workflow anatomy below.
 4. Inspect `.deployignore`. Notice it excludes `README.md`, `LICENSE`, the `.github/` directory, `docs/`, `scripts/`, and the per-instance `services/config/resources/local/`. For each pattern, say **why the gateway shouldn't have that file**.
 
 > **No sample project?** Use any view under the shipped `projects/example-project/` instead — the flow is identical.

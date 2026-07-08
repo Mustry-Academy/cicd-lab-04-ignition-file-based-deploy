@@ -330,27 +330,21 @@ docker exec lab04-ignition-local cat &lt;path-you-found&gt;</pre></div>
       <div class="steps">
         <div class="step"><div class="ix t">1</div><div class="tx">Edit <span class="inlinecode">projects/sample/…/views/Hello/view.json</span> (e.g. <span class="inlinecode">width: 800 → 1200</span>). It's <b>already on the local gateway's disk</b> via the bind mount.</div></div>
         <div class="step"><div class="ix t">2</div><div class="tx"><b>Scan local</b>, verify at <span class="inlinecode">:8088</span>. The scan makes the gateway <i>notice</i> what's on disk.</div></div>
-        <div class="step"><div class="ix t">3</div><div class="tx"><b>Ship to dev by hand</b>: wipe, <span class="inlinecode">docker cp</span>, scan. Verify at <span class="inlinecode">:8089</span>: same view, same width.</div></div>
+        <div class="step"><div class="ix t">3</div><div class="tx"><b>Ship to dev by hand</b>: <span class="inlinecode">docker cp</span> the project, scan. Dev starts <b>empty</b>, so nothing to wipe. Verify at <span class="inlinecode">:8089</span>: same view, same width.</div></div>
         <div class="step"><div class="ix t">4</div><div class="tx">Open <span class="inlinecode">.deployignore</span>. For each pattern, say <b>why the gateway shouldn't have that file</b>.</div></div>
       </div>
       <div>
         <div class="code"><pre><span class="cm"># 2 (local): files already there, just scan</span>
 scripts/scan.sh both --gateway local
 
-<span class="cm"># 3 (dev): wipe, copy, scan (deploy.yml does exactly this)</span>
-<span class="cm"># wipe projects/ + config/, but keep the identity dirs .deployignore protects</span>
-docker exec lab04-ignition-dev sh -c '
-  D=/usr/local/bin/ignition/data
-  rm -rf $D/projects/*
-  find $D/config -mindepth 1 -maxdepth 1 \
-    ! -name local ! -name resources -exec rm -rf {} +
-  find $D/config/resources -mindepth 1 -maxdepth 1 \
-    ! -name local -exec rm -rf {} +'
+<span class="cm"># 3 (dev): copy the project over, scan</span>
 docker cp ./projects/. \
   lab04-ignition-dev:/usr/local/bin/ignition/data/projects/
-docker cp ./services/config/. \
-  lab04-ignition-dev:/usr/local/bin/ignition/data/config/
-scripts/scan.sh both --gateway dev</pre></div>
+scripts/scan.sh projects --gateway dev</pre></div>
+        <div class="goal" style="margin-top:16px">
+          <span class="badge">What deploy.yml adds</span>
+          <p>Before copying, it also <b>wipes</b> <span class="inlinecode">projects/</span> + <span class="inlinecode">config/</span> (sparing the identity dirs <span class="inlinecode">.deployignore</span> protects), so a resource deleted in the repo disappears from the gateway too. You'll read that step in the workflow anatomy.</p>
+        </div>
         <div class="goal" style="margin-top:16px">
           <span class="badge">No sample project?</span>
           <p>If you skipped the demo, use any view under the shipped <span class="inlinecode">projects/example-project/</span> instead. The flow is identical.</p>
