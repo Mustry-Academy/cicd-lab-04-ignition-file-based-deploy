@@ -293,28 +293,29 @@ scripts/setup.sh          <span class="cm"># three gateways + TimescaleDB + runn
     <div class="stage">File structure · we do · together</div>
   </div>
   <div class="body">
-    <div class="sechead"><span class="num warm">PART 1 · WE DO</span><div><div class="title">Add a database connection, find where it lands</div><div class="lead">The marker trick: set a timestamp marker, make the change in the UI, then ask <span class="inlinecode">find</span> what's newer. Watch the connection land under <span class="inlinecode">config/resources/&lt;scope&gt;/</span>.</div></div></div>
+    <div class="sechead"><span class="num warm">PART 1 · WE DO</span><div><div class="title">Gateway config is just files — read one, then watch changes land</div><div class="lead">The database connection already ships as a file in the repo. Read it to learn the path shape, then make a change of your own in the UI and let <span class="inlinecode">git status</span> / <span class="inlinecode">git diff</span> show you exactly where the gateway put it — because <b>local</b> bind-mounts <span class="inlinecode">./services/config/</span> onto the host.</div></div></div>
     <div class="cols2">
       <div class="steps">
-        <div class="step"><div class="ix t">1</div><div class="tx"><b>Set the marker</b> (<span class="inlinecode">docker exec lab04-ignition-local touch /tmp/marker</span>). Re-touch it <i>before</i> every change you want to trace.</div></div>
-        <div class="step"><div class="ix t">2</div><div class="tx">UI: <b>Config → Databases → Connections → New</b>. Postgres datasource → host <span class="inlinecode">timescaledb</span>, port <span class="inlinecode">5432</span>, db <span class="inlinecode">ignition_loc</span>, user/pass from <span class="inlinecode">.env</span> (default <span class="inlinecode">ignition</span>/<span class="inlinecode">ignition</span>). Save.</div></div>
-        <div class="step"><div class="ix t">3</div><div class="tx">Run the <span class="inlinecode">find -newer</span>. The connection lands at <span class="inlinecode">config/resources/&lt;scope&gt;/ignition/database-connection/&lt;name&gt;/config.json</span>. Because <b>local</b> bind-mounts <span class="inlinecode">./services/config/</span>, it also just appeared <b>in your repo on the host</b>: run <span class="inlinecode">git status</span>.</div></div>
+        <div class="step"><div class="ix t">1</div><div class="tx"><b>Open the shipped connection</b> at <span class="inlinecode">services/config/resources/core/ignition/database-connection/TimescaleDB/config.json</span>. No UI needed — it's already a file. Read the path shape (<span class="inlinecode">resources/&lt;scope&gt;/&lt;module&gt;/&lt;type&gt;/&lt;name&gt;/config.json</span>) and the contents: JDBC URL, pool sizes, encrypted password. See it <b>both ways</b>: the same connection shows in the <b>local</b> gateway's UI (<span class="inlinecode">:8088</span> → <b>Connections → Databases → Connections</b>) and in these config files — one is the view, the other is the source of truth.</div></div>
+        <div class="step"><div class="ix t">2</div><div class="tx"><b>See deployment modes.</b> <span class="inlinecode">diff</span> the <span class="inlinecode">loc</span> vs <span class="inlinecode">prd</span> copies of the same connection: exactly one line differs (<span class="inlinecode">ignition_loc</span> vs <span class="inlinecode">ignition_prd</span>). Same name, one per-mode override — that's how dev and prod diverge under one config set.</div></div>
+        <div class="step"><div class="ix t">3</div><div class="tx"><b>Now make your own change</b> in the UI — e.g. <b>Connections → Devices → Connections</b>, create fake device connection. Run <span class="inlinecode">git status</span>: it shows up right here under <span class="inlinecode">config/</span>. <span class="inlinecode">git diff</span> shows exactly what the gateway rewrote.</div></div>
         <div class="step"><div class="ix t">4</div><div class="tx"><b>Answer out loud:</b> gateway-level or project-level? Would you commit it? Which scope did it land in, and why does that matter for dev vs prod?</div></div>
       </div>
       <div>
-        <div class="code"><pre><span class="cm"># hostname "timescaledb" is the compose service name;</span>
-<span class="cm"># the gateway resolves it on the lab's docker network</span>
+        <div class="code"><pre><span class="cm"># 1: the DB connection already ships as a file — read it</span>
+cat services/config/resources/core/ignition/\
+  database-connection/TimescaleDB/config.json
 
-docker exec lab04-ignition-local touch /tmp/marker
-<span class="cm"># …make the UI change, then:</span>
-docker exec lab04-ignition-local find \
-  /usr/local/bin/ignition/data/config \
-  -newer /tmp/marker -type f 2>/dev/null
+<span class="cm"># 2: deployment modes — same connection, per-mode override</span>
+diff services/config/resources/{loc,prd}/ignition/\
+  database-connection/TimescaleDB/config.json
 
-docker exec lab04-ignition-local cat &lt;path-you-found&gt;</pre></div>
+<span class="cm"># 3: make a UI config change, then watch it land in the repo</span>
+git status                 <span class="cm"># new / edited files, right here</span>
+git diff services/config</pre></div>
         <div class="goal warn-g" style="margin-top:18px">
           <span class="badge">Heads-up</span>
-          <p>Expect a <b>longer path than 8.1 habits suggest</b>: scope first, then module namespace. If you can't find the file, you probably forgot to re-touch the marker <i>before</i> the change.</p>
+          <p>Expect a <b>longer path than 8.1 habits suggest</b>: scope first, then module namespace. And the flip side — only the bind-mounted <span class="inlinecode">config/</span> shows in git; <b>operational</b> changes (a new user lands in the internal DB, caches) go to the container's volume and never touch the host.</p>
         </div>
       </div>
     </div>
@@ -332,10 +333,6 @@ docker exec lab04-ignition-local cat &lt;path-you-found&gt;</pre></div>
     <div class="eyebrow">Part 1 · solo · which bucket, where on disk?</div>
     <div class="title" style="color:#fff">Make three changes. Classify every one.</div>
     <p class="lead">Pick <b style="color:#fff">three</b> from the list (or invent your own, where at least one of your own is worth more). For each, note: <b style="color:#fff">what you changed · where it lives on disk (relative to <span class="mono">data/</span>) · which bucket · would you commit it, one sentence why</b>.</p>
-    <ul class="checks" style="max-width:980px;margin-top:20px">
-      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>A Perspective view</b> in a project. No Designer? Simulate on disk: <span class="mono" style="color:#dbe4f0">projects/sample/com.inductiveautomation.perspective/views/Hello/{view.json, resource.json}</span> (minimal content in <span class="mono" style="color:#dbe4f0">docs/ignition-file-structure.md</span>, and the <b>resource.json manifest is required</b>).</span></li>
-      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>A new user</b> (Config → Security → Users) · <b>a new tag provider</b> (Config → Tags → Realtime) · <b>toggle a module</b> (Config → Modules).</span></li>
-    </ul>
   </div>
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>exercises/lab.md · You do, answers in your notes</span></div>
 </section>
@@ -352,7 +349,6 @@ docker exec lab04-ignition-local cat &lt;path-you-found&gt;</pre></div>
     <ul class="checks" style="max-width:960px;margin-top:20px">
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Fork with Actions enabled.</b> Forks ship with workflows <b>disabled</b>, so open your fork's <i>Actions</i> tab and click "enable" or nothing will ever trigger.</span></li>
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>The GitHub CLI (<span class="mono" style="color:#dbe4f0">gh</span>) authenticated</b>, with <span class="mono" style="color:#dbe4f0">RUNNER_REPO_URL</span> pointing at <b>your fork</b>. <span class="mono" style="color:#dbe4f0">setup.sh</span> mints the runner's registration token with <span class="mono" style="color:#dbe4f0">gh</span> — no PAT.</span></li>
-      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>An API key per gateway</b>: each gateway's UI → <i>Config → Security → API Keys → New</i>, scoped to <b>Project Scan + Config Scan</b> only. Copy immediately, because you can't read it back. Into <span class="mono" style="color:#dbe4f0">.env</span> as <span class="mono" style="color:#dbe4f0">IGNITION_API_KEY_LOCAL/_DEV/_PROD</span>.</span></li>
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Two GitHub environments</b>: <span class="mono" style="color:#dbe4f0">lab-gateway-dev</span> and <span class="mono" style="color:#dbe4f0">lab-gateway-prod</span>, set up in Part 2.</span></li>
     </ul>
   </div>
@@ -369,7 +365,7 @@ docker exec lab04-ignition-local cat &lt;path-you-found&gt;</pre></div>
     <div class="sechead"><span class="num warm">PART 2 · WE DO</span><div><div class="title">The deploy, by hand, once</div><div class="lead">Everything <span class="inlinecode">deploy.yml</span> automates, done manually so the workflow holds no mysteries.</div></div></div>
     <div class="cols2">
       <div class="steps">
-        <div class="step"><div class="ix t">1</div><div class="tx">Edit <span class="inlinecode">projects/sample/…/views/Hello/view.json</span> (e.g. <span class="inlinecode">width: 800 → 1200</span>). It's <b>already on the local gateway's disk</b> via the bind mount.</div></div>
+        <div class="step"><div class="ix t">1</div><div class="tx">Edit a view's <span class="inlinecode">view.json</span> (e.g. <span class="inlinecode">width: 800 → 1200</span>). It's <b>already on the local gateway's disk</b> via the bind mount.</div></div>
         <div class="step"><div class="ix t">2</div><div class="tx"><b>Scan local</b>, verify at <span class="inlinecode">:8088</span>. The scan makes the gateway <i>notice</i> what's on disk.</div></div>
         <div class="step"><div class="ix t">3</div><div class="tx"><b>Ship to dev by hand</b>: <span class="inlinecode">docker cp</span> the project, scan. Dev starts <b>empty</b>, so nothing to wipe. Verify at <span class="inlinecode">:8089</span>: same view, same width.</div></div>
         <div class="step"><div class="ix t">4</div><div class="tx">Open <span class="inlinecode">.deployignore</span>. For each pattern, say <b>why the gateway shouldn't have that file</b>.</div></div>
@@ -385,10 +381,6 @@ scripts/scan.sh projects --gateway dev</pre></div>
         <div class="goal" style="margin-top:16px">
           <span class="badge">What deploy.yml adds</span>
           <p>Before copying, it also <b>wipes</b> <span class="inlinecode">projects/</span> + <span class="inlinecode">config/</span> (sparing the identity dirs <span class="inlinecode">.deployignore</span> protects), so a resource deleted in the repo disappears from the gateway too. You'll read that step in the workflow anatomy.</p>
-        </div>
-        <div class="goal" style="margin-top:16px">
-          <span class="badge">No sample project?</span>
-          <p>If you skipped the demo, use any view under the shipped <span class="inlinecode">projects/example-project/</span> instead. The flow is identical.</p>
         </div>
       </div>
     </div>
@@ -586,7 +578,7 @@ data/modules/*.modl
 </div>
 
 <div class="hud"><div class="bar" id="bar"></div></div>
-<div class="pager" id="pager">01 / 13</div>
+<div class="pager" id="pager">01 / 14</div>
 <div class="hint" id="hint">↑ ↓ / scroll to navigate</div>
 
 <script>
