@@ -366,8 +366,8 @@ git diff services/config</pre></div>
     <div class="cols2">
       <div class="steps">
         <div class="step"><div class="ix t">1</div><div class="tx">Edit a view's <span class="inlinecode">view.json</span> (e.g. <span class="inlinecode">width: 800 → 1200</span>). It's <b>already on the local gateway's disk</b> via the bind mount.</div></div>
-        <div class="step"><div class="ix t">2</div><div class="tx"><b>Scan local</b>, verify at <span class="inlinecode">:8088</span>. The scan makes the gateway <i>notice</i> what's on disk.</div></div>
-        <div class="step"><div class="ix t">3</div><div class="tx"><b>Ship to dev by hand</b>: <span class="inlinecode">docker cp</span> the project, scan. Dev starts <b>empty</b>, so nothing to wipe. Verify at <span class="inlinecode">:8089</span>: same view, same width.</div></div>
+        <div class="step"><div class="ix t">2</div><div class="tx">Run scan.sh, verify at <span class="inlinecode">localhost:8088</span>. The scan makes the gateway <i>notice</i> what's on disk.</div></div>
+        <div class="step"><div class="ix t">3</div><div class="tx"><b>Ship to dev by hand</b>: <span class="inlinecode">docker cp</span> the project, scan. Dev starts <b>empty</b>, so nothing to wipe. However, the gateway needs a restart so it will pick up the changes. Verify at <span class="inlinecode">localhost:8089</span>: same view, same width.</div></div>
         <div class="step"><div class="ix t">4</div><div class="tx">Open <span class="inlinecode">.deployignore</span>. For each pattern, say <b>why the gateway shouldn't have that file</b>.</div></div>
       </div>
       <div>
@@ -376,8 +376,7 @@ scripts/scan.sh both --gateway local
 
 <span class="cm"># 3 (dev): copy the project over, scan</span>
 docker cp ./projects/. \
-  lab04-ignition-dev:/usr/local/bin/ignition/data/projects/
-scripts/scan.sh projects --gateway dev</pre></div>
+  lab04-ignition-dev:/usr/local/bin/ignition/data/projects/</pre></div>
         <div class="goal" style="margin-top:16px">
           <span class="badge">What deploy.yml adds</span>
           <p>Before copying, it also <b>wipes</b> <span class="inlinecode">projects/</span> + <span class="inlinecode">config/</span> (sparing the identity dirs <span class="inlinecode">.deployignore</span> protects), so a resource deleted in the repo disappears from the gateway too. You'll read that step in the workflow anatomy.</p>
