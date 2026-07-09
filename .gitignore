@@ -17,19 +17,51 @@ __pycache__/
 venv/
 .pytest_cache/
 
-# Ignition operational state — never commit these (see docs/ignition-file-structure.md)
-# These live inside the gateway's data/ directory at runtime; we mount them as a named
-# volume so they don't pollute the bind-mounted projects/ and services/ paths.
-**/.resources/
-**/migration-log-*.md
-**/jar-cache/
-**/datacache/
+
+# Database files
+**/db/
+**/metricsdb/
 **/autobackup/
+**/datacache/
 **/config/ignition/tags/*.idb
+**/db_backup_sqlite.idb
+**/valueStore.idb
+
+# Cache and temporary files
+**/jar-cache/
+**/request
+**/response
+*.tmp
+*.bak
+**/var
+
+# Log files
+*.log
+**/logs
+
+# Certificates and security
+**/certificates/
+**/keystore/
+
+# Runtime configuration (environment-specific)
+**/config/local
+**/config/resources/local
+
+# Gateway-specific runtime files
+**/.container-init.conf
+
+# Backup and converted files
+**/conversion-report.txt
+**.digest.json
+
+# Project conversion artifacts
+**/projects/conversion-report.txt
+**/migration-log-*.md
+**/.resources/
+
+# Alarm history files
+**/.alarms_*
+
 **/themes.digest.json
 **/fonts.digest.json
 **/icons.digest.json
-
-# Data-root operational state (db/ — the internal SQLite DB incl. the user store —
-# jar-cache/, metricsdb/, var/) lives in the gateways' named volumes and never
-# appears in this repo's tree, so it needs no patterns here.
