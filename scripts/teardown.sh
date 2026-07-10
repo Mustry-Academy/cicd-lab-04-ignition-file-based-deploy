@@ -45,6 +45,13 @@ if [ "$REMOVE_VOLUMES" = "true" ]; then
   # The dev/prod projects/ + config/ live on the host (bind mounts), so
   # `down -v` alone would leave stale gateway state behind for the next boot.
   rm -rf "$PROJECT_ROOT/gateways/dev" "$PROJECT_ROOT/gateways/prod"
+  # Same for the local gateway's own (gitignored) internal identity: wiping
+  # its volume means commissioning runs again on the next boot, and leftover
+  # identity files would make it create a temp_N profile instead of
+  # `default`. Remove them so setup.sh's first-boot flow starts clean.
+  rm -rf "$PROJECT_ROOT/services/config/resources/core/ignition/user-source/default" \
+         "$PROJECT_ROOT/services/config/resources/core/ignition/user-source/opcua-module" \
+         "$PROJECT_ROOT/services/config/resources/core/ignition/identity-provider/default"
 else
   echo -e "${GREEN}Stopping stack (volumes retained)...${NC}"
   docker compose down

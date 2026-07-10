@@ -232,6 +232,48 @@ seed_gateway_state() {
 
 seed_gateway_state
 
+# ---- Local first-boot: stash security-properties during commissioning -----
+# On the very first boot of the LOCAL gateway, auto-commissioning has to
+# guarantee an admin login exists. If it finds a security-properties file but
+# no matching user source (the repo tracks the policy file; the per-gateway
+# user-source/default is gitignored), it plays safe and creates a temp_N
+# identity, then rewrites security-properties to point at it — permanent git
+# noise AND an auth profile no other gateway has. If it finds NO
+# security-properties, it creates the `default` user source + identity
+# provider, exactly like dev/prod do. So: move the committed file aside for
+# the first boot, then put it back (it names systemAuthProfile=default, which
+# now exists, and carries the APIToken scan permissions) and restart local.
+SECPROPS_DIR="$PROJECT_ROOT/services/config/resources/core/ignition/security-properties"
+SECPROPS_STASH=""
+stash_secprops_for_commissioning() {
+    local usersource_dir="$PROJECT_ROOT/services/config/resources/core/ignition/user-source/default"
+    # If a previous interrupted run left the file stashed away, recover the
+    # committed version from git before deciding anything.
+    if [ ! -d "$SECPROPS_DIR" ]; then
+        git -C "$PROJECT_ROOT" checkout -- "$SECPROPS_DIR" 2>/dev/null || true
+    fi
+    if [ -d "$usersource_dir" ] || [ ! -d "$SECPROPS_DIR" ]; then
+        return 0   # not a first boot (or nothing to stash)
+    fi
+    SECPROPS_STASH="$(mktemp -d)"
+    mv "$SECPROPS_DIR" "$SECPROPS_STASH/security-properties"
+    echo -e "${YELLOW}First boot of the local gateway: letting commissioning create the${NC}"
+    echo -e "${YELLOW}default identity before restoring the committed security-properties.${NC}"
+}
+
+restore_secprops_after_commissioning() {
+    [ -n "$SECPROPS_STASH" ] || return 0
+    rm -rf "$SECPROPS_DIR"   # drop the commissioning-written version
+    mv "$SECPROPS_STASH/security-properties" "$SECPROPS_DIR"
+    rmdir "$SECPROPS_STASH" 2>/dev/null || true
+    SECPROPS_STASH=""
+    echo -e "${GREEN}Restored the committed security-properties; restarting local to load it...${NC}"
+    docker restart "$(gateway_container local)" >/dev/null
+    wait_for_gateway local
+}
+
+stash_secprops_for_commissioning
+
 # ---- Start the stack ------------------------------------------------------
 existing_id="$(docker compose ps -q ignition-local 2>/dev/null || true)"
 if [ -n "$existing_id" ]; then
@@ -286,6 +328,8 @@ wait_for_gateway() {
 for gw in "${LAB_GATEWAYS[@]}"; do
     wait_for_gateway "$gw"
 done
+
+restore_secprops_after_commissioning
 
 # ---- API-permission repair (first boot only) ------------------------------
 # On the FIRST boot of a fresh gateway container, Ignition's auto-commissioning

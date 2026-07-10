@@ -9,8 +9,8 @@ Everything inside an Ignition gateway's `data/` directory falls into one of thre
 | Bucket | What | Owner | In git? |
 |---|---|---|---|
 | **Project-level** | Per-project resources: views, scripts, tags, UDTs | The application (versioned, peer-reviewed) | **Yes** |
-| **Gateway-level** | Cross-project config: DB connections, tag providers, tag history connections, enabled modules | The application (versioned, but smaller scope) | **Yes** |
-| **Operational** | Runtime state: internal DBs, logs, temp, metadata, runtime users, per-gateway auth state (user sources, identity providers) | The gateway (gateway owns this, full stop) | **No** |
+| **Gateway-level** | Cross-project config: DB connections, tag providers, tag history connections, enabled modules, identity resources you configure (DB/AD user sources, SAML/OIDC identity providers, security-properties) | The application (versioned, but smaller scope) | **Yes** |
+| **Operational** | Runtime state: internal DBs, logs, temp, metadata, runtime users, the gateway-owned *internal* identity (the `default` user source and `default` identity provider that commissioning creates) | The gateway (gateway owns this, full stop) | **No** |
 
 The whole point of the file-structure part is to internalize this split. If you can answer "which bucket?" for any file in `data/`, you'll know how to version, deploy, and roll back.
 
@@ -85,12 +85,19 @@ defined gateway-wide. A view might query a database, but the connection lives in
 `core/ignition/database-connection/<name>/`. Move a project to a new gateway and you'd port the
 project; you'd also port the matching `core/` resources.
 
-**Three `core/ignition/` subtrees are the exception: `user-source/`, `identity-provider/`, and
-`security-properties/` are untracked** (gitignored, and spared by the deploy workflows' wipe). They look like ordinary config but
-are per-gateway auth state: `user-source/<name>/users.json` carries **that gateway's admin password
+**The exception is the gateway-owned *internal* identity, excluded by name:
+`user-source/default/`, `user-source/opcua-module/`, and `identity-provider/default/` are
+untracked** (gitignored, and spared by the deploy workflows' wipe). Those are what first-boot
+commissioning creates, and `user-source/default/users.json` carries **that gateway's admin password
 hashes**. Commit and deploy one gateway's copy and you overwrite every other gateway's admin user —
 if the shipped hash isn't the password you expect, that's an instant lockout, recoverable only by
 wiping the target's state. Each gateway writes and owns its own; never commit them, never ship them.
+Everything else identity-related is ordinary config: a database or AD user source, a SAML/OIDC
+identity provider — those hold no password data (the users live in the external system) and are
+tracked and deployed like any other resource. `security-properties/` is tracked and deployed too:
+it is permission policy (APIToken scan grants, designer/config permissions), and the committed
+`systemAuthProfile=default` matches every gateway because commissioning creates the `default` user
+source on all of them.
 
 ### Deployment modes (this is the 8.3 feature behind those scopes)
 

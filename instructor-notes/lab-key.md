@@ -23,11 +23,11 @@ All paths are the real 8.3 layout: project resources are namespaced by owning mo
 | Change gateway timezone (Config → System → Time) | Gateway-level | under `config/resources/core/ignition/system-properties/config.json` (path may shift between 8.3 minor versions) | Yes — but often gitignored and set via env |
 | Add a database connection | Gateway-level | `data/config/resources/core/ignition/database-connection/<name>/config.json` | Yes |
 | Add a historian connection | Gateway-level | `data/config/resources/core/com.inductiveautomation.historian/historian-provider/<name>/config.json` | Yes |
-| Add a new identity provider (OIDC) | Gateway-level | `data/config/resources/core/ignition/identity-provider/<name>/config.json` | **No in this lab** — `identity-provider/` (like `user-source/`) is per-gateway auth state: untracked, `.deployignore`d, spared by the deploy wipe |
+| Add a new identity provider (OIDC/SAML) | Gateway-level | `data/config/resources/core/ignition/identity-provider/<name>/config.json` | **Yes** — an external IdP holds no password data (users live in the IdP), so it's tracked config that deploys normally. Only the gateway-owned **internal** `identity-provider/default/` (and `user-source/default/` + `user-source/opcua-module/`) is per-gateway: untracked, `.deployignore`d, spared by the deploy wipe |
 | Enable / disable a module | Gateway-level | `data/modules.json` (repo: `services/modules.json`) | Yes |
 | Install a new module (.modl) | Gateway-level binary | `data/modules/<module>.modl` | Yes / No |
-| Add a new gateway user (UI-managed) | Operational | inside `data/db/config.idb` (the internal user store — there is no separate `users.idb`) | **No** |
-| Change the gateway admin password | Operational | inside `data/db/config.idb` | **No** |
+| Add a new gateway user (UI-managed) | Operational | `data/config/resources/core/ignition/user-source/default/users.json` (the internal default user source — untracked; runtime auth state like lockouts rides in `data/db/config.idb`) | **No** |
+| Change the gateway admin password | Operational | `data/config/resources/core/ignition/user-source/default/users.json` (password hashes) | **No** |
 | Tag values changing at runtime | Operational | `data/config/ignition/tags/valueStore.idb` (masked by `.gitignore`) | **No** |
 | Wrapper logs filling up | Operational | `logs/` at the install root (outside `data/`) | **No** |
 
@@ -40,7 +40,7 @@ These handle ~99% of cases.
 
 ## Common stumbles
 
-- **"I added a user in the UI — where did it land, should I commit it?"** It landed inside the internal SQLite DB (`data/db/config.idb`) — there is no separate `users.idb`. Never commit `db/`: the internal user tables hold hashed passwords, last-login timestamps, lockout state, and a `gwbk` backup carries the same data. The same goes for the file-based auth state under `config/resources/core/ignition/user-source/` and `identity-provider/`: `users.json` in there carries this gateway's admin password hash, which is why both dirs are untracked and spared by the deploy wipe. The source-controlled pattern for real user management is an external identity provider (OIDC), configured per gateway.
+- **"I added a user in the UI — where did it land, should I commit it?"** It landed in `users.json` inside the **default (internal) user source** — `config/resources/core/ignition/user-source/default/users.json` — which carries password hashes and is deliberately untracked (gitignored, `.deployignore`d, spared by the deploy wipe), like the rest of the internal identity (`user-source/opcua-module/`, `identity-provider/default/`). Never commit `db/` either: the internal SQLite DB (`data/db/config.idb`) holds runtime auth state (last-login timestamps, lockout state), and a `gwbk` backup carries the same data. The source-controlled pattern for real user management is a database/AD user source or an external identity provider (OIDC/SAML) — those hold no password data, so they're tracked config that deploys normally.
 - **"Why isn't `modules/` in git?"** `.modl` files are 5-100 MB binary blobs keyed by license/vendor. Pin versions in a manifest; install separately. (Lab-05 revisits this with derived Docker images.)
 - **"I changed the timezone but can't find the file."** The path is sometimes config-mode dependent, and 8.3 has shifted some config from XML to JSON across minor releases. The `find ... -newer /tmp/marker -type f` trick handles this: the file *will* be newer than the marker. **Prerequisite:** the marker only works if they ran `docker exec lab04-ignition-local touch /tmp/marker` *before* the UI change. If they forgot, re-touch and redo. Expect a sibling `resource.json` to also be rewritten — that's the gateway's manifest.
 - **"I made a Perspective change in the Designer but nothing's on disk."** Did they *save* in the Designer? Unsaved changes live only in Designer memory.
@@ -73,9 +73,12 @@ data/config/ignition/tags/*.idb
 data/config/local/
 data/config/resources/local/
 
-# Per-gateway auth state — users.json holds admin password hashes
-data/config/resources/core/ignition/user-source/
-data/config/resources/core/ignition/identity-provider/
+# The gateway-owned INTERNAL identity — users.json holds admin password hashes.
+# Only these named dirs: identity resources you add (DB/AD user sources,
+# SAML/OIDC providers) and security-properties are tracked, deployable config.
+data/config/resources/core/ignition/user-source/default/
+data/config/resources/core/ignition/user-source/opcua-module/
+data/config/resources/core/ignition/identity-provider/default/
 
 # Module binaries — manage separately
 data/modules/*.modl
@@ -87,7 +90,7 @@ data/modules/*.modl
 .env
 ```
 
-Commonly missed: `data/config/local/` and `data/config/resources/local/` (per-instance identity: keystores, UUID); the `user-source/` + `identity-provider/` + `security-properties/` auth state (admin password hashes, auth-profile wiring); `data/config/ignition/tags/*.idb` (tag value stores inside the versioned config tree); backup files (`*.gwbk`); module binaries (`*.modl`).
+Commonly missed: `data/config/local/` and `data/config/resources/local/` (per-instance identity: keystores, UUID); the internal identity by name — `user-source/default/`, `user-source/opcua-module/`, `identity-provider/default/` (admin password hashes) — while noting that other user sources/IdPs and `security-properties` are tracked config; `data/config/ignition/tags/*.idb` (tag value stores inside the versioned config tree); backup files (`*.gwbk`); module binaries (`*.modl`).
 
 ## Debrief crib
 
@@ -124,7 +127,7 @@ If any is missing — especially #6 — push them to complete. The failure cases
 1. **Commit:** developer edits a view on a `feature/*` branch, opens a PR **into `main`**. PR merges into `main`.
 2. **Checkout:** the bundled runner picks up the push to `main`, checks out the merged commit.
 3. **Prune:** the runner reads `.deployignore` and removes those files from the working tree before they can ship.
-4. **Ship:** `docker exec` wipes the target's `projects/` and `config/` dirs — preserving the five gateway-owned subtrees `.deployignore` protects (`config/local/`, `config/resources/local/`, and `config/resources/core/ignition/{user-source,identity-provider,security-properties}/`) — then `docker cp` writes the working tree into the gateway's container.
+4. **Ship:** `docker exec` wipes the target's `projects/` and `config/` dirs — preserving the five gateway-owned entries `.deployignore` protects (`config/local/`, `config/resources/local/`, and the internal identity by name: `config/resources/core/ignition/user-source/default/`, `user-source/opcua-module/`, `identity-provider/default/`) — then `docker cp` writes the working tree into the gateway's container.
 5. **Scan:** an inline `POST /data/api/v1/scan/{projects,config}` against the gateway. Gateway re-reads disk.
 
 ## The shipped `deploy.yml`, annotated
@@ -165,15 +168,16 @@ jobs:
       - name: Ship projects and config into gateway container
         run: |
           # Wipe-then-copy: projects/ AND config/, so a deleted-in-repo resource
-          # disappears from the gateway too. Preserve the subtrees .deployignore
+          # disappears from the gateway too. Preserve the entries .deployignore
           # prunes (and thus never copies back): config/local/ and
           # config/resources/local/ (UUID, OPC-UA keystores, machine-local props)
-          # plus config/resources/core/ignition/{user-source,
-          # identity-provider,security-properties}/ (per-gateway auth state:
-          # users.json holds THIS gateway's admin hash; security-properties
-          # names its auth profile). Everything else under config/ is
-          # repo-owned, incl. the scan API token
-          # (resources/core/ignition/api-token/), so it is wiped and copied fresh.
+          # plus the gateway-owned INTERNAL identity by name —
+          # user-source/{default,opcua-module}/ and identity-provider/default/
+          # (users.json holds THIS gateway's admin hash). Everything else under
+          # config/ is repo-owned and wiped + copied fresh, incl. the scan API
+          # token (resources/core/ignition/api-token/), security-properties
+          # (permission policy), and any identity resources you added yourself
+          # (DB/AD user sources, SAML/OIDC providers — no password data).
           docker exec "$IGNITION_CONTAINER" sh -c "
             set -eu
             rm -rf '$GATEWAY_DATA_PATH/projects/'*
@@ -189,8 +193,15 @@ jobs:
             fi
             if [ -d '$GATEWAY_DATA_PATH/config/resources/core/ignition' ]; then
               find '$GATEWAY_DATA_PATH/config/resources/core/ignition' -mindepth 1 -maxdepth 1 \
-                ! -name user-source ! -name identity-provider \
-                ! -name security-properties -exec rm -rf {} +
+                ! -name user-source ! -name identity-provider -exec rm -rf {} +
+            fi
+            if [ -d '$GATEWAY_DATA_PATH/config/resources/core/ignition/user-source' ]; then
+              find '$GATEWAY_DATA_PATH/config/resources/core/ignition/user-source' -mindepth 1 -maxdepth 1 \
+                ! -name default ! -name opcua-module -exec rm -rf {} +
+            fi
+            if [ -d '$GATEWAY_DATA_PATH/config/resources/core/ignition/identity-provider' ]; then
+              find '$GATEWAY_DATA_PATH/config/resources/core/ignition/identity-provider' -mindepth 1 -maxdepth 1 \
+                ! -name default -exec rm -rf {} +
             fi
           "
           docker cp ./projects/.        "$IGNITION_CONTAINER:$GATEWAY_DATA_PATH/projects/"
@@ -203,6 +214,11 @@ jobs:
             curl -sS -X POST -H "X-Ignition-API-Token: $IGNITION_API_KEY" \
               "$IGNITION_URL/data/api/v1/scan/$what"  # check for HTTP 2xx
           done
+          # Self-heal (abridged — see the real file): on HTTP 401 (token never
+          # loaded) or 403 (commissioning reset the permissions), restart the
+          # gateway once — Ship already put the token + security-properties on
+          # its disk, loaded at boot — wait for RUNNING, retry the scans.
+          # First deploy to a fresh gateway heals itself; later deploys scan hot.
       - name: Smoke-check gateway health            # poll /StatusPing for 20s
 ```
 
@@ -212,7 +228,7 @@ Highlights for the grade:
 - **`branches: [main]`.** Only pushes to main deploy to dev. Prod is reached by tagging (`release.yml`). Most common point of confusion.
 - **`paths:` filter.** Docs-only changes don't retrigger the deploy.
 - **`concurrency` block.** `cancel-in-progress: false` queues a new run rather than cancelling an in-flight one — cancellation mid-`docker cp` would leave a partial state.
-- **Wipe `config/`, but spare what `.deployignore` prunes.** The wipe deletes everything under `projects/` and `config/` *except* the five identity subtrees `.deployignore` protects: `config/local/` and `config/resources/local/` (UUID, OPC-UA keystores, machine-local props), plus `config/resources/core/ignition/user-source/`, `identity-provider/` and `security-properties/` (per-gateway auth state). Those are pruned from the working tree, so a blanket `rm -rf config/*` would delete them with nothing to copy back — stripping the gateway's identity, and in the user-source case deleting `users.json` out from under the *running* gateway, breaking logins instantly. War story worth telling: an earlier course run committed the local gateway's user source, so the first prod deploy overwrote prod's admin user with local's hash — everyone locked out, volumes wiped to recover. The scan API token lives at `config/resources/core/ignition/api-token/` and **is** committed, so it gets wiped and copied back fresh each deploy. The rule: **wipe = repo-owned; preserve = whatever `.deployignore` prunes.**
+- **Wipe `config/`, but spare what `.deployignore` prunes.** The wipe deletes everything under `projects/` and `config/` *except* the five entries `.deployignore` protects: `config/local/` and `config/resources/local/` (UUID, OPC-UA keystores, machine-local props), plus the gateway-owned **internal** identity by name — `config/resources/core/ignition/user-source/default/`, `user-source/opcua-module/`, and `identity-provider/default/`. Note the last three are name-scoped *inside* `user-source/` and `identity-provider/`: other user sources and identity providers in those dirs (database/AD, SAML/OIDC — no password data) are repo-owned and get wiped and redeployed like anything else, as does `security-properties` (permission policy, committed with `systemAuthProfile=default`, which every gateway has). The spared entries are pruned from the working tree, so a blanket `rm -rf config/*` would delete them with nothing to copy back — stripping the gateway's identity, and in the user-source case deleting `users.json` out from under the *running* gateway, breaking logins instantly. War story worth telling: an earlier course run committed the local gateway's user source, so the first prod deploy overwrote prod's admin user with local's hash — everyone locked out, volumes wiped to recover. The scan API token lives at `config/resources/core/ignition/api-token/` and **is** committed, so it gets wiped and copied back fresh each deploy. The rule: **wipe = repo-owned; preserve = whatever `.deployignore` prunes.**
 - **Inline scan, not the script.** The prune step deletes `scripts/` (it's in `.deployignore` and nothing ships it), so the scan must not depend on `scripts/scan.sh`. `scan.sh` stays for manual/local use.
 - **`environment:` scoping.** Secrets scoped to `lab-gateway-dev`. A repo-level `IGNITION_API_KEY` won't be picked up — deliberate. Environments give per-target secrets and deploy history for free.
 - **Verify + smoke-check.** Cheap; catch missing key / stopped container before any file moves, and a broken gateway after.
@@ -225,7 +241,7 @@ Highlights for the grade:
 - **"I pushed to `main` and expected prod to update."** Merging into `main` deploys to **dev** only — prod is reached by **tagging**. By design: prod always runs a named version.
 - **"My runner isn't picking up jobs."** Container running (`docker compose ps github-runner`), `RUNNER_REPO_URL` points at the **fork**, and `gh` was authenticated when they ran `setup.sh` (it mints the token). `docker compose logs github-runner` surfaces it.
 - **"The deploy ran but my change isn't visible."** Did `Ship` succeed (docker cp output)? Did the scan return HTTP 200? Are they looking at **dev** (8089) or **local** (8088)?
-- **"The scan step 403'd (or 401'd)."** 403 = the API key's role lacks Project/Config Scan **or** the gateway's Read/Write permissions (Config → Security → General Settings) don't admit the token's security level (`Authenticated`). 401 = the token isn't recognized. Two classic causes. (a) **Fresh gateway never loaded the token:** the scan API only accepts tokens the gateway has *loaded*, and a deploy can't scan in its own token — the scan call already needs it. `setup.sh` handles this by pre-seeding the committed `cicd` token into `gateways/dev/config` and `gateways/prod/config` *before* first boot, and self-heals: if a probe still 401s (stack started with plain `docker compose up`, so no pre-seed), it seeds the token and restarts that gateway, then falls through to the 403 permission repair (`fix-gateway-api-perms.sh`). Fix: re-run `scripts/setup.sh`. (b) **Uncommitted token:** the deploy wipes and re-copies `config/`, including the API token under `config/resources/core/ignition/api-token/` — that works only because the token is **committed to the repo**, so it's copied back with the same hash each deploy. If someone generates a fresh token in the gateway UI but doesn't commit it, the next deploy wipes it and the scan 401s. Fix: commit the token resource (or generate the CI token, export it into the repo, and keep it there).
+- **"The scan step 403'd (or 401'd)."** 403 = the API key's role lacks Project/Config Scan **or** the gateway's Read/Write permissions (Config → Security → General Settings) don't admit the token's security level (`Authenticated`). 401 = the token isn't recognized. In **CI this is now self-healing**: the scan step catches a 401 (fresh gateway never loaded the token) or 403 (commissioning reset the permissions in security-properties), restarts the gateway once — Ship already copied the token and security-properties onto its disk, and the gateway loads them at boot — waits for RUNNING, and retries. So the *first* deploy to an unprepared gateway (even one started with plain `docker compose up`) goes green on its own; later deploys scan hot. Where students still hit this is **manual scans** (`scripts/scan.sh`) before any deploy has run: `setup.sh` handles that by pre-seeding the committed `cicd` token into `gateways/dev/config` and `gateways/prod/config` *before* first boot, and self-heals: if a probe still 401s, it seeds the token and restarts that gateway, then falls through to the 403 permission repair (`fix-gateway-api-perms.sh`). Fix for manual scans: re-run `scripts/setup.sh`. The other classic cause is an **uncommitted token:** the deploy wipes and re-copies `config/`, including the API token under `config/resources/core/ignition/api-token/` — that works only because the token is **committed to the repo**, so it's copied back with the same hash each deploy. If someone generates a fresh token in the gateway UI but doesn't commit it, the next deploy wipes it and the scan 401s. Fix: commit the token resource (or generate the CI token, export it into the repo, and keep it there).
 - **"`Context access might be invalid` warnings."** Cosmetic — the VS Code Actions extension can't verify `vars.X`/`secrets.X` until the environment exists. Goes away once created.
 - **"My `.deployignore` patterns aren't working."** The prune logic handles literal paths (with a `/`) and bare-name globs. It does NOT handle full gitignore semantics (`!` negations, `**/` deep globs). Keep patterns simple; if they need more, switch to `rsync --exclude-from`.
 
@@ -233,7 +249,7 @@ Highlights for the grade:
 
 The most teaching-rich segment.
 
-**`IGNITION_API_KEY` wrong on the environment** — Ship succeeds (docker cp doesn't care about the API), scan 403s, workflow exits non-zero. Files are on disk in the container but the gateway hasn't been told; runtime is stale. Recovery: fix the secret, re-run (`workflow_dispatch`); idempotent. Lesson: the verify step can't validate the key's *permissions* without a call, so the scan step is where you find out.
+**`IGNITION_API_KEY` wrong on the environment** — Ship succeeds (docker cp doesn't care about the API), scan 403s; the workflow first assumes an unprepared gateway and does its one-time restart-retry, then the retry 403s again and the run exits non-zero. Files are on disk in the container but the gateway hasn't been told; runtime is stale. Recovery: fix the secret, re-run (`workflow_dispatch`); idempotent. Lesson: the verify step can't validate the key's *permissions* without a call, so the scan step is where you find out.
 
 **Target container not running** — Verify step fails with "container is in state 'exited', expected 'running'". No-op, safe. Recovery: `docker compose up -d ignition-dev`, re-run. Lesson: fail fast at the right step; `docker cp` against a stopped container still writes to the volume, which desyncs on next start.
 

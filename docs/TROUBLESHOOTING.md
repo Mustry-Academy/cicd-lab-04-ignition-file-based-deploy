@@ -82,20 +82,28 @@ against prod.
 The scan API only accepts tokens the gateway has **loaded** — and a deploy can't scan in its own
 token, because the scan call already needs it (chicken-and-egg). On a gateway that never loaded the
 committed `cicd` token, the first deploy copies everything to disk (token included) but the scan
-401s: it *looks* like "the API key deployed but nothing else did". `scripts/setup.sh` prevents this
-by pre-seeding the token into `gateways/dev/config` and `gateways/prod/config` **before** first
-boot, and it self-heals: a probe that still 401s (e.g. the stack was started with plain
-`docker compose up`, so the pre-seed never ran) makes it seed the token and restart that gateway.
-**Fix: re-run `scripts/setup.sh`.** Don't hand-generate a replacement token in the gateway UI
-without committing it — the next deploy wipes uncommitted tokens and you're back to 401.
+401s: it *looks* like "the API key deployed but nothing else did". **The deploy workflows now
+self-heal this:** on a 401 (token never loaded) or 403 (first-boot commissioning reset the
+permissions), the scan step restarts the gateway container once — the Ship step already copied the
+token and `security-properties` onto its disk, and the gateway loads them at boot — waits for
+RUNNING, and retries the scans. So the first deploy to a fresh gateway goes green on its own, even
+if the stack was started with plain `docker compose up`; every later deploy hot-scans, no restart.
+Where `scripts/setup.sh` still matters is **manual** scans (`scripts/scan.sh`) *before* the first
+deploy: it pre-seeds the token into `gateways/dev/config` and `gateways/prod/config` before first
+boot, and self-heals a probe that still 401s by seeding the token and restarting that gateway. If
+manual scans fail, re-run `scripts/setup.sh`. Don't hand-generate a replacement token in the
+gateway UI without committing it — the next deploy wipes uncommitted tokens and you're back to 401.
 
 ## Locked out of dev/prod after a deploy (admin password rejected)
 
 Historically this happened when a deploy shipped the repo's copy of
 `config/resources/core/ignition/user-source/` — its `users.json` carries the **local** gateway's
-admin password hash, so it overwrote the target's own admin user. The current workflows spare
-`user-source/`, `identity-provider/`, and `security-properties/` in the wipe and `.deployignore`
-keeps them out of the payload, so this shouldn't happen anymore. If you still hit it (e.g. an older working tree):
+admin password hash, so it overwrote the target's own admin user. The current workflows spare the
+gateway-owned internal identity **by name** — `user-source/default/`, `user-source/opcua-module/`,
+and `identity-provider/default/` — in the wipe, and `.deployignore` keeps those dirs out of the
+payload, so this shouldn't happen anymore. (Other user sources and identity providers — database,
+AD, SAML/OIDC — hold no password data and deploy normally, as does `security-properties`.) If you
+still hit it (e.g. an older working tree):
 
 - **Full reset:** `scripts/teardown.sh --volumes`, then `scripts/setup.sh`. Nukes all gateway state.
 - **Targeted:** stop the gateway, delete `gateways/<gw>/config/resources/core/ignition/user-source`,

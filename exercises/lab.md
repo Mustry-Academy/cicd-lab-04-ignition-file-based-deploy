@@ -215,8 +215,8 @@ Now edit a view and ship it to dev by hand — this is exactly what `deploy.yml`
    ```
    Verify in http://localhost:8089 — the same view should appear, the same width.
 
-   `deploy.yml` does one more thing before copying: it **wipes** `projects/` and `config/` on the target (sparing the identity subtrees `.deployignore` protects — `config/local/`, `config/resources/local/`, and the `user-source/` + `identity-provider/` + `security-properties/` auth state), so a resource deleted in the repo disappears from the gateway too. You'll read that step line by line in the workflow anatomy below.
-4. Inspect `.deployignore`. Notice it excludes `README.md`, `LICENSE`, the `.github/` directory, `docs/`, `scripts/`, the per-instance `services/config/resources/local/`, and the per-gateway `user-source/` + `identity-provider/` + `security-properties/` (deploying those would overwrite the target's admin user and auth wiring — instant lockout). For each pattern, say **why the gateway shouldn't have that file**.
+   `deploy.yml` does one more thing before copying: it **wipes** `projects/` and `config/` on the target (sparing the entries `.deployignore` protects — `config/local/`, `config/resources/local/`, and the gateway-owned internal identity by name: `user-source/default/`, `user-source/opcua-module/`, `identity-provider/default/`), so a resource deleted in the repo disappears from the gateway too. You'll read that step line by line in the workflow anatomy below.
+4. Inspect `.deployignore`. Notice it excludes `README.md`, `LICENSE`, the `.github/` directory, `docs/`, `scripts/`, the per-instance `services/config/resources/local/`, and the gateway-owned **internal** identity by name: `user-source/default/`, `user-source/opcua-module/`, `identity-provider/default/` (deploying those would overwrite the target's admin user — instant lockout). Identity resources you add yourself (database or AD user sources, SAML/OIDC providers) hold no password data and deploy normally, as does `security-properties` (permission policy — tracked and shipped). For each pattern, say **why the gateway shouldn't have that file**.
 
 > **No sample project?** Use any view under the shipped `projects/example-project/` instead — the flow is identical.
 
@@ -286,7 +286,7 @@ You **don't** need to set `IGNITION_URL` or `IGNITION_CONTAINER` variables unles
    ```
 2. Open a PR **into `main`**. Watch [`ci.yml`](../.github/workflows/ci.yml) run on `ubuntu-latest` (free): it validates JSON, `.deployignore`, and the workflow files themselves.
 3. Merge the PR into `main`. [`deploy.yml`](../.github/workflows/deploy.yml) fires because of the `paths:` filter (and only on `main`).
-4. Watch the workflow run. The interesting steps are **Ship projects and config into gateway container** (the `docker cp` half) and **Trigger gateway scan** (`POST /data/api/v1/scan/{projects,config}`).
+4. Watch the workflow run. The interesting steps are **Ship projects and config into gateway container** (the `docker cp` half) and **Trigger gateway scan** (`POST /data/api/v1/scan/{projects,config}`). On a fresh gateway the scan step self-heals: a 401/403 makes it restart the gateway once (the token Ship just copied loads at boot) and retry — first deploy green, every later deploy hot-scans.
 5. Verify in http://localhost:8089 — the view's height should match what you pushed. Then verify from the **host**: `ls gateways/dev/projects` shows the deployed tree (dev's `projects/` and `config/` bind-mount to `./gateways/dev/`), so you can `cat` the exact `view.json` CI just shipped.
 6. **Multi-project check.** The deploy step copies `./projects/.` (the whole directory), so a single merge deploys **both** `example-project` and `packaging-site` at once. Confirm the dev gateway (Config → Projects) lists **both**, even though your PR only touched a view in one. The unit of deploy is the `projects/` tree, not a single project.
 

@@ -108,14 +108,16 @@ jobs:
         # .deployignore prunes (so they are NOT copied back):
         #   config/local/ and config/resources/local/  — per-instance identity
         #     (UUID, OPC-UA keystores, machine-local system props)
-        #   config/resources/core/ignition/{user-source,identity-provider,
-        #     security-properties}/ — per-gateway auth state; users.json holds
-        #     THIS gateway's admin password hash and security-properties names
-        #     its auth profile. Wiping or overwriting them locks everyone out.
+        #   config/resources/core/ignition/user-source/{default,opcua-module}/
+        #     and identity-provider/default/ — the gateway-owned INTERNAL
+        #     identity; users.json holds THIS gateway's admin password hash.
+        #     Wiping or overwriting it locks everyone out.
         # Wiping any of those would strip the gateway's identity, since nothing
-        # restores them. Everything else under config/ IS repo-owned (including
-        # the scan API token under resources/core/ignition/api-token/), so it
-        # is wiped and copied fresh.
+        # restores them. Everything else under config/ IS repo-owned and is
+        # wiped and copied fresh — including the scan API token
+        # (resources/core/ignition/api-token/), security-properties (permission
+        # policy), and any identity resources you added yourself (database/AD
+        # user sources, SAML/OIDC providers — those hold no password data).
         run: |
           set -euo pipefail
           docker exec "$IGNITION_CONTAINER" sh -c "
@@ -133,8 +135,15 @@ jobs:
             fi
             if [ -d '$GATEWAY_DATA_PATH/config/resources/core/ignition' ]; then
               find '$GATEWAY_DATA_PATH/config/resources/core/ignition' -mindepth 1 -maxdepth 1 \
-                ! -name user-source ! -name identity-provider \
-                ! -name security-properties -exec rm -rf {} +
+                ! -name user-source ! -name identity-provider -exec rm -rf {} +
+            fi
+            if [ -d '$GATEWAY_DATA_PATH/config/resources/core/ignition/user-source' ]; then
+              find '$GATEWAY_DATA_PATH/config/resources/core/ignition/user-source' -mindepth 1 -maxdepth 1 \
+                ! -name default ! -name opcua-module -exec rm -rf {} +
+            fi
+            if [ -d '$GATEWAY_DATA_PATH/config/resources/core/ignition/identity-provider' ]; then
+              find '$GATEWAY_DATA_PATH/config/resources/core/ignition/identity-provider' -mindepth 1 -maxdepth 1 \
+                ! -name default -exec rm -rf {} +
             fi
           "
           docker cp ./projects/.        "$IGNITION_CONTAINER:$GATEWAY_DATA_PATH/projects/"
@@ -144,19 +153,50 @@ jobs:
         # Call the scan API inline rather than scripts/scan.sh: the prune
         # step above removes scripts/ (it is in .deployignore), so that script is
         # not on disk in this job.
+        #
+        # Self-heal on 401/403: on a gateway that has never loaded the API
+        # token (or whose first-boot commissioning reset the permissions in
+        # security-properties), the scan cannot authenticate — but the Ship
+        # step has ALREADY copied the token and the repo's security-properties
+        # onto its disk. The gateway only loads those at boot, so: restart it
+        # once, wait for RUNNING, retry the scans. First deploy to a fresh
+        # gateway heals itself; every later deploy scans hot, no restart.
         run: |
           set -euo pipefail
-          for what in projects config; do
-            code="$(curl -sS -o /dev/null -w '%{http_code}' -X POST \
-              --connect-timeout 5 --max-time 30 \
-              -H "X-Ignition-API-Token: $IGNITION_API_KEY" \
-              "$IGNITION_URL/data/api/v1/scan/$what")"
-            echo "scan $what -> HTTP $code"
-            if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then
-              echo "scan $what failed (HTTP $code)" >&2
-              exit 1
-            fi
-          done
+          run_scans() {
+            local what code
+            for what in projects config; do
+              code="$(curl -sS -o /dev/null -w '%{http_code}' -X POST \
+                --connect-timeout 5 --max-time 30 \
+                -H "X-Ignition-API-Token: $IGNITION_API_KEY" \
+                "$IGNITION_URL/data/api/v1/scan/$what")"
+              echo "scan $what -> HTTP $code"
+              if [ "$code" = "401" ] || [ "$code" = "403" ]; then
+                return 42
+              fi
+              if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then
+                echo "scan $what failed (HTTP $code)" >&2
+                return 1
+              fi
+            done
+          }
+          rc=0
+          run_scans || rc=$?
+          if [ "$rc" = "42" ]; then
+            echo "Scan not authorized — the gateway has not loaded the deployed"
+            echo "API token / security-properties yet (first deploy to a fresh"
+            echo "gateway). Restarting it to load them, then retrying."
+            docker restart "$IGNITION_CONTAINER"
+            for _ in $(seq 1 60); do
+              if curl -fsS --max-time 3 "$IGNITION_URL/StatusPing" 2>/dev/null | grep -q RUNNING; then
+                break
+              fi
+              sleep 5
+            done
+            run_scans
+          elif [ "$rc" != "0" ]; then
+            exit "$rc"
+          fi
 
       - name: Smoke-check gateway health
         run: |
