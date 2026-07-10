@@ -3,7 +3,8 @@
 #
 # Usage:
 #   scripts/teardown.sh              # docker compose down (keeps volumes)
-#   scripts/teardown.sh --volumes    # also wipes named volumes — DATA LOSS
+#   scripts/teardown.sh --volumes    # also wipes named volumes AND the
+#                                    # ./gateways/ dev/prod state — DATA LOSS
 #   scripts/teardown.sh --help
 
 set -euo pipefail
@@ -29,7 +30,8 @@ for arg in "$@"; do
 done
 
 if [ "$REMOVE_VOLUMES" = "true" ]; then
-  echo -e "${YELLOW}This will wipe named volumes (gateway internal DB, TimescaleDB data).${NC}"
+  echo -e "${YELLOW}This will wipe named volumes (gateway internal DB, TimescaleDB data)${NC}"
+  echo -e "${YELLOW}and the dev/prod gateway state under ./gateways/.${NC}"
   if [ -t 0 ] && [ "${CI:-}" != "1" ]; then
     read -p "Continue? (y/N): " -n 1 -r
     echo
@@ -40,6 +42,9 @@ if [ "$REMOVE_VOLUMES" = "true" ]; then
   fi
   echo -e "${GREEN}Stopping stack and removing volumes...${NC}"
   docker compose down -v
+  # The dev/prod projects/ + config/ live on the host (bind mounts), so
+  # `down -v` alone would leave stale gateway state behind for the next boot.
+  rm -rf "$PROJECT_ROOT/gateways/dev" "$PROJECT_ROOT/gateways/prod"
 else
   echo -e "${GREEN}Stopping stack (volumes retained)...${NC}"
   docker compose down

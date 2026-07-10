@@ -4,9 +4,11 @@
 #   ignition-local   http://localhost:8088   bind-mounts ./projects + ./services/config
 #                                            (working gateway — edits show
 #                                             up immediately on disk)
-#   ignition-dev     http://localhost:8089   named volume, populated by deploy.yml
+#   ignition-dev     http://localhost:8089   projects/ + config/ bind-mounted from
+#                                            ./gateways/dev, populated by deploy.yml
 #                                            (push to main)
-#   ignition-prod    http://localhost:8090   named volume, populated by release.yml
+#   ignition-prod    http://localhost:8090   projects/ + config/ bind-mounted from
+#                                            ./gateways/prod, populated by release.yml
 #                                            (tag push v*)
 #
 #   timescaledb      localhost:5432          databases: ignition_loc, ignition_dev,
@@ -128,6 +130,12 @@ services:
       - "8061:8060"
     volumes:
       - ignition-dev-data:/usr/local/bin/ignition/data
+      # projects/ and config/ are bind-mounted from ./gateways/dev (gitignored,
+      # created by setup.sh) so you can SEE what a deploy shipped straight from
+      # your laptop: `ls gateways/dev/projects`. The rest of data/ (internal db,
+      # var/, certificates/) stays in the named volume above.
+      - ./gateways/dev/projects:/usr/local/bin/ignition/data/projects
+      - ./gateways/dev/config:/usr/local/bin/ignition/data/config
       - ./services/modules.json:/usr/local/bin/ignition/data/modules.json
       - ./third-party-modules:/third-party-modules
     environment:
@@ -162,6 +170,10 @@ services:
       - "8062:8060"
     volumes:
       - ignition-prod-data:/usr/local/bin/ignition/data
+      # Same pattern as dev: deployed files are visible on the host under
+      # ./gateways/prod (gitignored, created by setup.sh).
+      - ./gateways/prod/projects:/usr/local/bin/ignition/data/projects
+      - ./gateways/prod/config:/usr/local/bin/ignition/data/config
       - ./services/modules.json:/usr/local/bin/ignition/data/modules.json
       - ./third-party-modules:/third-party-modules
     environment:

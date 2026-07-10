@@ -200,6 +200,32 @@ ensure_runner_token() {
 
 ensure_runner_token
 
+# ---- Dev/prod gateway state dirs + API-token pre-seed ----------------------
+# dev and prod bind-mount ./gateways/<gw>/{projects,config} (see
+# docker-compose.yaml) so you can verify a deploy landed straight from the
+# host: `ls gateways/dev/projects`. Create the dirs before compose up and
+# pre-seed the committed `cicd` API token into config/ BEFORE the gateway's
+# first boot: the scan API only accepts tokens the gateway has LOADED, and
+# the deploy workflow cannot scan its own token in (chicken-and-egg — the
+# scan call already needs it). With the token on disk at first boot the
+# gateway loads it while commissioning; the 403 that commissioning's
+# permission reset causes is repaired further down.
+seed_gateway_state() {
+    local gw token_src
+    token_src="$PROJECT_ROOT/services/config/resources/core/ignition/api-token"
+    for gw in dev prod; do
+        mkdir -p "$PROJECT_ROOT/gateways/$gw/projects" "$PROJECT_ROOT/gateways/$gw/config"
+        if [ -d "$token_src" ] \
+           && [ ! -d "$PROJECT_ROOT/gateways/$gw/config/resources/core/ignition/api-token" ]; then
+            mkdir -p "$PROJECT_ROOT/gateways/$gw/config/resources/core/ignition"
+            cp -R "$token_src" \
+                  "$PROJECT_ROOT/gateways/$gw/config/resources/core/ignition/"
+        fi
+    done
+}
+
+seed_gateway_state
+
 # ---- Start the stack ------------------------------------------------------
 existing_id="$(docker compose ps -q ignition-local 2>/dev/null || true)"
 if [ -n "$existing_id" ]; then
@@ -260,20 +286,45 @@ done
 # resets the read/write permissions in security-properties, which locks the
 # pre-provisioned API key out: it still authenticates (bad key = 401) but every
 # call gets 403. Detect that and graft the APIToken permissions back
-# (scripts/fix-gateway-api-perms.sh restarts the affected gateways). Later
-# setups skip this: the data volumes persist, so commissioning runs only once.
+# (scripts/fix-gateway-api-perms.sh restarts the affected gateways). A 401 with
+# the correct key means the gateway never LOADED the token resource (e.g. the
+# stack was first started with `docker compose up` directly, so the pre-seed
+# above never ran before first boot): make sure the token is on disk, restart
+# that gateway so it loads it, then fall through to the 403 repair. Later
+# setups skip all of this: the data volumes persist, so commissioning runs
+# only once.
+probe_scan_api() {
+    curl -s -o /dev/null -w '%{http_code}' -m 10 -X POST \
+        -H "X-Ignition-API-Token: $IGNITION_API_KEY" \
+        "$(gateway_url "$1")/data/api/v1/scan/projects" || true
+}
+
 repair_api_perms() {
     load_api_key_from_env local
     if is_placeholder_api_key; then
         return 0   # no key to probe with; initial_scan prints the guidance
     fi
-    local needs_fix=()
-    local gw url code
+    local needs_fix=() needs_load=()
+    local gw code
     for gw in "${LAB_GATEWAYS[@]}"; do
-        url="$(gateway_url "$gw")"
-        code="$(curl -s -o /dev/null -w '%{http_code}' -m 10 -X POST             -H "X-Ignition-API-Token: $IGNITION_API_KEY"             "$url/data/api/v1/scan/projects" || true)"
-        [ "$code" = "403" ] && needs_fix+=("$gw")
+        code="$(probe_scan_api "$gw")"
+        case "$code" in
+            403) needs_fix+=("$gw") ;;
+            401) needs_load+=("$gw") ;;
+        esac
     done
+    if [ ${#needs_load[@]} -gt 0 ]; then
+        echo -e "${YELLOW}API token not loaded yet on: ${needs_load[*]} — seeding the token and restarting...${NC}"
+        seed_gateway_state
+        for gw in "${needs_load[@]}"; do
+            docker restart "$(gateway_container "$gw")" >/dev/null
+        done
+        for gw in "${needs_load[@]}"; do
+            wait_for_gateway "$gw"
+            code="$(probe_scan_api "$gw")"
+            [ "$code" = "403" ] && needs_fix+=("$gw")
+        done
+    fi
     [ ${#needs_fix[@]} -eq 0 ] && return 0
     echo -e "${YELLOW}First-boot commissioning reset the API permissions on: ${needs_fix[*]}${NC}"
     echo "Grafting the APIToken permissions back and restarting..."

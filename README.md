@@ -30,8 +30,8 @@ Once setup finishes you have three Ignition gateways:
 | Gateway | URL | Source of project files |
 |---|---|---|
 | `local` | http://localhost:8088 | Bind-mounted from `./projects/` and `./services/config/` — edits show up immediately |
-| `dev` | http://localhost:8089 | Empty until `deploy.yml` runs on push to `main` |
-| `prod` | http://localhost:8090 | Empty until `release.yml` runs on tag push `v*` (cut from `main`) |
+| `dev` | http://localhost:8089 | Empty until `deploy.yml` runs on push to `main` — deployed files visible on the host under `./gateways/dev/` |
+| `prod` | http://localhost:8090 | Empty until `release.yml` runs on tag push `v*` (cut from `main`) — deployed files visible under `./gateways/prod/` |
 
 Login to any of them with the credentials from `.env` (`GATEWAY_ADMIN_USERNAME_LOCAL/_DEV/_PROD`, default `admin / password`).
 
@@ -87,6 +87,7 @@ cicd-lab-04-ignition-file-based-deploy/
 ├── projects/                           ← project content (bind-mounted into `local` only)
 │   ├── example-project/                ← a real Perspective project (views, templates)
 │   └── packaging-site/                 ← a second project; proves one deploy ships every project under projects/
+├── gateways/                           ← dev/prod gateway state (gitignored; bind-mounted projects/ + config/)
 ├── services/
 │   ├── config/                         ← gateway-level config (bind-mounted into `local`)
 │   │   └── resources/                  ← <scope>/<module-id>/<resource-type>/<name>/{config.json,resource.json}
@@ -100,7 +101,7 @@ cicd-lab-04-ignition-file-based-deploy/
 Three Ignition 8.3 gateways + one TimescaleDB. The three gateways simulate the classic local → dev → prod promotion:
 
 - **`ignition-local`** bind-mounts `./projects/` and `./services/config/` from the host. Anything you write into those paths on your laptop is *immediately on disk* inside the local gateway. Hit `scripts/scan.sh both` to make the gateway notice. That's the tight inner feedback loop.
-- **`ignition-dev`** uses a named volume (not a bind mount). It starts empty; the deploy workflow (`deploy.yml`) `docker cp`s the working tree into the container and triggers a scan. Mirrors how a real shared dev environment gets fed by CI.
+- **`ignition-dev`** bind-mounts its `projects/` and `config/` from `./gateways/dev/` (gitignored — this is the *gateway's* state, not the repo's). It starts empty; the deploy workflow (`deploy.yml`) `docker cp`s the working tree into the container and triggers a scan. Because the target dirs are bind mounts, you can verify a deploy landed straight from your laptop: `ls gateways/dev/projects`. Mirrors how a real shared dev environment gets fed by CI.
 - **`ignition-prod`** is the same shape as dev, populated by the release workflow (`release.yml`) when you push a tag.
 
 The single TimescaleDB hosts three logical databases (`ignition_loc`, `ignition_dev`, `ignition_prd`) so each gateway can have its own historian data without crosstalk.
