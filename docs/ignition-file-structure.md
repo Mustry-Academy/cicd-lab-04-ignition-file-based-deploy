@@ -85,8 +85,8 @@ defined gateway-wide. A view might query a database, but the connection lives in
 `core/ignition/database-connection/<name>/`. Move a project to a new gateway and you'd port the
 project; you'd also port the matching `core/` resources.
 
-**Two `core/ignition/` subtrees are the exception: `user-source/` and `identity-provider/` are
-untracked** (gitignored, and spared by the deploy workflows' wipe). They look like ordinary config but
+**Three `core/ignition/` subtrees are the exception: `user-source/`, `identity-provider/`, and
+`security-properties/` are untracked** (gitignored, and spared by the deploy workflows' wipe). They look like ordinary config but
 are per-gateway auth state: `user-source/<name>/users.json` carries **that gateway's admin password
 hashes**. Commit and deploy one gateway's copy and you overwrite every other gateway's admin user —
 if the shipped hash isn't the password you expect, that's an instant lockout, recoverable only by

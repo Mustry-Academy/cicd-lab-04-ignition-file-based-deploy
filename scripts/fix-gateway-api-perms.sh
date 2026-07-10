@@ -2,18 +2,19 @@
 # fix-gateway-api-perms.sh — restore the APIToken permissions that Ignition's
 # first-boot auto-commissioning wipes from core security-properties.
 #
-# Why this exists: the image bakes services/config with an api-token (`cicd`)
-# plus security-properties granting APIToken Access/Read/Write. But when a
-# FRESH container boots (every image deploy recreates dev/prod), the gateway's
-# auto-commissioning (driven by GATEWAY_ADMIN_USERNAME/PASSWORD) creates a new
-# temp_N user source and RESETS readPermissions/writePermissions to
-# Roles/Administrator only — which an API token can never hold. Result: the
-# baked key authenticates (401 for a bad key) but every call is Forbidden
-# (403). This script grafts the APIToken permission entries back into the
-# container's live security-properties (keeping whatever systemAuthProfile
-# commissioning chose), restarts the gateway, and the key works.
+# Why this exists: the lab pre-provisions an api-token (`cicd`) on every
+# gateway (local via the repo bind mount, dev/prod via setup.sh's pre-seed).
+# But on a gateway's very FIRST boot, auto-commissioning (driven by
+# GATEWAY_ADMIN_USERNAME/PASSWORD) writes a fresh security-properties with
+# readPermissions/writePermissions set to Roles/Administrator only — which an
+# API token can never hold. Result: the key authenticates (401 for a bad key)
+# but every call is Forbidden (403). This script grafts the APIToken
+# permission entries back into the gateway's live security-properties
+# (keeping whatever systemAuthProfile commissioning chose — that file is
+# per-gateway auth state, untracked and never deployed), restarts the
+# gateway, and the key works.
 #
-# In this lab all three gateways keep persistent volumes, so each one only
+# In this lab all three gateways keep persistent state, so each one only
 # needs this ONCE, right after its very first boot (scripts/setup.sh detects
 # the 403 and runs this automatically).
 #

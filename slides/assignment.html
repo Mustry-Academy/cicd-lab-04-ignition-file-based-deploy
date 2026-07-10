@@ -379,7 +379,7 @@ docker cp ./projects/. \
   lab04-ignition-dev:/usr/local/bin/ignition/data/projects/</pre></div>
         <div class="goal" style="margin-top:16px">
           <span class="badge">What deploy.yml adds</span>
-          <p>Before copying, it also <b>wipes</b> <span class="inlinecode">projects/</span> + <span class="inlinecode">config/</span> (sparing the identity subtrees <span class="inlinecode">.deployignore</span> protects, including the <span class="inlinecode">user-source/</span> + <span class="inlinecode">identity-provider/</span> auth state), so a resource deleted in the repo disappears from the gateway too. You'll read that step in the workflow anatomy.</p>
+          <p>Before copying, it also <b>wipes</b> <span class="inlinecode">projects/</span> + <span class="inlinecode">config/</span> (sparing the identity subtrees <span class="inlinecode">.deployignore</span> protects, including the <span class="inlinecode">user-source/</span> + <span class="inlinecode">identity-provider/</span> + <span class="inlinecode">security-properties/</span> auth state), so a resource deleted in the repo disappears from the gateway too. You'll read that step in the workflow anatomy.</p>
         </div>
       </div>
     </div>

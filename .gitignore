@@ -47,12 +47,16 @@ venv/
 **/config/local
 **/config/resources/local
 
-# Per-gateway identity: user sources (users.json holds the admin password
-# hash!) and identity providers belong to ONE gateway. Committing them ships
-# your local gateway's admin credentials to every gateway you deploy to —
-# and locks everyone out of dev/prod. Never in git, never in a deploy.
+# Per-gateway auth state: user sources (users.json holds the admin password
+# hash!), identity providers, and security-properties belong to ONE gateway.
+# Committing them ships your local gateway's admin credentials and auth
+# wiring (systemAuthProfile) to every gateway you deploy to — and locks
+# everyone out of dev/prod. Commissioning also rewrites security-properties
+# on first boot, so tracking it guarantees permanent git noise. Never in
+# git, never in a deploy.
 **/config/resources/core/ignition/user-source/
 **/config/resources/core/ignition/identity-provider/
+**/config/resources/core/ignition/security-properties/
 
 # Dev/prod gateway state (bind mounts written by the gateways + CI deploys,
 # see docker-compose.yaml)

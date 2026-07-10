@@ -211,15 +211,21 @@ ensure_runner_token
 # gateway loads it while commissioning; the 403 that commissioning's
 # permission reset causes is repaired further down.
 seed_gateway_state() {
-    local gw token_src
+    local gw token_src manifest_src core_dst
     token_src="$PROJECT_ROOT/services/config/resources/core/ignition/api-token"
+    # The collection manifest MUST accompany any pre-seeded resource: on first
+    # boot the gateway creates the `core` collection and refuses a non-empty
+    # dir that has no manifest ("Resource collection path ... exists but is
+    # not empty" -> FAULTED).
+    manifest_src="$PROJECT_ROOT/services/config/resources/core/config-mode.json"
     for gw in dev prod; do
         mkdir -p "$PROJECT_ROOT/gateways/$gw/projects" "$PROJECT_ROOT/gateways/$gw/config"
-        if [ -d "$token_src" ] \
-           && [ ! -d "$PROJECT_ROOT/gateways/$gw/config/resources/core/ignition/api-token" ]; then
-            mkdir -p "$PROJECT_ROOT/gateways/$gw/config/resources/core/ignition"
-            cp -R "$token_src" \
-                  "$PROJECT_ROOT/gateways/$gw/config/resources/core/ignition/"
+        core_dst="$PROJECT_ROOT/gateways/$gw/config/resources/core"
+        if [ -d "$token_src" ] && [ -f "$manifest_src" ] \
+           && [ ! -d "$core_dst/ignition/api-token" ]; then
+            mkdir -p "$core_dst/ignition"
+            cp "$manifest_src" "$core_dst/config-mode.json"
+            cp -R "$token_src" "$core_dst/ignition/"
         fi
     done
 }

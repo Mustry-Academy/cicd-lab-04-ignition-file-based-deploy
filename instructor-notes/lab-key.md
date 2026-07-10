@@ -87,7 +87,7 @@ data/modules/*.modl
 .env
 ```
 
-Commonly missed: `data/config/local/` and `data/config/resources/local/` (per-instance identity: keystores, UUID); the `user-source/` + `identity-provider/` auth state (admin password hashes); `data/config/ignition/tags/*.idb` (tag value stores inside the versioned config tree); backup files (`*.gwbk`); module binaries (`*.modl`).
+Commonly missed: `data/config/local/` and `data/config/resources/local/` (per-instance identity: keystores, UUID); the `user-source/` + `identity-provider/` + `security-properties/` auth state (admin password hashes, auth-profile wiring); `data/config/ignition/tags/*.idb` (tag value stores inside the versioned config tree); backup files (`*.gwbk`); module binaries (`*.modl`).
 
 ## Debrief crib
 
@@ -124,7 +124,7 @@ If any is missing — especially #6 — push them to complete. The failure cases
 1. **Commit:** developer edits a view on a `feature/*` branch, opens a PR **into `main`**. PR merges into `main`.
 2. **Checkout:** the bundled runner picks up the push to `main`, checks out the merged commit.
 3. **Prune:** the runner reads `.deployignore` and removes those files from the working tree before they can ship.
-4. **Ship:** `docker exec` wipes the target's `projects/` and `config/` dirs — preserving the four gateway-owned subtrees `.deployignore` protects (`config/local/`, `config/resources/local/`, `config/resources/core/ignition/user-source/`, `config/resources/core/ignition/identity-provider/`) — then `docker cp` writes the working tree into the gateway's container.
+4. **Ship:** `docker exec` wipes the target's `projects/` and `config/` dirs — preserving the five gateway-owned subtrees `.deployignore` protects (`config/local/`, `config/resources/local/`, and `config/resources/core/ignition/{user-source,identity-provider,security-properties}/`) — then `docker cp` writes the working tree into the gateway's container.
 5. **Scan:** an inline `POST /data/api/v1/scan/{projects,config}` against the gateway. Gateway re-reads disk.
 
 ## The shipped `deploy.yml`, annotated
@@ -168,9 +168,10 @@ jobs:
           # disappears from the gateway too. Preserve the subtrees .deployignore
           # prunes (and thus never copies back): config/local/ and
           # config/resources/local/ (UUID, OPC-UA keystores, machine-local props)
-          # plus config/resources/core/ignition/user-source/ and
-          # identity-provider/ (per-gateway auth state — users.json holds THIS
-          # gateway's admin password hash). Everything else under config/ is
+          # plus config/resources/core/ignition/{user-source,
+          # identity-provider,security-properties}/ (per-gateway auth state:
+          # users.json holds THIS gateway's admin hash; security-properties
+          # names its auth profile). Everything else under config/ is
           # repo-owned, incl. the scan API token
           # (resources/core/ignition/api-token/), so it is wiped and copied fresh.
           docker exec "$IGNITION_CONTAINER" sh -c "
@@ -188,7 +189,8 @@ jobs:
             fi
             if [ -d '$GATEWAY_DATA_PATH/config/resources/core/ignition' ]; then
               find '$GATEWAY_DATA_PATH/config/resources/core/ignition' -mindepth 1 -maxdepth 1 \
-                ! -name user-source ! -name identity-provider -exec rm -rf {} +
+                ! -name user-source ! -name identity-provider \
+                ! -name security-properties -exec rm -rf {} +
             fi
           "
           docker cp ./projects/.        "$IGNITION_CONTAINER:$GATEWAY_DATA_PATH/projects/"
@@ -210,7 +212,7 @@ Highlights for the grade:
 - **`branches: [main]`.** Only pushes to main deploy to dev. Prod is reached by tagging (`release.yml`). Most common point of confusion.
 - **`paths:` filter.** Docs-only changes don't retrigger the deploy.
 - **`concurrency` block.** `cancel-in-progress: false` queues a new run rather than cancelling an in-flight one — cancellation mid-`docker cp` would leave a partial state.
-- **Wipe `config/`, but spare what `.deployignore` prunes.** The wipe deletes everything under `projects/` and `config/` *except* the four identity subtrees `.deployignore` protects: `config/local/` and `config/resources/local/` (UUID, OPC-UA keystores, machine-local props), plus `config/resources/core/ignition/user-source/` and `identity-provider/` (per-gateway auth state). Those are pruned from the working tree, so a blanket `rm -rf config/*` would delete them with nothing to copy back — stripping the gateway's identity, and in the user-source case deleting `users.json` out from under the *running* gateway, breaking logins instantly. War story worth telling: an earlier course run committed the local gateway's user source, so the first prod deploy overwrote prod's admin user with local's hash — everyone locked out, volumes wiped to recover. The scan API token lives at `config/resources/core/ignition/api-token/` and **is** committed, so it gets wiped and copied back fresh each deploy. The rule: **wipe = repo-owned; preserve = whatever `.deployignore` prunes.**
+- **Wipe `config/`, but spare what `.deployignore` prunes.** The wipe deletes everything under `projects/` and `config/` *except* the five identity subtrees `.deployignore` protects: `config/local/` and `config/resources/local/` (UUID, OPC-UA keystores, machine-local props), plus `config/resources/core/ignition/user-source/`, `identity-provider/` and `security-properties/` (per-gateway auth state). Those are pruned from the working tree, so a blanket `rm -rf config/*` would delete them with nothing to copy back — stripping the gateway's identity, and in the user-source case deleting `users.json` out from under the *running* gateway, breaking logins instantly. War story worth telling: an earlier course run committed the local gateway's user source, so the first prod deploy overwrote prod's admin user with local's hash — everyone locked out, volumes wiped to recover. The scan API token lives at `config/resources/core/ignition/api-token/` and **is** committed, so it gets wiped and copied back fresh each deploy. The rule: **wipe = repo-owned; preserve = whatever `.deployignore` prunes.**
 - **Inline scan, not the script.** The prune step deletes `scripts/` (it's in `.deployignore` and nothing ships it), so the scan must not depend on `scripts/scan.sh`. `scan.sh` stays for manual/local use.
 - **`environment:` scoping.** Secrets scoped to `lab-gateway-dev`. A repo-level `IGNITION_API_KEY` won't be picked up — deliberate. Environments give per-target secrets and deploy history for free.
 - **Verify + smoke-check.** Cheap; catch missing key / stopped container before any file moves, and a broken gateway after.

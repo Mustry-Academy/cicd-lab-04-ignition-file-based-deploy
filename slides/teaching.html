@@ -414,7 +414,7 @@ loc/config-mode.json   <span class="cm"># scope descriptor {parent: "core"}</spa
       <tr><td><code>config/ignition/tags/*.idb · *.digest.json · migration-log-*.md</code></td><td>More churn inside versioned trees</td><td>Tag value store, theme/font/icon digests, 8.3 migration logs. The shipped <code>.gitignore</code> masks all of these with <code>**/</code> patterns.</td></tr>
       <tr><td><code>jar-cache/ · metricsdb/ · var/</code></td><td>Runtime breadcrumbs</td><td>Regenerable noise. Often not even worth backing up. (Gateway logs live <i>outside</i> <code>data/</code>, at the install root.)</td></tr>
       <tr><td><code>config/resources/local/</code></td><td>Instance identity (OPC-UA keystores, UUID)</td><td>Belongs to <b>this specific box</b>. Promote it and you clone a gateway's identity onto another.</td></tr>
-      <tr><td><code>config/resources/core/ignition/user-source/ · identity-provider/</code></td><td>Per-gateway auth state</td><td><code>users.json</code> in there holds <b>this gateway's admin password hash</b>. Commit and deploy it and you overwrite the target's admin user: instant lockout.</td></tr>
+      <tr><td><code>config/resources/core/ignition/user-source/ · identity-provider/ · security-properties/</code></td><td>Per-gateway auth state</td><td><code>users.json</code> in there holds <b>this gateway's admin password hash</b>. Commit and deploy it and you overwrite the target's admin user: instant lockout.</td></tr>
     </table>
     <div class="callout">
       <div class="lab">Where users actually live</div>
@@ -626,6 +626,7 @@ services/config/resources/local/
 services/config/resources/core/ignition/user-source/
                          <span class="cm"># ← users.json = that gateway's admin hash</span>
 services/config/resources/core/ignition/identity-provider/
+services/config/resources/core/ignition/security-properties/
 .DS_Store
 docker-compose.yaml <span class="cm"># ← unless you want it to run there with your settings</span>
 .env</pre></div>
@@ -674,7 +675,8 @@ docker exec "$IGNITION_CONTAINER" sh -c '
   find $DATA/config/resources/core -mindepth 1 -maxdepth 1 \
     ! -name ignition -exec rm -rf {} +
   find $DATA/config/resources/core/ignition -mindepth 1 -maxdepth 1 \
-    ! -name user-source ! -name identity-provider -exec rm -rf {} +'
+    ! -name user-source ! -name identity-provider \
+    ! -name security-properties -exec rm -rf {} +'
 
 docker cp ./projects/.        "$IGNITION_CONTAINER:$DATA/projects/"
 docker cp ./services/config/. "$IGNITION_CONTAINER:$DATA/config/"</pre></div>
@@ -682,7 +684,7 @@ docker cp ./services/config/. "$IGNITION_CONTAINER:$DATA/config/"</pre></div>
         <ul class="checks">
           <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Why wipe first?</b> <span class="inlinecode">docker cp</span> has no <span class="inlinecode">--delete</span>. Without the wipe, a view you deleted from the repo <b>keeps living on the gateway</b>, forever.</span></li>
           <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>Wipe-then-copy gives you <b>"deleted in repo → deleted on gateway"</b>: the same semantics <span class="inlinecode">rsync --delete</span> would give a bind-mount setup.</span></li>
-          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Wipe repo-owned, spare gateway-owned.</b> Four subtrees are kept back: <span class="inlinecode">config/local/</span> and <span class="inlinecode">config/resources/local/</span> (UUID, OPC-UA keystores), plus <span class="inlinecode">user-source/</span> and <span class="inlinecode">identity-provider/</span> (users.json is that gateway's admin password hash, deploying it locks everyone out). All four are exactly what <span class="inlinecode">.deployignore</span> prunes, so they're never copied back. Everything else, including the scan API token, is committed and copied fresh.</span></li>
+          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Wipe repo-owned, spare gateway-owned.</b> Five subtrees are kept back: <span class="inlinecode">config/local/</span> and <span class="inlinecode">config/resources/local/</span> (UUID, OPC-UA keystores), plus <span class="inlinecode">user-source/</span>, <span class="inlinecode">identity-provider/</span> and <span class="inlinecode">security-properties/</span> (users.json is that gateway's admin password hash, security-properties names its auth profile; deploying them locks everyone out). All five are exactly what <span class="inlinecode">.deployignore</span> prunes, so they're never copied back. Everything else, including the scan API token, is committed and copied fresh.</span></li>
           <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>It is not atomic.</b> A runner killed mid-copy leaves a partial tree. Two mitigations here. Deploys are idempotent, so you <b>re-run and it converges</b>, and the workflows' <span class="inlinecode">concurrency</span> group <b>queues instead of cancelling</b>, so CI never kills its own copy.</span></li>
         </ul>
         <div class="callout" style="margin-top:16px">

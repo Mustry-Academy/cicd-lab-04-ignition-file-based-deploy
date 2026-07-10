@@ -215,8 +215,8 @@ Now edit a view and ship it to dev by hand — this is exactly what `deploy.yml`
    ```
    Verify in http://localhost:8089 — the same view should appear, the same width.
 
-   `deploy.yml` does one more thing before copying: it **wipes** `projects/` and `config/` on the target (sparing the identity subtrees `.deployignore` protects — `config/local/`, `config/resources/local/`, and the `user-source/` + `identity-provider/` auth state), so a resource deleted in the repo disappears from the gateway too. You'll read that step line by line in the workflow anatomy below.
-4. Inspect `.deployignore`. Notice it excludes `README.md`, `LICENSE`, the `.github/` directory, `docs/`, `scripts/`, the per-instance `services/config/resources/local/`, and the per-gateway `user-source/` + `identity-provider/` (deploying those would overwrite the target's admin user — instant lockout). For each pattern, say **why the gateway shouldn't have that file**.
+   `deploy.yml` does one more thing before copying: it **wipes** `projects/` and `config/` on the target (sparing the identity subtrees `.deployignore` protects — `config/local/`, `config/resources/local/`, and the `user-source/` + `identity-provider/` + `security-properties/` auth state), so a resource deleted in the repo disappears from the gateway too. You'll read that step line by line in the workflow anatomy below.
+4. Inspect `.deployignore`. Notice it excludes `README.md`, `LICENSE`, the `.github/` directory, `docs/`, `scripts/`, the per-instance `services/config/resources/local/`, and the per-gateway `user-source/` + `identity-provider/` + `security-properties/` (deploying those would overwrite the target's admin user and auth wiring — instant lockout). For each pattern, say **why the gateway shouldn't have that file**.
 
 > **No sample project?** Use any view under the shipped `projects/example-project/` instead — the flow is identical.
 

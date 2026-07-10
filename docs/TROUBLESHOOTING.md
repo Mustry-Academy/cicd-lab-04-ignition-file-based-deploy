@@ -94,8 +94,8 @@ without committing it — the next deploy wipes uncommitted tokens and you're ba
 Historically this happened when a deploy shipped the repo's copy of
 `config/resources/core/ignition/user-source/` — its `users.json` carries the **local** gateway's
 admin password hash, so it overwrote the target's own admin user. The current workflows spare
-`user-source/` and `identity-provider/` in the wipe and `.deployignore` keeps them out of the
-payload, so this shouldn't happen anymore. If you still hit it (e.g. an older working tree):
+`user-source/`, `identity-provider/`, and `security-properties/` in the wipe and `.deployignore`
+keeps them out of the payload, so this shouldn't happen anymore. If you still hit it (e.g. an older working tree):
 
 - **Full reset:** `scripts/teardown.sh --volumes`, then `scripts/setup.sh`. Nukes all gateway state.
 - **Targeted:** stop the gateway, delete `gateways/<gw>/config/resources/core/ignition/user-source`,

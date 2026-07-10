@@ -26,12 +26,15 @@ services/config/local/
 # Must never be copied onto another gateway — each instance owns its own.
 services/config/resources/local/
 # Per-gateway auth state: users.json carries the LOCAL gateway's admin
-# password hash, and the identity provider is bound to that user source.
-# Deploying these overwrites the target gateway's own admin user — instant
-# lockout. These are untracked in git too; this entry protects manual deploys
-# run from a working tree where the local gateway has written them.
+# password hash, the identity provider is bound to that user source, and
+# security-properties names the gateway's own auth profile
+# (systemAuthProfile). Deploying any of these overwrites the target
+# gateway's own admin/auth wiring — instant lockout. They are untracked in
+# git too; these entries protect manual deploys run from a working tree
+# where the local gateway has written them.
 services/config/resources/core/ignition/user-source/
 services/config/resources/core/ignition/identity-provider/
+services/config/resources/core/ignition/security-properties/
 # Dev/prod gateway state (bind mounts) — never part of a deploy payload
 gateways/
 
