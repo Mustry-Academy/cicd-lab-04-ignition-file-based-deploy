@@ -367,7 +367,7 @@ git diff services/config</pre></div>
       <div class="steps">
         <div class="step"><div class="ix t">1</div><div class="tx">Edit a view's <span class="inlinecode">view.json</span> (e.g. <span class="inlinecode">width: 800 → 1200</span>). It's <b>already on the local gateway's disk</b> via the bind mount.</div></div>
         <div class="step"><div class="ix t">2</div><div class="tx">Run scan.sh, verify at <span class="inlinecode">localhost:8088 (or Designer)</span>. The scan makes the gateway <i>notice</i> what's on disk.</div></div>
-        <div class="step"><div class="ix t">3</div><div class="tx"><b>Ship to dev by hand</b>: <span class="inlinecode">docker cp</span> the project, scan. Dev starts <b>empty</b>, so nothing to wipe. However, the gateway needs a restart so it will pick up the changes. Verify at <span class="inlinecode">localhost:8089 (or Designer)</span>: same view, same width.</div></div>
+        <div class="step"><div class="ix t">3</div><div class="tx"><b>Ship to dev by hand</b>: <span class="inlinecode">docker cp</span> the project, scan. Dev starts <b>empty</b>, so nothing to wipe. Verify at <span class="inlinecode">localhost:8089 (or Designer)</span>: same view, same width. Bonus check from the host: <span class="inlinecode">ls gateways/dev/projects</span> shows what just landed.</div></div>
         <div class="step"><div class="ix t">4</div><div class="tx">Open <span class="inlinecode">.deployignore</span>. For each pattern, say <b>why the gateway shouldn't have that file</b>.</div></div>
       </div>
       <div>
@@ -379,7 +379,7 @@ docker cp ./projects/. \
   lab04-ignition-dev:/usr/local/bin/ignition/data/projects/</pre></div>
         <div class="goal" style="margin-top:16px">
           <span class="badge">What deploy.yml adds</span>
-          <p>Before copying, it also <b>wipes</b> <span class="inlinecode">projects/</span> + <span class="inlinecode">config/</span> (sparing the identity dirs <span class="inlinecode">.deployignore</span> protects), so a resource deleted in the repo disappears from the gateway too. You'll read that step in the workflow anatomy.</p>
+          <p>Before copying, it also <b>wipes</b> <span class="inlinecode">projects/</span> + <span class="inlinecode">config/</span> (sparing the identity subtrees <span class="inlinecode">.deployignore</span> protects, including the <span class="inlinecode">user-source/</span> + <span class="inlinecode">identity-provider/</span> auth state), so a resource deleted in the repo disappears from the gateway too. You'll read that step in the workflow anatomy.</p>
         </div>
       </div>
     </div>
@@ -427,11 +427,11 @@ docker compose logs --tail 50 github-runner
     <div class="sechead"><span class="num p" style="background:var(--peri)">PART 3</span><div><div class="title">Ship to the development environment via the <span class="mono" style="font-size:30px">main</span> branch</div><div class="lead">15 min. A real PR rides the pipeline: feature branch → PR → CI → merge → deploy.yml → dev gateway.</div></div></div>
     <div class="cols2">
       <div class="steps">
-        <div class="step"><div class="ix p">1</div><div class="tx"><b>One-time:</b> commit a small change to <span class="inlinecode">main</span> to trigger a deployment of both project and configuration files. Then restart the gateway so the gateway picks up these changes.</div></div>
+        <div class="step"><div class="ix p">1</div><div class="tx"><b>One-time:</b> commit a small change to <span class="inlinecode">main</span> to trigger a deployment of both project and configuration files. The gateway hot-scans them, no restart needed.</div></div>
         <div class="step"><div class="ix p">2</div><div class="tx">Branch <span class="inlinecode">feature/tweak-view</span> off <span class="inlinecode">main</span>, make a small change in a view (e.g. the height) <b>height</b>, then push the change.</div></div>
         <div class="step"><div class="ix p">3</div><div class="tx">Open a PR <b>into <span class="inlinecode">main</span></b>. Watch <span class="inlinecode">ci.yml</span> run on <span class="inlinecode">ubuntu-latest</span> (free): JSON, <span class="inlinecode">.deployignore</span> and workflow validation.</div></div>
         <div class="step"><div class="ix p">4</div><div class="tx"><b>Merge.</b> <span class="inlinecode">deploy.yml</span> fires (note the <span class="inlinecode">paths:</span> filter, since docs-only pushes don't deploy). Watch the <b>Ship</b> and <b>Trigger gateway scan</b> steps.</div></div>
-        <div class="step"><div class="ix p">5</div><div class="tx"><b>Verify at localhost:8089 (or Designer).</b> The dev gateway shows your new height.</div></div>
+        <div class="step"><div class="ix p">5</div><div class="tx"><b>Verify at localhost:8089 (or Designer).</b> The dev gateway shows your new height. From the host, <span class="inlinecode">ls gateways/dev/projects</span> shows the tree CI just shipped.</div></div>
       </div>
       <div>
         <div class="code"><pre><span class="cm"># 1 (one-time): get sample onto main</span>
@@ -468,8 +468,8 @@ git push -u origin feature/tweak-view
       <div class="steps">
         <div class="step"><div class="ix p">6</div><div class="tx">The change is already on <span class="inlinecode">main</span> from the dev deploy, now tag it.</div></div>
         <div class="step"><div class="ix p">7</div><div class="tx"><b>Observe: the tag is what ships prod.</b> The merge already shipped dev, but only a <span class="inlinecode">v*</span> tag reaches prod.</div></div>
-        <div class="step"><div class="ix p">8</div><div class="tx">Tag <span class="inlinecode">v0.1.0</span> and push the tag. <span class="inlinecode">release.yml</span> fires: same five steps, different environment, prod container. Restart the gateway after the workflow has finished to see the changes.</div></div>
-        <div class="step"><div class="ix p">9</div><div class="tx"><b>Verify at localhost:8090 (or Designer).</b> Prod now shows the change you merged into <span class="inlinecode">main</span> and just released.</div></div>
+        <div class="step"><div class="ix p">8</div><div class="tx">Tag <span class="inlinecode">v0.1.0</span> and push the tag. <span class="inlinecode">release.yml</span> fires: same five steps, different environment, prod container.</div></div>
+        <div class="step"><div class="ix p">9</div><div class="tx"><b>Verify at localhost:8090 (or Designer).</b> Prod now shows the change you merged into <span class="inlinecode">main</span> and just released. Host-side check: <span class="inlinecode">ls gateways/prod/projects</span>.</div></div>
       </div>
       <div>
         <div class="code"><pre><span class="cm"># on main, the change is already there from the dev deploy</span>

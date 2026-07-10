@@ -9,7 +9,8 @@
 # already-released tag to prod without touching git.
 #
 # Mechanics: file-based deploy via `docker cp` into the prod gateway's
-# container (named volume, not a bind mount), then trigger a scan.
+# container, then trigger a scan. The gateway's projects/ and config/ are
+# bind-mounted from ./gateways/prod on the host for easy verification.
 # Identical to deploy.yml except for the environment, container name, and
 # default URL.
 #

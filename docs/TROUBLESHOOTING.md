@@ -77,6 +77,30 @@ Config Scan**, and set it as the `IGNITION_API_KEY` secret on the matching GitHu
 (`lab-gateway-dev` / `lab-gateway-prod`). Keys are **per-gateway** — a dev key won't authenticate
 against prod.
 
+## The scan step 401s on a fresh gateway
+
+The scan API only accepts tokens the gateway has **loaded** — and a deploy can't scan in its own
+token, because the scan call already needs it (chicken-and-egg). On a gateway that never loaded the
+committed `cicd` token, the first deploy copies everything to disk (token included) but the scan
+401s: it *looks* like "the API key deployed but nothing else did". `scripts/setup.sh` prevents this
+by pre-seeding the token into `gateways/dev/config` and `gateways/prod/config` **before** first
+boot, and it self-heals: a probe that still 401s (e.g. the stack was started with plain
+`docker compose up`, so the pre-seed never ran) makes it seed the token and restart that gateway.
+**Fix: re-run `scripts/setup.sh`.** Don't hand-generate a replacement token in the gateway UI
+without committing it — the next deploy wipes uncommitted tokens and you're back to 401.
+
+## Locked out of dev/prod after a deploy (admin password rejected)
+
+Historically this happened when a deploy shipped the repo's copy of
+`config/resources/core/ignition/user-source/` — its `users.json` carries the **local** gateway's
+admin password hash, so it overwrote the target's own admin user. The current workflows spare
+`user-source/` and `identity-provider/` in the wipe and `.deployignore` keeps them out of the
+payload, so this shouldn't happen anymore. If you still hit it (e.g. an older working tree):
+
+- **Full reset:** `scripts/teardown.sh --volumes`, then `scripts/setup.sh`. Nukes all gateway state.
+- **Targeted:** stop the gateway, delete `gateways/<gw>/config/resources/core/ignition/user-source`,
+  start it again — it recommissions the admin user from the `GATEWAY_ADMIN_*` values in `.env`.
+
 ## I merged my PR but nothing deployed (GitHub Flow)
 
 This lab uses GitHub Flow — the branch decides the gateway:

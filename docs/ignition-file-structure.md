@@ -9,8 +9,8 @@ Everything inside an Ignition gateway's `data/` directory falls into one of thre
 | Bucket | What | Owner | In git? |
 |---|---|---|---|
 | **Project-level** | Per-project resources: views, scripts, tags, UDTs | The application (versioned, peer-reviewed) | **Yes** |
-| **Gateway-level** | Cross-project config: DB connections, identity providers, tag history connections, enabled modules | The application (versioned, but smaller scope) | **Yes** |
-| **Operational** | Runtime state: internal DBs, logs, temp, metadata, runtime users | The gateway (gateway owns this, full stop) | **No** |
+| **Gateway-level** | Cross-project config: DB connections, tag providers, tag history connections, enabled modules | The application (versioned, but smaller scope) | **Yes** |
+| **Operational** | Runtime state: internal DBs, logs, temp, metadata, runtime users, per-gateway auth state (user sources, identity providers) | The gateway (gateway owns this, full stop) | **No** |
 
 The whole point of the file-structure part is to internalize this split. If you can answer "which bucket?" for any file in `data/`, you'll know how to version, deploy, and roll back.
 
@@ -61,7 +61,7 @@ The **scopes** (in this repo, under [`services/config/resources/`](../services/c
 | Scope | Purpose |
 |---|---|
 | `external` | Built-in Ignition defaults (the base everything inherits from). |
-| `core` | The locally-managed, **portable** config you version and ship (DB connections, identity providers, tag providers, system properties). Inherits `external`. |
+| `core` | The locally-managed, **portable** config you version and ship (DB connections, tag providers, system properties). Inherits `external`. |
 | `loc` / `dev` / `prd` | Per-environment overrides, selected at boot via `-Dignition.config.mode=<scope>`. Inherits `core`. |
 | `local` | **Per-instance, instance-bound** state — see the `local/` note below. |
 
@@ -73,7 +73,7 @@ config/resources/core/
 ├── ignition/
 │   ├── system-properties/{config.json, resource.json}        ← singleton (no <name> level)
 │   ├── database-connection/TimescaleDB/{config.json, resource.json}
-│   ├── identity-provider/default/{config.json, resource.json}
+│   ├── opc-connection/Ignition OPC UA Server/{config.json, resource.json}
 │   └── tag-provider/MQTT Engine/{config.json, resource.json}
 └── com.inductiveautomation.historian/
     └── historian-provider/TimescaleDB Historian/{config.json, resource.json}
@@ -84,6 +84,13 @@ rewrites on every change (hence the churn-undo script). Resources here are *refe
 defined gateway-wide. A view might query a database, but the connection lives in
 `core/ignition/database-connection/<name>/`. Move a project to a new gateway and you'd port the
 project; you'd also port the matching `core/` resources.
+
+**Two `core/ignition/` subtrees are the exception: `user-source/` and `identity-provider/` are
+untracked** (gitignored, and spared by the deploy workflows' wipe). They look like ordinary config but
+are per-gateway auth state: `user-source/<name>/users.json` carries **that gateway's admin password
+hashes**. Commit and deploy one gateway's copy and you overwrite every other gateway's admin user —
+if the shipped hash isn't the password you expect, that's an instant lockout, recoverable only by
+wiping the target's state. Each gateway writes and owns its own; never commit them, never ship them.
 
 ### Deployment modes (this is the 8.3 feature behind those scopes)
 

@@ -414,10 +414,11 @@ loc/config-mode.json   <span class="cm"># scope descriptor {parent: "core"}</spa
       <tr><td><code>config/ignition/tags/*.idb · *.digest.json · migration-log-*.md</code></td><td>More churn inside versioned trees</td><td>Tag value store, theme/font/icon digests, 8.3 migration logs. The shipped <code>.gitignore</code> masks all of these with <code>**/</code> patterns.</td></tr>
       <tr><td><code>jar-cache/ · metricsdb/ · var/</code></td><td>Runtime breadcrumbs</td><td>Regenerable noise. Often not even worth backing up. (Gateway logs live <i>outside</i> <code>data/</code>, at the install root.)</td></tr>
       <tr><td><code>config/resources/local/</code></td><td>Instance identity (OPC-UA keystores, UUID)</td><td>Belongs to <b>this specific box</b>. Promote it and you clone a gateway's identity onto another.</td></tr>
+      <tr><td><code>config/resources/core/ignition/user-source/ · identity-provider/</code></td><td>Per-gateway auth state</td><td><code>users.json</code> in there holds <b>this gateway's admin password hash</b>. Commit and deploy it and you overwrite the target's admin user: instant lockout.</td></tr>
     </table>
     <div class="callout">
       <div class="lab">Where users actually live</div>
-      <p>There is no separate users file: the internal user store, <b>password hashes included</b>, rides inside <code>db/config.idb</code>, and inside every <b>gwbk</b> backup. Put either in git and you've committed credentials. The versionable pattern for users is an <b>identity provider</b>, which is ordinary config under <code>config/resources/core/ignition/identity-provider/</code>.</p>
+      <p>Users ride in two radioactive places: the internal store inside <code>db/config.idb</code> (and inside every <b>gwbk</b> backup), and <code>users.json</code> under <code>user-source/</code>. Both carry <b>password hashes</b>: put either in git and you've committed credentials, deploy a user source and you overwrite the target gateway's admin user. Each gateway owns its own auth state; the versionable pattern for real user management is an <b>external identity provider</b> (OIDC), configured per gateway.</p>
     </div>
   </div>
 
@@ -621,13 +622,17 @@ tests/
 third-party-modules/
 db-init/
 services/config/local/   <span class="cm"># ← instance-bound scope!</span>
+services/config/resources/local/
+services/config/resources/core/ignition/user-source/
+                         <span class="cm"># ← users.json = that gateway's admin hash</span>
+services/config/resources/core/ignition/identity-provider/
 .DS_Store
 docker-compose.yaml <span class="cm"># ← unless you want it to run there with your settings</span>
 .env</pre></div>
       <div>
         <ul class="checks">
           <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Mostly hygiene:</b> a stray <span class="inlinecode">README.md</span> inside <span class="inlinecode">data/projects/</span> is harmless noise, but noise accumulates, and some lab files could shadow real resources.</span></li>
-          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Sometimes safety:</b> <span class="inlinecode">.env</span> holds your API keys. <span class="inlinecode">services/config/local/</span> is instance identity. Neither may ever reach a shared gateway.</span></li>
+          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Sometimes safety:</b> <span class="inlinecode">.env</span> holds your API keys. <span class="inlinecode">services/config/local/</span> is instance identity. <span class="inlinecode">user-source/</span> holds admin password hashes: ship it and you lock everyone out of the target gateway. None of these may ever reach a shared gateway.</span></li>
           <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>The lab's prune step handles <b>literal paths</b> and <b>bare-name globs</b>, not full gitignore semantics (no <span class="inlinecode">!</span> negation). Keep patterns simple.</span></li>
           <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Tailor it per customer.</b> One customer wants simulation tags shipped, another never; one keeps a device config in the repo but off the plant. A per-project <span class="inlinecode">.deployignore</span> lets each pipeline draw its own line between "in git" and "on the gateway".</span></li>
         </ul>
@@ -654,18 +659,22 @@ docker-compose.yaml <span class="cm"># ← unless you want it to run there with 
       <span class="num">09</span>
       <div>
         <div class="title">Ship = wipe, then copy</div>
-        <div class="lead">dev and prod use <b>named volumes</b>, with no shared filesystem with the runner. So the runner reaches <b>inside</b> the container with <span class="inlinecode">docker exec</span> + <span class="inlinecode">docker cp</span>.</div>
+        <div class="lead">The runner is a container, so it reaches <b>inside</b> the gateway with <span class="inlinecode">docker exec</span> + <span class="inlinecode">docker cp</span> through the docker socket. dev and prod bind-mount <span class="inlinecode">projects/</span> + <span class="inlinecode">config/</span> to <span class="inlinecode">./gateways/&lt;gw&gt;/</span> on the host, so you can <b>watch a deploy land</b>: <span class="inlinecode">ls gateways/dev/projects</span>.</div>
       </div>
     </div>
     <div class="cols2">
       <div class="code"><pre><span class="cm"># the "Ship" step from deploy.yml ($DATA = GATEWAY_DATA_PATH)</span>
 docker exec "$IGNITION_CONTAINER" sh -c '
   rm -rf $DATA/projects/*
-  <span class="cm"># wipe config/, but keep the identity dirs .deployignore protects</span>
+  <span class="cm"># wipe config/, but keep the subtrees .deployignore protects</span>
   find $DATA/config -mindepth 1 -maxdepth 1 \
     ! -name local ! -name resources -exec rm -rf {} +
   find $DATA/config/resources -mindepth 1 -maxdepth 1 \
-    ! -name local -exec rm -rf {} +'
+    ! -name local ! -name core -exec rm -rf {} +
+  find $DATA/config/resources/core -mindepth 1 -maxdepth 1 \
+    ! -name ignition -exec rm -rf {} +
+  find $DATA/config/resources/core/ignition -mindepth 1 -maxdepth 1 \
+    ! -name user-source ! -name identity-provider -exec rm -rf {} +'
 
 docker cp ./projects/.        "$IGNITION_CONTAINER:$DATA/projects/"
 docker cp ./services/config/. "$IGNITION_CONTAINER:$DATA/config/"</pre></div>
@@ -673,7 +682,7 @@ docker cp ./services/config/. "$IGNITION_CONTAINER:$DATA/config/"</pre></div>
         <ul class="checks">
           <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Why wipe first?</b> <span class="inlinecode">docker cp</span> has no <span class="inlinecode">--delete</span>. Without the wipe, a view you deleted from the repo <b>keeps living on the gateway</b>, forever.</span></li>
           <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>Wipe-then-copy gives you <b>"deleted in repo → deleted on gateway"</b>: the same semantics <span class="inlinecode">rsync --delete</span> would give a bind-mount setup.</span></li>
-          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Wipe repo-owned, spare gateway-owned.</b> The two dirs kept back, <span class="inlinecode">config/local/</span> and <span class="inlinecode">config/resources/local/</span> (UUID, OPC-UA keystores), are exactly what <span class="inlinecode">.deployignore</span> prunes, so they're never copied back. Wiping them would strip the gateway's identity. Everything else, including the scan API token, is committed and copied fresh.</span></li>
+          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Wipe repo-owned, spare gateway-owned.</b> Four subtrees are kept back: <span class="inlinecode">config/local/</span> and <span class="inlinecode">config/resources/local/</span> (UUID, OPC-UA keystores), plus <span class="inlinecode">user-source/</span> and <span class="inlinecode">identity-provider/</span> (users.json is that gateway's admin password hash, deploying it locks everyone out). All four are exactly what <span class="inlinecode">.deployignore</span> prunes, so they're never copied back. Everything else, including the scan API token, is committed and copied fresh.</span></li>
           <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>It is not atomic.</b> A runner killed mid-copy leaves a partial tree. Two mitigations here. Deploys are idempotent, so you <b>re-run and it converges</b>, and the workflows' <span class="inlinecode">concurrency</span> group <b>queues instead of cancelling</b>, so CI never kills its own copy.</span></li>
         </ul>
         <div class="callout" style="margin-top:16px">
@@ -956,8 +965,8 @@ function bindControls(slideEl,ctrl){
   const repo   = box(260,340,360,190,'your fork','projects/\nservices/config/', 'var(--teal)');
   const local  = box(1200,120,380,140,'ignition-local  :8088','bind mount · your scratchpad', teal);
   const runner = box(700,520,360,150,'lab04-runner','self-hosted · lab04\nshares /var/run/docker.sock', peri);
-  const dev    = box(1200,380,380,140,'ignition-dev  :8089','named volume · fed by CI', peri);
-  const prod   = box(1200,610,380,140,'ignition-prod  :8090','named volume · fed by tags', amber);
+  const dev    = box(1200,380,380,140,'ignition-dev  :8089','./gateways/dev · fed by CI', peri);
+  const prod   = box(1200,610,380,140,'ignition-prod  :8090','./gateways/prod · fed by tags', amber);
 
   const fBind = flow(440,270,1005,140,'bind mount · edit → scan',teal);
   const fPushD= flow(440,400,517,485,'merge PR into main',peri);

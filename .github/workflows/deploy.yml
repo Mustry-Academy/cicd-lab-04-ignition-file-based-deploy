@@ -4,9 +4,11 @@
 # it via PR, and every push here ships the working tree to the DEV gateway.
 # Releases to prod happen separately (tag on main → release.yml).
 #
-# File-based deploy via `docker cp` — the dev gateway uses a named volume
-# (not a bind mount), so the runner ships files INTO the container's
-# filesystem and then asks the gateway to scan. Runs on a self-hosted
+# File-based deploy via `docker cp` — the runner is a container without the
+# host's paths, so it ships files INTO the dev gateway's container and then
+# asks the gateway to scan. The gateway's projects/ and config/ are
+# bind-mounted from ./gateways/dev on the host, so you can verify what a
+# deploy shipped with `ls gateways/dev/projects`. Runs on a self-hosted
 # runner with the `lab04` label that has access to the same Docker daemon
 # as the dev gateway container.
 #

@@ -18,7 +18,7 @@ Reference reading for the deploy part of the lab. The complete pattern in five s
 3. **Prune** the working tree per `.deployignore` — exclude lab files, READMEs, secrets, anything that shouldn't reach the gateway.
 4. **Ship** the files into the target gateway's container. How depends on the gateway:
    - **`local`** uses a bind mount on `./projects/` and `./services/config/`, so the files are already on disk inside the gateway. No copy step needed.
-   - **`dev` / `prod`** use named volumes. The workflows `docker exec ... rm -rf` to wipe the destination (`projects/` and `config/`, sparing only the identity dirs `.deployignore` protects — `config/local/`, `config/resources/local/`), then `docker cp` the working tree in. This wipe-then-copy gives you "deleted in repo → deleted in gateway" semantics that `rsync --delete` would have given you with a bind mount.
+   - **`dev` / `prod`** bind-mount `./gateways/dev/{projects,config}` and `./gateways/prod/{projects,config}` (gitignored, created by `setup.sh`); the rest of their `data/` stays in named volumes. The runner is itself a container and doesn't share those host paths, so the workflows still `docker exec ... rm -rf` to wipe the destination (`projects/` and `config/`, sparing the four subtrees `.deployignore` protects — `config/local/`, `config/resources/local/`, `config/resources/core/ignition/user-source/`, `config/resources/core/ignition/identity-provider/`), then `docker cp` the working tree in. This wipe-then-copy gives you "deleted in repo → deleted in gateway" semantics that `rsync --delete` would have given you with a bind mount. The bind mounts pay off on the verification side: `ls gateways/dev/projects` on the host shows exactly what a deploy shipped.
 5. **Trigger** a project + config scan via `POST /data/api/v1/scan/{projects,config}` with that gateway's API key.
 
 That's it. No SSH, no SCP, no remote shell. The gateway has an HTTP API that picks up disk changes.
@@ -50,6 +50,12 @@ The `local` gateway sits outside GitHub Flow entirely — it's your bind-mounted
 - **Triggering a scan when a restart is what's needed.** Module changes, Java args, memory limits — these need a restart, not a scan. See the table in [`ignition-file-structure.md`](./ignition-file-structure.md).
 - **Wrong API key for the wrong gateway.** Each lab gateway has its own API key. `IGNITION_API_KEY_LOCAL` won't authenticate against `ignition-dev`. The workflow's environment-scoped secrets get this right automatically; manual `scan.sh` calls need the matching `--gateway` flag.
 - **Partial copies.** If the runner crashes between copying view A and view B, the gateway scans a half-state and may serve broken views. Two-phase mitigations exist (write to a staging dir, then atomically swap) but for most labs, "fix forward by re-running the deploy" is fine.
+
+### Never deploy identity: user sources and identity providers
+
+`config/resources/core/ignition/user-source/` and `.../identity-provider/` look like ordinary config, but they are **per-gateway auth state**: `users.json` inside the user source carries *that* gateway's admin password hash. Deploy one gateway's copy onto another and you overwrite the target's admin user with the source's — if the source hash isn't the password you expect, you're locked out of the gateway, and only wiping its volumes brings it back. (This happened in a previous course run: the repo committed the *local* gateway's user source, so the first prod deploy locked everyone — students and instructor — out of prod.) The wipe side is just as dangerous: deleting `users.json` out from under a *running* gateway breaks logins the instant the deploy runs, no restart required.
+
+This lab keeps both dirs untracked in git, lists them in `.deployignore`, and the workflows' wipe spares them — identity never ships, in either direction. The design rule: **wipe = repo-owned; preserve = whatever `.deployignore` prunes.**
 
 ## File-based vs image-based: when each fits
 
@@ -119,10 +125,11 @@ lab04-runner   ───/var/run/docker.sock───▶  Docker daemon
                                                 │
                                                 ▼
                                        lab04-ignition-dev  (or -prod)
-   `docker exec ... rm -rf <data-path>` then `docker cp` writes into the container's volume
+   `docker exec ... rm -rf <data-path>` then `docker cp` writes into the container's filesystem
+   (landing in the `./gateways/<gw>/` bind mounts, visible from the host)
 ```
 
-The bundled `github-runner` in `docker-compose.yaml` uses this for `dev` and `prod`. Mounting the docker socket gives the runner full daemon access (lab-grade, not production-grade — in prod you'd use a remote registry or a constrained API). The advantage: dev/prod don't need bind mounts, so their state is fully owned by their named volumes and isn't accidentally edited from the host.
+The bundled `github-runner` in `docker-compose.yaml` uses this for `dev` and `prod`. Mounting the docker socket gives the runner full daemon access (lab-grade, not production-grade — in prod you'd use a remote registry or a constrained API). The runner ships through the socket because it's a container itself and doesn't share the host filesystem. dev/prod's `projects/` and `config/` *are* bind-mounted to `./gateways/<gw>/` on the host — deliberately, so a deploy is observable: `cat gateways/prod/config/resources/core/ignition/database-connection/TimescaleDB/config.json` shows exactly what CI shipped. Treat those host dirs as read-only in practice; editing them by hand defeats the pipeline.
 
 ## When to NOT do file-based
 

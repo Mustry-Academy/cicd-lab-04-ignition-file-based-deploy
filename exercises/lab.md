@@ -171,7 +171,7 @@ The five steps:
 1. **Developer commits** to `projects/<name>/` on a `feature/*` branch off `main`, then opens a PR into `main`.
 2. **Runner checks out** the merged commit (after the PR merges into `main`). The bundled `github-runner` container handles this.
 3. **Runner prunes** the working tree per `.deployignore` so lab-only files (READMEs, docs, scripts) don't pollute the gateway.
-4. **Runner ships** the files into the target gateway container via `docker cp` (dev and prod use named volumes — no shared filesystem with the runner).
+4. **Runner ships** the files into the target gateway container via `docker cp` (the runner is a container itself, so it reaches through the docker socket; dev and prod bind-mount `./gateways/<gw>/{projects,config}` on the host, which is how you'll *verify* what landed).
 5. **Runner calls** `POST /data/api/v1/scan/{projects,config}` to make the gateway notice the change without a restart.
 
 ## The deploy, by hand, once (guided, ~20 min)
@@ -215,8 +215,8 @@ Now edit a view and ship it to dev by hand — this is exactly what `deploy.yml`
    ```
    Verify in http://localhost:8089 — the same view should appear, the same width.
 
-   `deploy.yml` does one more thing before copying: it **wipes** `projects/` and `config/` on the target (sparing the identity dirs `.deployignore` protects), so a resource deleted in the repo disappears from the gateway too. You'll read that step line by line in the workflow anatomy below.
-4. Inspect `.deployignore`. Notice it excludes `README.md`, `LICENSE`, the `.github/` directory, `docs/`, `scripts/`, and the per-instance `services/config/resources/local/`. For each pattern, say **why the gateway shouldn't have that file**.
+   `deploy.yml` does one more thing before copying: it **wipes** `projects/` and `config/` on the target (sparing the identity subtrees `.deployignore` protects — `config/local/`, `config/resources/local/`, and the `user-source/` + `identity-provider/` auth state), so a resource deleted in the repo disappears from the gateway too. You'll read that step line by line in the workflow anatomy below.
+4. Inspect `.deployignore`. Notice it excludes `README.md`, `LICENSE`, the `.github/` directory, `docs/`, `scripts/`, the per-instance `services/config/resources/local/`, and the per-gateway `user-source/` + `identity-provider/` (deploying those would overwrite the target's admin user — instant lockout). For each pattern, say **why the gateway shouldn't have that file**.
 
 > **No sample project?** Use any view under the shipped `projects/example-project/` instead — the flow is identical.
 
@@ -231,13 +231,13 @@ The runner topology:
                                                   │
                                                   │ docker cp / docker exec
                                                   ▼
-                                       ┌──────────────────────┐
-                                       │ ignition-dev (named) │
-                                       │ ignition-prod (named)│
-                                       └──────────────────────┘
+                                       ┌────────────────────────────────┐
+                                       │ ignition-dev  → gateways/dev/  │
+                                       │ ignition-prod → gateways/prod/ │
+                                       └────────────────────────────────┘
 ```
 
-The runner doesn't share a bind-mounted filesystem with dev/prod — they each have a named volume. The runner reaches *inside* the container with `docker cp` instead. (Local is different: it bind-mounts `./projects/` and `./services/config/`, so changes show up without any copy step.)
+The runner is a container, so it doesn't share the host filesystem with dev/prod — it reaches *inside* their containers with `docker cp` through the docker socket. But dev and prod bind-mount their `projects/` and `config/` to `./gateways/dev/` and `./gateways/prod/` on the host (gitignored, created by `setup.sh`), so **you can watch a deploy land**: `ls gateways/dev/projects` shows exactly what CI shipped. Treat those dirs as read-only — editing them by hand defeats the pipeline. (Local is different again: it bind-mounts `./projects/` and `./services/config/` from the repo itself, so changes show up without any copy step.)
 
 ## Solo: wire the flow into GitHub Actions (~40 min)
 
@@ -287,7 +287,7 @@ You **don't** need to set `IGNITION_URL` or `IGNITION_CONTAINER` variables unles
 2. Open a PR **into `main`**. Watch [`ci.yml`](../.github/workflows/ci.yml) run on `ubuntu-latest` (free): it validates JSON, `.deployignore`, and the workflow files themselves.
 3. Merge the PR into `main`. [`deploy.yml`](../.github/workflows/deploy.yml) fires because of the `paths:` filter (and only on `main`).
 4. Watch the workflow run. The interesting steps are **Ship projects and config into gateway container** (the `docker cp` half) and **Trigger gateway scan** (`POST /data/api/v1/scan/{projects,config}`).
-5. Verify in http://localhost:8089 — the view's height should match what you pushed.
+5. Verify in http://localhost:8089 — the view's height should match what you pushed. Then verify from the **host**: `ls gateways/dev/projects` shows the deployed tree (dev's `projects/` and `config/` bind-mount to `./gateways/dev/`), so you can `cat` the exact `view.json` CI just shipped.
 6. **Multi-project check.** The deploy step copies `./projects/.` (the whole directory), so a single merge deploys **both** `example-project` and `packaging-site` at once. Confirm the dev gateway (Config → Projects) lists **both**, even though your PR only touched a view in one. The unit of deploy is the `projects/` tree, not a single project.
 
 ### Part 2.4 — Release to prod via `main` + tag (10 min)
@@ -300,7 +300,7 @@ git tag v0.1.0
 git push origin v0.1.0        # ← release.yml fires
 ```
 
-[`release.yml`](../.github/workflows/release.yml) fires on the tag. Watch it run, then check http://localhost:8090 — the change you merged into main and just released should be visible on prod. The push to `main` deployed to dev on its own; the **tag** is what promotes to prod, so prod always runs a named, re-deployable version. That's also your rollback button: `release.yml`'s `workflow_dispatch` takes a tag input.
+[`release.yml`](../.github/workflows/release.yml) fires on the tag. Watch it run, then check http://localhost:8090 — the change you merged into main and just released should be visible on prod. Host-side check works here too: `ls gateways/prod/projects`. The push to `main` deployed to dev on its own; the **tag** is what promotes to prod, so prod always runs a named, re-deployable version. That's also your rollback button: `release.yml`'s `workflow_dispatch` takes a tag input.
 
 ### Part 2.5 — Break a deploy on purpose (optional, ~5 min)
 
