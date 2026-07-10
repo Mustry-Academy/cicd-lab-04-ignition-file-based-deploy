@@ -232,6 +232,44 @@ seed_gateway_state() {
 
 seed_gateway_state
 
+# ---- Stale-volume detection (identity/volume desync) -----------------------
+# A gateway's internal identity (user-source/default, identity-provider/
+# default) lives in its CONFIG TREE — bind mounts: local -> services/config,
+# dev/prod -> gateways/<gw>/config — but the "already commissioned" marker
+# lives in its data VOLUME. Docker Compose reuses volumes by project (folder)
+# name, so a fresh clone sitting next to volumes from an earlier stack boots
+# gateways that skip commissioning yet have no identity on disk: the web UI
+# dies with "Identity provider not found: default". Detect that desync and
+# recreate the affected gateway's container + volume so commissioning runs
+# again on this boot.
+compose_project_name() {
+    docker compose config --format json 2>/dev/null \
+        | python3 -c 'import json,sys; print(json.load(sys.stdin).get("name",""))' 2>/dev/null || true
+}
+
+reset_desynced_gateways() {
+    local project vol gw identity_dir
+    project="$(compose_project_name)"
+    if [ -z "$project" ]; then
+        project="$(basename "$PWD" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9_-')"
+    fi
+    for gw in "${LAB_GATEWAYS[@]}"; do
+        case "$gw" in
+            local) identity_dir="$PROJECT_ROOT/services/config/resources/core/ignition/user-source/default" ;;
+            *)     identity_dir="$PROJECT_ROOT/gateways/$gw/config/resources/core/ignition/user-source/default" ;;
+        esac
+        vol="${project}_ignition-${gw}-data"
+        if [ ! -d "$identity_dir" ] && docker volume inspect "$vol" >/dev/null 2>&1; then
+            echo -e "${YELLOW}$gw gateway: data volume '$vol' exists but its config tree has no internal identity${NC}"
+            echo "  (fresh clone next to an old stack?) — recreating it so commissioning runs again."
+            docker compose rm -sf "ignition-$gw" >/dev/null 2>&1 || true
+            docker volume rm "$vol" >/dev/null
+        fi
+    done
+}
+
+reset_desynced_gateways
+
 # ---- Local first-boot: stash security-properties during commissioning -----
 # On the very first boot of the LOCAL gateway, auto-commissioning has to
 # guarantee an admin login exists. If it finds a security-properties file but

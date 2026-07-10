@@ -106,8 +106,23 @@ AD, SAML/OIDC — hold no password data and deploy normally, as does `security-p
 still hit it (e.g. an older working tree):
 
 - **Full reset:** `scripts/teardown.sh --volumes`, then `scripts/setup.sh`. Nukes all gateway state.
-- **Targeted:** stop the gateway, delete `gateways/<gw>/config/resources/core/ignition/user-source`,
-  start it again — it recommissions the admin user from the `GATEWAY_ADMIN_*` values in `.env`.
+- **Targeted:** delete `gateways/<gw>/config/resources/core/ignition/user-source`, then re-run
+  `scripts/setup.sh` — it notices the missing identity, recreates that gateway's data volume so
+  commissioning runs again, and the admin user comes back from the `GATEWAY_ADMIN_*` values in
+  `.env`. (Deleting the files alone is not enough: the old volume still says "already
+  commissioned", so the gateway would boot with no identity at all.)
+
+## Login page says `Identity provider not found: default` (HTTP 500)
+
+The gateway is running but has no internal identity on disk. Classic cause: a **fresh clone next
+to an old stack** — you deleted or re-cloned the repo folder without `scripts/teardown.sh
+--volumes` first. Docker Compose reuses data volumes by project (folder) name, so the gateway
+boots against the old volume, believes it is already commissioned, and never re-creates the
+`default` user source / identity provider that used to live in the (now gone) config tree.
+
+**Fix:** re-run `scripts/setup.sh`. It detects the desync (volume exists, identity missing) and
+recreates the affected gateway's container + volume so commissioning runs again. Rule of thumb:
+always `scripts/teardown.sh --volumes` before deleting or re-cloning the folder.
 
 ## I merged my PR but nothing deployed (GitHub Flow)
 
