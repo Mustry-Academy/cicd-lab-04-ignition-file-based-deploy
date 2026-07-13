@@ -72,8 +72,8 @@ PYEOF
 }
 
 wait_running() {
-  local url="$1" i
-  for i in $(seq 1 60); do
+  local url="$1"
+  for _ in $(seq 1 60); do
     if curl -fsS -m 3 "$url/StatusPing" 2>/dev/null | grep -q RUNNING; then
       return 0
     fi
