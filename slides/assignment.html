@@ -290,7 +290,7 @@ scripts/setup.sh          <span class="cm"># three gateways + TimescaleDB + runn
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
-    <div class="stage">File structure · we do · together</div>
+    <div class="stage">File structure · we do → you do</div>
   </div>
   <div class="body">
     <div class="sechead"><span class="num warm">PART 1 · WE DO</span><div><div class="title">Gateway config is just files — read one, then watch changes land</div><div class="lead">The database connection already ships as a file in the repo. Read it to learn the path shape, then make a change of your own in the UI and let <span class="inlinecode">git status</span> / <span class="inlinecode">git diff</span> show you exactly where the gateway put it — because <b>local</b> bind-mounts <span class="inlinecode">./services/config/</span> onto the host.</div></div></div>
@@ -298,7 +298,7 @@ scripts/setup.sh          <span class="cm"># three gateways + TimescaleDB + runn
       <div class="steps">
         <div class="step"><div class="ix t">1</div><div class="tx"><b>Open the shipped connection</b> at <span class="inlinecode">services/config/resources/core/ignition/database-connection/TimescaleDB/config.json</span>. No UI needed — it's already a file. Read the path shape (<span class="inlinecode">resources/&lt;scope&gt;/&lt;module&gt;/&lt;type&gt;/&lt;name&gt;/config.json</span>) and the contents: JDBC URL, pool sizes, encrypted password. See it <b>both ways</b>: the same connection shows in the <b>local</b> gateway's UI (<span class="inlinecode">:8088</span> → <b>Connections → Databases → Connections</b>) and in these config files — one is the view, the other is the source of truth.</div></div>
         <div class="step"><div class="ix t">2</div><div class="tx"><b>See deployment modes.</b> <span class="inlinecode">diff</span> the <span class="inlinecode">loc</span> vs <span class="inlinecode">prd</span> copies of the same connection: exactly one line differs (<span class="inlinecode">ignition_loc</span> vs <span class="inlinecode">ignition_prd</span>). Same name, one per-mode override — that's how dev and prod diverge under one config set.</div></div>
-        <div class="step"><div class="ix t">3</div><div class="tx"><b>Now make your own change</b> in the UI — e.g. <b>Connections → Devices → Connections</b>, create fake device connection. Run <span class="inlinecode">git status</span>: it shows up right here under <span class="inlinecode">config/</span>. <span class="inlinecode">git diff</span> shows exactly what the gateway rewrote.</div></div>
+        <div class="step"><div class="ix t">3</div><div class="tx"><b>Now make your own change</b> in the UI — e.g. <b>Connections → Devices → Connections</b>, create fake device connection. Run <span class="inlinecode">git status</span>: it shows up right here under <span class="inlinecode">config/</span>. <span class="inlinecode">git diff</span> shows exactly what the gateway rewrote. Then <b>go solo</b>: make <b>three</b> changes this way (e.g. new user, new project, change gateway timezone, tag changes... or invent your own). For each, note: <b>what you changed · where it lives on disk (relative to <span class="inlinecode">data/</span>) · which bucket · would you commit it, one sentence why</b>.</div></div>
         <div class="step"><div class="ix t">4</div><div class="tx"><b>Answer out loud:</b> gateway-level or project-level? Would you commit it? Which scope did it land in, and why does that matter for dev vs prod?</div></div>
       </div>
       <div>
@@ -320,24 +320,10 @@ git diff services/config</pre></div>
       </div>
     </div>
   </div>
-  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>File structure we-do → now go solo</span></div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>We do together → three changes solo · exercises/lab.md</span></div>
 </section>
 
-<!-- 6 · PART 1 · YOU DO -->
-<section class="slide dark">
-  <div class="topbar">
-    <div class="on-dark brandrow"><img class="logo-img" src="logos/OriginalLight.png" alt="Mustry Solutions"></div>
-    <div class="stage on-dark">File structure · you do · solo · 30 min</div>
-  </div>
-  <div class="body">
-    <div class="eyebrow">Part 1 · solo · which bucket, where on disk?</div>
-    <div class="title" style="color:#fff">Make three changes. Classify every one.</div>
-    <p class="lead">Pick <b style="color:#fff">three</b> from the list (or invent your own, where at least one of your own is worth more). For each, note: <b style="color:#fff">what you changed · where it lives on disk (relative to <span class="mono">data/</span>) · which bucket · would you commit it, one sentence why</b>.</p>
-  </div>
-  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>exercises/lab.md · You do, answers in your notes</span></div>
-</section>
-
-<!-- 7 · PART 2 · WE DO -->
+<!-- 6 · PART 2 · WE DO -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
@@ -369,7 +355,7 @@ docker cp ./projects/. \
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Deploy we-do → now automate it</span></div>
 </section>
 
-<!-- 8 · PART 2 · YOU DO · PARTS 1-2 -->
+<!-- 7 · PART 2 · YOU DO · PARTS 1-2 -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
@@ -399,7 +385,7 @@ docker compose logs --tail 50 github-runner
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Parts 1-2 of 5</span></div>
 </section>
 
-<!-- 9 · PART 2 · YOU DO · PART 3 -->
+<!-- 8 · PART 2 · YOU DO · PART 3 -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
@@ -438,7 +424,7 @@ git push -u origin feature/tweak-view
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Part 3 of 5</span></div>
 </section>
 
-<!-- 10 · PART 2 · YOU DO · PART 4 -->
+<!-- 9 · PART 2 · YOU DO · PART 4 -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
@@ -469,7 +455,7 @@ git push origin v0.1.0        <span class="cm"># ← release.yml fires</span></p
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Part 4 of 5</span></div>
 </section>
 
-<!-- 11 · PART 2 · YOU DO · PART 5 -->
+<!-- 10 · PART 2 · YOU DO · PART 5 -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
@@ -498,7 +484,7 @@ docker compose up -d ignition-dev  <span class="cm"># recovery</span></pre></div
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Part 5 of 5 → definition of done</span></div>
 </section>
 
-<!-- 12 · STRETCH · GITIGNORE DRAFT -->
+<!-- 11 · STRETCH · GITIGNORE DRAFT -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
@@ -534,7 +520,7 @@ data/modules/*.modl
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Stretch · optional · then on to the deploy part</span></div>
 </section>
 
-<!-- 13 · DONE -->
+<!-- 12 · DONE -->
 <section class="slide dark">
   <div class="topbar">
     <div class="on-dark brandrow"><img class="logo-img" src="logos/OriginalLight.png" alt="Mustry Solutions"></div>
@@ -559,7 +545,7 @@ data/modules/*.modl
 </div>
 
 <div class="hud"><div class="bar" id="bar"></div></div>
-<div class="pager" id="pager">01 / 13</div>
+<div class="pager" id="pager">01 / 12</div>
 <div class="hint" id="hint">↑ ↓ / scroll to navigate</div>
 
 <script>
