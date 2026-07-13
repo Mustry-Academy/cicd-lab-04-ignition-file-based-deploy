@@ -368,7 +368,7 @@ docker cp ./projects/. \
         <div class="step"><div class="ix p">1</div><div class="tx"><b>Verify the runner</b> (it's part of the compose stack). Then check your fork: <i>Settings → Actions → Runners</i> must show it <b>online</b> with labels <span class="inlinecode">self-hosted, lab04</span>.</div></div>
         <div class="step"><div class="ix p">2</div><div class="tx">Not there? Three checks: <span class="inlinecode">RUNNER_REPO_URL</span> points at <b>your fork</b> · <span class="inlinecode">gh</span> was authenticated when you ran setup (it mints the token) · <span class="inlinecode">docker compose restart github-runner</span>.</div></div>
         <div class="step"><div class="ix p">3</div><div class="tx"><b>Create environment</b> <span class="inlinecode">lab-gateway-dev</span> (<i>Settings → Environments</i>) with secret <span class="inlinecode">IGNITION_API_KEY</span> = the key you generated <b>on the dev gateway</b> (:8089).</div></div>
-        <div class="step"><div class="ix p">4</div><div class="tx">Repeat: <span class="inlinecode">lab-gateway-prod</span> with the key from the <b>prod gateway</b> (:8090). Leave <span class="inlinecode">IGNITION_URL</span> / <span class="inlinecode">IGNITION_CONTAINER</span> unset; the defaults match the bundled runner.</div></div>
+        <div class="step"><div class="ix p">4</div><div class="tx">Repeat: <span class="inlinecode">lab-gateway-prod</span> with the key from the <b>prod gateway</b> (:8090). Other Github environment parameters(<span class="inlinecode">IGNITION_URL</span> / <span class="inlinecode">IGNITION_CONTAINER</span>) can be left as is.</div></div>
       </div>
       <div>
         <div class="code"><pre><span class="cm"># part 1: is the runner alive?</span>
