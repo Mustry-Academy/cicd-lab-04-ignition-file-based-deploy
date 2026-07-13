@@ -337,25 +337,7 @@ git diff services/config</pre></div>
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>exercises/lab.md · You do, answers in your notes</span></div>
 </section>
 
-<!-- 7 · PART 2 · PRE-FLIGHT -->
-<section class="slide dark">
-  <div class="topbar">
-    <div class="on-dark brandrow"><img class="logo-img" src="logos/OriginalLight.png" alt="Mustry Solutions"></div>
-    <div class="stage on-dark">File-based deploy · pre-flight</div>
-  </div>
-  <div class="body">
-    <div class="eyebrow">Part 2 · before anything can deploy</div>
-    <div class="title" style="color:#fff;max-width:22ch">Pre-flight: four things your fork needs</div>
-    <ul class="checks" style="max-width:960px;margin-top:20px">
-      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Fork with Actions enabled.</b> Forks ship with workflows <b>disabled</b>, so open your fork's <i>Actions</i> tab and click "enable" or nothing will ever trigger.</span></li>
-      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>The GitHub CLI (<span class="mono" style="color:#dbe4f0">gh</span>) authenticated</b>, with <span class="mono" style="color:#dbe4f0">RUNNER_REPO_URL</span> pointing at <b>your fork</b>. <span class="mono" style="color:#dbe4f0">setup.sh</span> mints the runner's registration token with <span class="mono" style="color:#dbe4f0">gh</span> — no PAT.</span></li>
-      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Two GitHub environments</b>: <span class="mono" style="color:#dbe4f0">lab-gateway-dev</span> and <span class="mono" style="color:#dbe4f0">lab-gateway-prod</span>, set up in Part 2.</span></li>
-    </ul>
-  </div>
-  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>exercises/lab.md · Pre-flight</span></div>
-</section>
-
-<!-- 8 · PART 2 · WE DO -->
+<!-- 7 · PART 2 · WE DO -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
@@ -387,7 +369,7 @@ docker cp ./projects/. \
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Deploy we-do → now automate it</span></div>
 </section>
 
-<!-- 9 · PART 2 · YOU DO · PARTS 1-2 -->
+<!-- 8 · PART 2 · YOU DO · PARTS 1-2 -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
@@ -417,7 +399,7 @@ docker compose logs --tail 50 github-runner
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Parts 1-2 of 5</span></div>
 </section>
 
-<!-- 10 · PART 2 · YOU DO · PART 3 -->
+<!-- 9 · PART 2 · YOU DO · PART 3 -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
@@ -456,7 +438,7 @@ git push -u origin feature/tweak-view
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Part 3 of 5</span></div>
 </section>
 
-<!-- 11 · PART 2 · YOU DO · PART 4 -->
+<!-- 10 · PART 2 · YOU DO · PART 4 -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
@@ -487,7 +469,7 @@ git push origin v0.1.0        <span class="cm"># ← release.yml fires</span></p
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Part 4 of 5</span></div>
 </section>
 
-<!-- 12 · PART 2 · YOU DO · PART 5 -->
+<!-- 11 · PART 2 · YOU DO · PART 5 -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
@@ -516,7 +498,7 @@ docker compose up -d ignition-dev  <span class="cm"># recovery</span></pre></div
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Part 5 of 5 → definition of done</span></div>
 </section>
 
-<!-- 13 · STRETCH · GITIGNORE DRAFT -->
+<!-- 12 · STRETCH · GITIGNORE DRAFT -->
 <section class="slide">
   <div class="topbar">
     <div class="brandrow"><img class="logo-img" src="logos/OriginalDark.png" alt="Mustry Solutions"></div>
@@ -552,7 +534,7 @@ data/modules/*.modl
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Stretch · optional · then on to the deploy part</span></div>
 </section>
 
-<!-- 14 · DONE -->
+<!-- 13 · DONE -->
 <section class="slide dark">
   <div class="topbar">
     <div class="on-dark brandrow"><img class="logo-img" src="logos/OriginalLight.png" alt="Mustry Solutions"></div>
@@ -577,7 +559,7 @@ data/modules/*.modl
 </div>
 
 <div class="hud"><div class="bar" id="bar"></div></div>
-<div class="pager" id="pager">01 / 14</div>
+<div class="pager" id="pager">01 / 13</div>
 <div class="hint" id="hint">↑ ↓ / scroll to navigate</div>
 
 <script>
