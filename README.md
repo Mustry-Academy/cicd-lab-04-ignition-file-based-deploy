@@ -6,8 +6,6 @@ Day 2 (afternoon) of the [CI/CD for Ignition Masterclass](https://github.com/mus
 
 This is the **first lab that opens up the Ignition gateway itself**. Labs 02–03 already worked with a real Ignition project — a Perspective HMI and a couple of Python script libraries running on a gateway you spin up — but kept the gateway's *administrative* side (config, modules, databases, deploys) deliberately abstracted away: the repo tracked only project files, and the gateway generated its own config into a volume you never touched. This lab pulls that curtain back — the `data/` file structure, gateway-level config, and how to deploy it — and points it at three real gateways that simulate a local → dev → prod promotion flow.
 
-Block C (image-based deploys) lives in [`cicd-lab-05-ignition-image-based-deploy`](https://github.com/mustry-academy/cicd-lab-05-ignition-image-based-deploy). Block D (multi-gateway) lives in [`cicd-lab-06-multi-gateway-deploy`](https://github.com/mustry-academy/cicd-lab-06-multi-gateway-deploy).
-
 ## Prerequisites
 
 - A fork of this repo (the self-hosted runner registers against your fork, not the upstream)
@@ -46,7 +44,7 @@ The lab is one exercise in two ordered parts — see [`exercises/lab.md`](./exer
 1. **Ignition 8.3 file structure decoded** — know every file in `data/`: what it is, who owns it, whether it belongs in git.
 2. **File-based deploy mechanic** — ship project changes local → dev → prod, hot scan, no restarts.
 
-> Image-based deploys and multi-gateway coordination come next, on Day 3, in separate labs ([image-based](https://github.com/mustry-academy/cicd-lab-05-ignition-image-based-deploy), [multi-gateway](https://github.com/mustry-academy/cicd-lab-06-multi-gateway-deploy)).
+> Image-based deploys come next, on Day 3 ([image-based](https://github.com/mustry-academy/cicd-lab-05-ignition-image-based-deploy)); multi-gateway deployments follow on Day 4 ([multi-gateway](https://github.com/mustry-academy/cicd-lab-07-multi-gateway-deploy)).
 
 ## Repo layout
 
