@@ -46,8 +46,16 @@ permissions:
   contents: read
 
 jobs:
+  # Re-run the full CI suite (ci.yml as a reusable workflow) before anything
+  # touches the gateway. PRs already ran it, but this also covers direct
+  # pushes to main — the deploy job below only starts if validation is green.
+  validate:
+    name: Validate
+    uses: ./.github/workflows/ci.yml
+
   deploy:
     name: Deploy to dev gateway
+    needs: validate
     runs-on: [self-hosted, lab04]
     environment: lab-gateway-dev
     env:

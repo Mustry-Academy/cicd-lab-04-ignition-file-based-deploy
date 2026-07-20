@@ -809,7 +809,7 @@ scripts/scan.sh both --gateway dev</pre></div>
       <span class="num">12</span>
       <div>
         <div class="title">Two workflows, one pattern</div>
-        <div class="lead"><span class="inlinecode">deploy.yml</span> and <span class="inlinecode">release.yml</span> run the <b>same five steps</b>: checkout → prune → ship → scan → verify. Diff them and the only differences are <b>the trigger and the target</b>. That's the whole deployment policy.</div>
+        <div class="lead"><span class="inlinecode">deploy.yml</span> and <span class="inlinecode">release.yml</span> both start by re-running the <span class="inlinecode">ci.yml</span> validation as a gate, then run the <b>same five deploy steps</b>: checkout → prune → ship → scan → verify. Diff them and the only differences are <b>the trigger and the target</b>. That's the whole deployment policy.</div>
       </div>
     </div>
     <table class="tbl" style="max-width:1080px">

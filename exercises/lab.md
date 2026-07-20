@@ -289,7 +289,7 @@ You **don't** need to set `IGNITION_URL` or `IGNITION_CONTAINER` variables unles
    git push -u origin feature/tweak-view
    ```
 2. Open a PR **into `main`**. Watch [`ci.yml`](../.github/workflows/ci.yml) run on `ubuntu-latest` (free): it validates JSON, `.deployignore`, and the workflow files themselves.
-3. Merge the PR into `main`. [`deploy.yml`](../.github/workflows/deploy.yml) fires because of the `paths:` filter (and only on `main`).
+3. Merge the PR into `main`. [`deploy.yml`](../.github/workflows/deploy.yml) fires because of the `paths:` filter (and only on `main`). Its first job re-runs the whole `ci.yml` suite as a gate (that also covers direct pushes to `main`, which never see a PR) — the deploy job only starts once validation is green.
 4. Watch the workflow run. The interesting steps are **Ship projects and config into gateway container** (the `docker cp` half) and **Trigger gateway scan** (`POST /data/api/v1/scan/{projects,config}`). On a fresh gateway the scan step self-heals: a 401/403 makes it restart the gateway once (the token Ship just copied loads at boot) and retry — first deploy green, every later deploy hot-scans.
 5. Verify in http://localhost:8089 — the view's height should match what you pushed. Then verify from the **host**: `ls gateways/dev/projects` shows the deployed tree (dev's `projects/` and `config/` bind-mount to `./gateways/dev/`), so you can `cat` the exact `view.json` CI just shipped.
 6. **Multi-project check.** The deploy step copies `./projects/.` (the whole directory), so a single merge deploys **both** `example-project` and `packaging-site` at once. Confirm the dev gateway (Config → Projects) lists **both**, even though your PR only touched a view in one. The unit of deploy is the `projects/` tree, not a single project.
@@ -304,7 +304,7 @@ git tag v0.1.0
 git push origin v0.1.0        # ← release.yml fires
 ```
 
-[`release.yml`](../.github/workflows/release.yml) fires on the tag. Watch it run, then check http://localhost:8090 — the change you merged into main and just released should be visible on prod. Host-side check works here too: `ls gateways/prod/projects`. The push to `main` deployed to dev on its own; the **tag** is what promotes to prod, so prod always runs a named, re-deployable version. That's also your rollback button: `release.yml`'s `workflow_dispatch` takes a tag input.
+[`release.yml`](../.github/workflows/release.yml) fires on the tag. It starts with the same validation gate as `deploy.yml` (tags never go through a PR), then releases. Watch it run, then check http://localhost:8090 — the change you merged into main and just released should be visible on prod. Host-side check works here too: `ls gateways/prod/projects`. The push to `main` deployed to dev on its own; the **tag** is what promotes to prod, so prod always runs a named, re-deployable version. That's also your rollback button: `release.yml`'s `workflow_dispatch` takes a tag input.
 
 ### Part 2.5 — Break a deploy on purpose (optional, ~5 min)
 
