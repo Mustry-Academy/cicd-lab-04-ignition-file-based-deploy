@@ -274,18 +274,19 @@ You **don't** need to set `IGNITION_URL` or `IGNITION_CONTAINER` variables unles
 
 ### Part 2.3 — Ship to dev via `main` (15 min)
 
-> **Prerequisite:** the change below needs the `sample` project to be *committed* (the guided steps left it untracked). Commit it to `main` first:
+> **One-time, only if you did the guided deploy-by-hand:** the `sample` project it created is still *untracked*. Commit it to `main` first so your repo matches what is already on your gateways:
 > ```bash
 > git add projects/sample && git commit -m "Add sample project"
 > git push origin main
 > ```
-> No `sample` project? Use any view under `projects/example-project/` instead.
+> Skipped the guided part or don't have `sample`? Fine — the steps below use the **shipped** `example-project`, which every clone has.
 
-1. Branch a feature off `main` and change a view:
+1. Branch a feature off `main` and change a view. Use the shipped `overview` view (any view under `projects/` works, including the guided part's `Hello` if you committed it):
    ```bash
    git checkout main && git checkout -b feature/tweak-view
-   # edit projects/sample/com.inductiveautomation.perspective/views/Hello/view.json — change the height value
-   git commit -am "Tweak Hello view height"
+   # edit projects/example-project/com.inductiveautomation.perspective/views/pages/overview/view.json
+   #   — change props.defaultSize.height (920 → e.g. 700)
+   git commit -am "Tweak overview view height"
    git push -u origin feature/tweak-view
    ```
 2. Open a PR **into `main`**. Watch [`ci.yml`](../.github/workflows/ci.yml) run on `ubuntu-latest` (free): it validates JSON, `.deployignore`, and the workflow files themselves.
