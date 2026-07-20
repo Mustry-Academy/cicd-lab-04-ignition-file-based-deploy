@@ -4,7 +4,7 @@ Two lessons baked in here:
   1. Always parameterize. Every query below passes values as bound parameters,
      never string-concatenated into SQL. This is the SQL-injection guard rail.
   2. Name the database in ONE constant. The lab's TimescaleDB connection is
-     'ignition_loc' on the local gateway; promote-time the dev/prod gateways
+     'ignition_local_development' on the local gateway; promote-time the test/production gateways
      point their own connection at their own logical database.
 
 The 'readings' table is assumed to exist (create it via a named query or your
@@ -26,7 +26,7 @@ from common import log
 logger = log.get("infrastructure.db")
 
 # The Ignition database connection name (Config -> Databases -> Connections).
-DB = "ignition_loc"
+DB = "ignition_local_development"
 
 
 def log_reading(unit_name, temp_c, status):

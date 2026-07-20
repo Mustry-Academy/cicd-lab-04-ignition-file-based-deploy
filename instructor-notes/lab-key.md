@@ -54,7 +54,7 @@ The `local` gateway is the only one that uses **host bind mounts** for `projects
 
 `data/db/`, `data/jar-cache/`, `data/metricsdb/`, `data/var/` stay inside the named volume — students don't see them by default. `docker exec lab04-ignition-local ls /usr/local/bin/ignition/data/` shows the full tree.
 
-The `dev` and `prod` gateways bind-mount **only** their `projects/` and `config/` to `./gateways/dev/` and `./gateways/prod/` (gitignored, created by `setup.sh`); the rest of their `data/` stays in named volumes. That's deliberate: deploys become **observable from the host** (`ls gateways/dev/projects` shows exactly what CI shipped), which named volumes made painful. The teaching point stays the same — you ship files via CI, you don't hand-edit dev/prod state on the host; the bind mounts are a window, not an editing surface. Part 2 is where students touch those.
+The `test` and `production` gateways bind-mount **only** their `projects/` and `config/` to `./gateways/test/` and `./gateways/production/` (gitignored, created by `setup.sh`); the rest of their `data/` stays in named volumes. That's deliberate: deploys become **observable from the host** (`ls gateways/test/projects` shows exactly what CI shipped), which named volumes made painful. The teaching point stays the same — you ship files via CI, you don't hand-edit test/production state on the host; the bind mounts are a window, not an editing surface. Part 2 is where students touch those.
 
 ## Solo grading
 
@@ -101,7 +101,7 @@ Commonly missed: `data/config/local/` and `data/config/resources/local/` (per-in
 Before students move to part 2:
 
 - Remind them part 2 uses the bundled `github-runner` container — needs `RUNNER_REPO_URL` in `.env` pointed at their fork and a `repo`-scope PAT in `RUNNER_GITHUB_PAT`. This is the lab where they create that PAT; Labs 05 and 06 reuse it. A placeholder PAT shows up as a 401 restart-loop in `docker compose logs github-runner`.
-- API keys need no gateway-UI work: `setup.sh` already generated a unique key per gateway into `.env` (`IGNITION_API_KEY_LOCAL/_DEV/_PROD`) and installed the hash-only token resources. Have them copy the `_DEV` / `_PROD` values into environment-scoped secrets on the `lab-gateway-dev` / `lab-gateway-prod` GitHub environments. Teaching point: nothing key-related is in git — earlier course iterations committed the token, i.e. shipped a working credential in every fork.
+- API keys need no gateway-UI work: `setup.sh` already generated a unique key per gateway into `.env` (`IGNITION_API_KEY_LOCAL/_TEST/_PRODUCTION`) and installed the hash-only token resources. Have them copy the `_TEST` / `_PRODUCTION` values into environment-scoped secrets on the `lab-gateway-test` / `lab-gateway-production` GitHub environments. Teaching point: nothing key-related is in git — earlier course iterations committed the token, i.e. shipped a working credential in every fork.
 - Confirm Actions is enabled on their fork — the #1 "nothing deployed" stumble (forks ship with workflows disabled; a docs-only push also won't trip the `paths:` filter).
 
 ---
@@ -113,11 +113,11 @@ Before students move to part 2:
 By the end of part 2, the participant has:
 
 1. The bundled `github-runner` online — visible in their fork as `self-hosted, lab04`.
-2. Two GitHub environments (`lab-gateway-dev`, `lab-gateway-prod`), each with `IGNITION_API_KEY` as an environment-scoped secret.
+2. Two GitHub environments (`lab-gateway-test`, `lab-gateway-production`), each with `IGNITION_API_KEY` as an environment-scoped secret.
 3. Edited a view on a `feature/*` branch, opened a PR **into `main`**, watched CI pass, merged. (The sample project must be committed to `main` first.)
 4. Watched `deploy.yml` run end-to-end: checkout → verify prereqs → prune → ship (docker cp) → scan → smoke-check.
-5. Verified the change on the **dev** gateway (http://localhost:8089).
-6. Tagged a commit on `main` with `v*`, watched `release.yml` promote the same change to **prod** (http://localhost:8090).
+5. Verified the change on the **test** gateway (http://localhost:8089).
+6. Tagged a commit on `main` with `v*`, watched `release.yml` promote the same change to **production** (http://localhost:8090).
 7. Deliberately broken at least one deploy and read the failure mode.
 
 If any is missing — especially #6 — push them to complete. The failure cases are half the lesson.
@@ -149,16 +149,16 @@ permissions:
   contents: read                    # least privilege
 
 concurrency:
-  group: deploy-lab-gateway-dev
+  group: deploy-lab-gateway-test
   cancel-in-progress: false         # never let two deploys run at once
 
 jobs:
   deploy:
     runs-on: [self-hosted, lab04]   # routes to the bundled runner
-    environment: lab-gateway-dev    # secrets/vars scoped here
+    environment: lab-gateway-test    # secrets/vars scoped here
     env:
-      IGNITION_URL: ${{ vars.IGNITION_URL || 'http://ignition-dev:8088' }}
-      IGNITION_CONTAINER: ${{ vars.IGNITION_CONTAINER || 'lab04-ignition-dev' }}
+      IGNITION_URL: ${{ vars.IGNITION_URL || 'http://ignition-test:8088' }}
+      IGNITION_CONTAINER: ${{ vars.IGNITION_CONTAINER || 'lab04-ignition-test' }}
       IGNITION_API_KEY: ${{ secrets.IGNITION_API_KEY }}
       GATEWAY_DATA_PATH: /usr/local/bin/ignition/data
     steps:
@@ -226,23 +226,23 @@ jobs:
 Highlights for the grade:
 
 - **Least-privilege permissions.** `contents: read` is enough.
-- **`branches: [main]`.** Only pushes to main deploy to dev. Prod is reached by tagging (`release.yml`). Most common point of confusion.
+- **`branches: [main]`.** Only pushes to main deploy to test. Production is reached by tagging (`release.yml`). Most common point of confusion.
 - **`paths:` filter.** Docs-only changes don't retrigger the deploy.
 - **`concurrency` block.** `cancel-in-progress: false` queues a new run rather than cancelling an in-flight one — cancellation mid-`docker cp` would leave a partial state.
-- **Wipe `config/`, but spare what `.deployignore` prunes.** The wipe deletes everything under `projects/` and `config/` *except* the six entries `.deployignore` protects: `config/local/` and `config/resources/local/` (UUID, OPC-UA keystores, machine-local props), plus the gateway-owned **internal** identity by name — `config/resources/core/ignition/user-source/default/`, `user-source/opcua-module/`, and `identity-provider/default/`. Note the last three are name-scoped *inside* `user-source/` and `identity-provider/`: other user sources and identity providers in those dirs (database/AD, SAML/OIDC — no password data) are repo-owned and get wiped and redeployed like anything else, as does `security-properties` (permission policy, committed with `systemAuthProfile=default`, which every gateway has). The spared entries are pruned from the working tree, so a blanket `rm -rf config/*` would delete them with nothing to copy back — stripping the gateway's identity, and in the user-source case deleting `users.json` out from under the *running* gateway, breaking logins instantly. War story worth telling: an earlier course run committed the local gateway's user source, so the first prod deploy overwrote prod's admin user with local's hash — everyone locked out, volumes wiped to recover. The scan API token at `config/resources/core/ignition/api-token/` is the fourth name-scoped spare: it is **generated per clone** by `setup.sh` (never committed — a committed token is a working credential in every fork), so the wipe must leave it in place or the deploy would revoke the very key it scans with. The rule: **wipe = repo-owned; preserve = whatever `.deployignore` prunes.**
+- **Wipe `config/`, but spare what `.deployignore` prunes.** The wipe deletes everything under `projects/` and `config/` *except* the six entries `.deployignore` protects: `config/local/` and `config/resources/local/` (UUID, OPC-UA keystores, machine-local props), plus the gateway-owned **internal** identity by name — `config/resources/core/ignition/user-source/default/`, `user-source/opcua-module/`, and `identity-provider/default/`. Note the last three are name-scoped *inside* `user-source/` and `identity-provider/`: other user sources and identity providers in those dirs (database/AD, SAML/OIDC — no password data) are repo-owned and get wiped and redeployed like anything else, as does `security-properties` (permission policy, committed with `systemAuthProfile=default`, which every gateway has). The spared entries are pruned from the working tree, so a blanket `rm -rf config/*` would delete them with nothing to copy back — stripping the gateway's identity, and in the user-source case deleting `users.json` out from under the *running* gateway, breaking logins instantly. War story worth telling: an earlier course run committed the local gateway's user source, so the first production deploy overwrote production's admin user with local's hash — everyone locked out, volumes wiped to recover. The scan API token at `config/resources/core/ignition/api-token/` is the fourth name-scoped spare: it is **generated per clone** by `setup.sh` (never committed — a committed token is a working credential in every fork), so the wipe must leave it in place or the deploy would revoke the very key it scans with. The rule: **wipe = repo-owned; preserve = whatever `.deployignore` prunes.**
 - **Inline scan, not the script.** The prune step deletes `scripts/` (it's in `.deployignore` and nothing ships it), so the scan must not depend on `scripts/scan.sh`. `scan.sh` stays for manual/local use.
-- **`environment:` scoping.** Secrets scoped to `lab-gateway-dev`. A repo-level `IGNITION_API_KEY` won't be picked up — deliberate. Environments give per-target secrets and deploy history for free.
+- **`environment:` scoping.** Secrets scoped to `lab-gateway-test`. A repo-level `IGNITION_API_KEY` won't be picked up — deliberate. Environments give per-target secrets and deploy history for free.
 - **Verify + smoke-check.** Cheap; catch missing key / stopped container before any file moves, and a broken gateway after.
 
-`release.yml` is structurally the same — different trigger (`tags: ['v*']`), environment (`lab-gateway-prod`), default URL (`ignition-prod`).
+`release.yml` is structurally the same — different trigger (`tags: ['v*']`), environment (`lab-gateway-production`), default URL (`ignition-production`).
 
 ## Common stumbles
 
 - **"I merged my PR but nothing deployed."** (a) The change didn't touch a deploy path, so the `paths:` filter skipped `deploy.yml` (docs-only, README, etc.); (b) Actions isn't enabled on their fork (forks ship with workflows disabled). Fix: touch a path under the filter, and enable Actions in the fork's *Actions* tab.
-- **"I pushed to `main` and expected prod to update."** Merging into `main` deploys to **dev** only — prod is reached by **tagging**. By design: prod always runs a named version.
+- **"I pushed to `main` and expected production to update."** Merging into `main` deploys to **test** only — production is reached by **tagging**. By design: production always runs a named version.
 - **"My runner isn't picking up jobs."** Container running (`docker compose ps github-runner`), `RUNNER_REPO_URL` points at the **fork**, and `RUNNER_GITHUB_PAT` is a real `repo`-scope PAT (a bad one is a 401 in `docker compose logs github-runner`). Fix and `docker compose up -d --force-recreate github-runner`.
-- **"The deploy ran but my change isn't visible."** Did `Ship` succeed (docker cp output)? Did the scan return HTTP 200? Are they looking at **dev** (8089) or **local** (8088)?
-- **"The scan step 403'd (or 401'd)."** 403 = the API key's role lacks Project/Config Scan **or** the gateway's Read/Write permissions (Config → Security → General Settings) don't admit the token's security level (`Authenticated`). 401 = the token isn't recognized. In **CI this is now self-healing**: the scan step catches a 401 (fresh gateway never loaded the token) or 403 (commissioning reset the permissions in security-properties), restarts the gateway once — Ship already copied the token and security-properties onto its disk, and the gateway loads them at boot — waits for RUNNING, and retries. So the *first* deploy to an unprepared gateway (even one started with plain `docker compose up`) goes green on its own; later deploys scan hot. Where students still hit this is **manual scans** (`scripts/scan.sh`) before any deploy has run: `setup.sh` handles that by generating each gateway's key into `.env` (`scripts/generate-api-keys.sh`) and writing the hash-only token into `services/config` (local) and `gateways/{dev,prod}/config` *before* first boot, and self-heals: if a probe still 401s, it re-seeds the token and restarts that gateway, then falls through to the 403 permission repair (`fix-gateway-api-perms.sh`). Fix for manual scans: re-run `scripts/setup.sh`. Note the token is **not** in git (deliberately — no credentials in commits) and the deploy wipe **spares** `api-token/` on the gateway, so the key survives every deploy and restart; because the hash is derived from the key, `.env` is the single source of truth and a wiped config tree is re-derived by re-running `setup.sh`. A token hand-made in the gateway UI works too, as long as the matching key goes into `.env`/the GitHub secret — the wipe spares it either way.
+- **"The deploy ran but my change isn't visible."** Did `Ship` succeed (docker cp output)? Did the scan return HTTP 200? Are they looking at **test** (8089) or **local** (8088)?
+- **"The scan step 403'd (or 401'd)."** 403 = the API key's role lacks Project/Config Scan **or** the gateway's Read/Write permissions (Config → Security → General Settings) don't admit the token's security level (`Authenticated`). 401 = the token isn't recognized. In **CI this is now self-healing**: the scan step catches a 401 (fresh gateway never loaded the token) or 403 (commissioning reset the permissions in security-properties), restarts the gateway once — Ship already copied the token and security-properties onto its disk, and the gateway loads them at boot — waits for RUNNING, and retries. So the *first* deploy to an unprepared gateway (even one started with plain `docker compose up`) goes green on its own; later deploys scan hot. Where students still hit this is **manual scans** (`scripts/scan.sh`) before any deploy has run: `setup.sh` handles that by generating each gateway's key into `.env` (`scripts/generate-api-keys.sh`) and writing the hash-only token into `services/config` (local) and `gateways/{test,production}/config` *before* first boot, and self-heals: if a probe still 401s, it re-seeds the token and restarts that gateway, then falls through to the 403 permission repair (`fix-gateway-api-perms.sh`). Fix for manual scans: re-run `scripts/setup.sh`. Note the token is **not** in git (deliberately — no credentials in commits) and the deploy wipe **spares** `api-token/` on the gateway, so the key survives every deploy and restart; because the hash is derived from the key, `.env` is the single source of truth and a wiped config tree is re-derived by re-running `setup.sh`. A token hand-made in the gateway UI works too, as long as the matching key goes into `.env`/the GitHub secret — the wipe spares it either way.
 - **"`Context access might be invalid` warnings."** Cosmetic — the VS Code Actions extension can't verify `vars.X`/`secrets.X` until the environment exists. Goes away once created.
 - **"My `.deployignore` patterns aren't working."** The prune logic handles literal paths (with a `/`) and bare-name globs. It does NOT handle full gitignore semantics (`!` negations, `**/` deep globs). Keep patterns simple; if they need more, switch to `rsync --exclude-from`.
 
@@ -252,7 +252,7 @@ The most teaching-rich segment.
 
 **`IGNITION_API_KEY` wrong on the environment** — Ship succeeds (docker cp doesn't care about the API), scan 403s; the workflow first assumes an unprepared gateway and does its one-time restart-retry, then the retry 403s again and the run exits non-zero. Files are on disk in the container but the gateway hasn't been told; runtime is stale. Recovery: fix the secret, re-run (`workflow_dispatch`); idempotent. Lesson: the verify step can't validate the key's *permissions* without a call, so the scan step is where you find out.
 
-**Target container not running** — Verify step fails with "container is in state 'exited', expected 'running'". No-op, safe. Recovery: `docker compose up -d ignition-dev`, re-run. Lesson: fail fast at the right step; `docker cp` against a stopped container still writes to the volume, which desyncs on next start.
+**Target container not running** — Verify step fails with "container is in state 'exited', expected 'running'". No-op, safe. Recovery: `docker compose up -d ignition-test`, re-run. Lesson: fail fast at the right step; `docker cp` against a stopped container still writes to the volume, which desyncs on next start.
 
 **Runner offline** — Workflow queues forever, no logs. Gateway unchanged. Recovery: `docker compose restart github-runner`. Lesson: self-hosted has operational cost — keep the runner alive across reboots and registration-token expirations.
 
@@ -262,11 +262,11 @@ The most teaching-rich segment.
 
 The lab doesn't formally implement rollback. Three patterns:
 
-1. **`git revert` on `main`** — idempotent; re-runs `deploy.yml`, restores **dev**.
-2. **`release.yml` workflow_dispatch with an older tag** — the canonical "redeploy v0.1.0" for **prod**; works because every prod deploy is pinned to a tag.
+1. **`git revert` on `main`** — idempotent; re-runs `deploy.yml`, restores **test**.
+2. **`release.yml` workflow_dispatch with an older tag** — the canonical "redeploy v0.1.0" for **production**; works because every production deploy is pinned to a tag.
 3. **Snapshot before deploy** — take a `gwbk` first.
 
-Maps to the branch: revert on `main` for **dev**; re-deploy the previous tag for **prod**.
+Maps to the branch: revert on `main` for **test**; re-deploy the previous tag for **production**.
 
 ## Stretch — gateway-level config & modules
 

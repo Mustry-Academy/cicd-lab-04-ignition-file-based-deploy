@@ -168,7 +168,7 @@ body{
   <div class="cover">
     <div class="eyebrow">The assignment · breakout rooms</div>
     <div class="big">Let's <em>deploy Ignition</em> now!</div>
-    <div class="sub">Two parts. In the first part you become the person who can point at any file in an Ignition gateway's <span class="mono" style="color:#dbe4f0">data/</span> directory and say what it is, who owns it, and whether it belongs in git. In the second part you wire that knowledge into GitHub Actions: a push to <span class="mono" style="color:#dbe4f0">main</span> lands on the dev gateway, a tag on <span class="mono" style="color:#dbe4f0">main</span> lands on prod. Hot scan, no restarts.</div>
+    <div class="sub">Two parts. In the first part you become the person who can point at any file in an Ignition gateway's <span class="mono" style="color:#dbe4f0">data/</span> directory and say what it is, who owns it, and whether it belongs in git. In the second part you wire that knowledge into GitHub Actions: a push to <span class="mono" style="color:#dbe4f0">main</span> lands on the test gateway, a tag on <span class="mono" style="color:#dbe4f0">main</span> lands on production. Hot scan, no restarts.</div>
     <div class="for">
       <span>Floating to help</span>
       <span class="pill"><b>Sam</b></span>
@@ -225,13 +225,13 @@ body{
       <div class="pcard p2">
         <div class="pn">PART 2 · WE DO</div>
         <h4>Deploy by hand</h4>
-        <p>Edit a view → scan local → <span class="inlinecode">docker cp</span> to dev → scan dev. The workflow, done manually once.</p>
+        <p>Edit a view → scan local → <span class="inlinecode">docker cp</span> to test → scan test. The workflow, done manually once.</p>
         <div class="gate">exercises/lab.md · We do</div>
       </div>
       <div class="pcard p3">
         <div class="pn">PART 2 · YOU DO</div>
         <h4>Wire it into Actions</h4>
-        <p>Runner online → environments + secrets → push to <span class="inlinecode">main</span> ships dev → tag ships prod → break one on purpose.</p>
+        <p>Runner online → environments + secrets → push to <span class="inlinecode">main</span> ships test → tag ships production → break one on purpose.</p>
         <div class="gate">Parts 1 → 5</div>
       </div>
     </div>
@@ -302,9 +302,9 @@ scripts/setup.sh          <span class="cm"># three gateways + TimescaleDB + runn
     <div class="cols2">
       <div class="steps">
         <div class="step"><div class="ix t">1</div><div class="tx"><b>Open the shipped connection</b> at <span class="inlinecode">services/config/resources/core/ignition/database-connection/TimescaleDB/config.json</span>. No UI needed — it's already a file. Read the path shape (<span class="inlinecode">resources/&lt;scope&gt;/&lt;module&gt;/&lt;type&gt;/&lt;name&gt;/config.json</span>) and the contents: JDBC URL, pool sizes, encrypted password. See it <b>both ways</b>: the same connection shows in the <b>local</b> gateway's UI (<span class="inlinecode">:8088</span> → <b>Connections → Databases → Connections</b>) and in these config files — one is the view, the other is the source of truth.</div></div>
-        <div class="step"><div class="ix t">2</div><div class="tx"><b>See deployment modes.</b> <span class="inlinecode">diff</span> the <span class="inlinecode">loc</span> vs <span class="inlinecode">prd</span> copies of the same connection: exactly one line differs (<span class="inlinecode">ignition_loc</span> vs <span class="inlinecode">ignition_prd</span>). Same name, one per-mode override — that's how dev and prod diverge under one config set.</div></div>
+        <div class="step"><div class="ix t">2</div><div class="tx"><b>See deployment modes.</b> <span class="inlinecode">diff</span> the <span class="inlinecode">local-development</span> vs <span class="inlinecode">production</span> copies of the same connection: exactly one line differs (<span class="inlinecode">ignition_local_development</span> vs <span class="inlinecode">ignition_production</span>). Same name, one per-mode override — that's how test and production diverge under one config set.</div></div>
         <div class="step"><div class="ix t">3</div><div class="tx"><b>Now make your own change</b> in the UI — e.g. <b>Connections → Devices → Connections</b>, create fake device connection. Run <span class="inlinecode">git status</span>: it shows up right here under <span class="inlinecode">config/</span>. <span class="inlinecode">git diff</span> shows exactly what the gateway rewrote. Then <b>go solo</b>: make <b>three</b> changes this way (e.g. new user, new project, change gateway timezone, tag changes... or invent your own). For each, note: <b>what you changed · where it lives on disk (relative to <span class="inlinecode">data/</span>) · which bucket · would you commit it, one sentence why</b>.</div></div>
-        <div class="step"><div class="ix t">4</div><div class="tx"><b>Answer out loud:</b> gateway-level or project-level? Would you commit it? Which scope did it land in, and why does that matter for dev vs prod?</div></div>
+        <div class="step"><div class="ix t">4</div><div class="tx"><b>Answer out loud:</b> gateway-level or project-level? Would you commit it? Which scope did it land in, and why does that matter for test vs production?</div></div>
       </div>
       <div>
         <div class="code"><pre><span class="cm"># 1: the DB connection already ships as a file — read it</span>
@@ -312,7 +312,7 @@ cat services/config/resources/core/ignition/\
   database-connection/TimescaleDB/config.json
 
 <span class="cm"># 2: deployment modes — same connection, per-mode override</span>
-diff services/config/resources/{loc,prd}/ignition/\
+diff services/config/resources/{local-development,production}/ignition/\
   database-connection/TimescaleDB/config.json
 
 <span class="cm"># 3: make a UI config change, then watch it land in the repo</span>
@@ -340,16 +340,16 @@ git diff services/config</pre></div>
       <div class="steps">
         <div class="step"><div class="ix t">1</div><div class="tx">Edit a view's <span class="inlinecode">view.json</span> (e.g. <span class="inlinecode">width: 800 → 1200</span>). It's <b>already on the local gateway's disk</b> via the bind mount.</div></div>
         <div class="step"><div class="ix t">2</div><div class="tx">Run scan.sh, verify at <span class="inlinecode">localhost:8088 (or Designer)</span>. The scan makes the gateway <i>notice</i> what's on disk.</div></div>
-        <div class="step"><div class="ix t">3</div><div class="tx"><b>Ship to dev by hand</b>: <span class="inlinecode">docker cp</span> the project, scan. Dev starts <b>empty</b>, so nothing to wipe. Verify at <span class="inlinecode">localhost:8089 (or Designer)</span>: same view, same width. Bonus check from the host: <span class="inlinecode">ls gateways/dev/projects</span> shows what just landed.</div></div>
+        <div class="step"><div class="ix t">3</div><div class="tx"><b>Ship to test by hand</b>: <span class="inlinecode">docker cp</span> the project, scan. Test starts <b>empty</b>, so nothing to wipe. Verify at <span class="inlinecode">localhost:8089 (or Designer)</span>: same view, same width. Bonus check from the host: <span class="inlinecode">ls gateways/test/projects</span> shows what just landed.</div></div>
         <div class="step"><div class="ix t">4</div><div class="tx">Open <span class="inlinecode">.deployignore</span>. For each pattern, say <b>why the gateway shouldn't have that file</b>.</div></div>
       </div>
       <div>
         <div class="code"><pre><span class="cm"># 2 (local): files already there, just scan</span>
 scripts/scan.sh both --gateway local
 
-<span class="cm"># 3 (dev): copy the project over, scan</span>
+<span class="cm"># 3 (test): copy the project over, scan</span>
 docker cp ./projects/. \
-  lab04-ignition-dev:/usr/local/bin/ignition/data/projects/</pre></div>
+  lab04-ignition-test:/usr/local/bin/ignition/data/projects/</pre></div>
         <div class="goal" style="margin-top:16px">
           <span class="badge">What deploy.yml adds</span>
           <p>Before copying, it also <b>wipes</b> <span class="inlinecode">projects/</span> + <span class="inlinecode">config/</span> (sparing what <span class="inlinecode">.deployignore</span> protects: <span class="inlinecode">config/local/</span>, <span class="inlinecode">config/resources/local/</span>, and the internal identity by name: <span class="inlinecode">user-source/default/</span> + <span class="inlinecode">user-source/opcua-module/</span> + <span class="inlinecode">identity-provider/default/</span>), so a resource deleted in the repo disappears from the gateway too. Other identity resources and <span class="inlinecode">security-properties</span> are ordinary config and ship normally. You'll read that step in the workflow anatomy.</p>
@@ -372,8 +372,8 @@ docker cp ./projects/. \
       <div class="steps">
         <div class="step"><div class="ix p">1</div><div class="tx"><b>Verify the runner</b> (it's part of the compose stack). Then check your fork: <i>Settings → Actions → Runners</i> must show it <b>online</b> with labels <span class="inlinecode">self-hosted, lab04</span>.</div></div>
         <div class="step"><div class="ix p">2</div><div class="tx">Not there? Three checks: <span class="inlinecode">RUNNER_REPO_URL</span> points at <b>your fork</b> · <span class="inlinecode">RUNNER_GITHUB_PAT</span> is a real <span class="inlinecode">repo</span>-scope PAT, not the placeholder (a bad one shows a <b>401</b> in <span class="inlinecode">docker compose logs github-runner</span>) · <span class="inlinecode">docker compose up -d --force-recreate github-runner</span>.</div></div>
-        <div class="step"><div class="ix p">3</div><div class="tx"><b>Create environment</b> <span class="inlinecode">lab-gateway-dev</span> <b>in your fork on GitHub</b> (<i>Settings → Environments → New environment</i>) with secret <span class="inlinecode">IGNITION_API_KEY</span> = the <span class="inlinecode">IGNITION_API_KEY_DEV</span> value from your <span class="inlinecode">.env</span> — the <b>dev gateway's</b> own key (:8089).</div></div>
-        <div class="step"><div class="ix p">4</div><div class="tx">Repeat on GitHub: environment <span class="inlinecode">lab-gateway-prod</span> with <span class="inlinecode">IGNITION_API_KEY_PROD</span> from <span class="inlinecode">.env</span> — the <b>prod gateway's</b> key (:8090). Other GitHub environment parameters (<span class="inlinecode">IGNITION_URL</span> / <span class="inlinecode">IGNITION_CONTAINER</span>) can be left as is.</div></div>
+        <div class="step"><div class="ix p">3</div><div class="tx"><b>Create environment</b> <span class="inlinecode">lab-gateway-test</span> <b>in your fork on GitHub</b> (<i>Settings → Environments → New environment</i>) with secret <span class="inlinecode">IGNITION_API_KEY</span> = the <span class="inlinecode">IGNITION_API_KEY_TEST</span> value from your <span class="inlinecode">.env</span> — the <b>test gateway's</b> own key (:8089).</div></div>
+        <div class="step"><div class="ix p">4</div><div class="tx">Repeat on GitHub: environment <span class="inlinecode">lab-gateway-production</span> with <span class="inlinecode">IGNITION_API_KEY_PRODUCTION</span> from <span class="inlinecode">.env</span> — the <b>production gateway's</b> key (:8090). Other GitHub environment parameters (<span class="inlinecode">IGNITION_URL</span> / <span class="inlinecode">IGNITION_CONTAINER</span>) can be left as is.</div></div>
       </div>
       <div>
         <div class="code"><pre><span class="cm"># part 1: is the runner alive?</span>
@@ -382,7 +382,7 @@ docker compose logs --tail 50 github-runner
 <span class="cm"># look for "Listening for Jobs"</span></pre></div>
         <div class="goal warn-g" style="margin-top:18px">
           <span class="badge">Per-gateway keys</span>
-          <p><b>API keys are per-gateway, not per-URL.</b> The dev key won't authenticate against prod. And the runner reaches gateways by <b>compose service name</b> (<span class="inlinecode">http://ignition-dev:8088</span>). The host ports 8089/8090 are only how <i>you</i> reach the UIs.</p>
+          <p><b>API keys are per-gateway, not per-URL.</b> The test key won't authenticate against production. And the runner reaches gateways by <b>compose service name</b> (<span class="inlinecode">http://ignition-test:8088</span>). The host ports 8089/8090 are only how <i>you</i> reach the UIs.</p>
         </div>
       </div>
     </div>
@@ -397,14 +397,14 @@ docker compose logs --tail 50 github-runner
     <div class="stage">File-based deploy · you do · part 3</div>
   </div>
   <div class="body">
-    <div class="sechead"><span class="num p" style="background:var(--peri)">PART 3</span><div><div class="title">Ship to the development environment via the <span class="mono" style="font-size:30px">main</span> branch</div><div class="lead">15 min. A real PR rides the pipeline: feature branch → PR → CI → merge → deploy.yml → dev gateway.</div></div></div>
+    <div class="sechead"><span class="num p" style="background:var(--peri)">PART 3</span><div><div class="title">Ship to the development environment via the <span class="mono" style="font-size:30px">main</span> branch</div><div class="lead">15 min. A real PR rides the pipeline: feature branch → PR → CI → merge → deploy.yml → test gateway.</div></div></div>
     <div class="cols2">
       <div class="steps">
         <div class="step"><div class="ix p">1</div><div class="tx"><b>One-time, only if you did the deploy-by-hand:</b> commit the <span class="inlinecode">sample</span> project it created (still untracked) straight to <span class="inlinecode">main</span>. That push is also your first automated deploy.</div></div>
         <div class="step"><div class="ix p">2</div><div class="tx">Branch <span class="inlinecode">feature/tweak-view</span> off <span class="inlinecode">main</span> and change the <b>height</b> of the shipped <span class="inlinecode">overview</span> view (in <span class="inlinecode">example-project</span>, every clone has it), then push the change.</div></div>
         <div class="step"><div class="ix p">3</div><div class="tx">Open a PR <b>into <span class="inlinecode">main</span></b>. Watch <span class="inlinecode">ci.yml</span> run on <span class="inlinecode">ubuntu-latest</span> (free): JSON, <span class="inlinecode">.deployignore</span> and workflow validation.</div></div>
         <div class="step"><div class="ix p">4</div><div class="tx"><b>Merge.</b> <span class="inlinecode">deploy.yml</span> fires (note the <span class="inlinecode">paths:</span> filter, since docs-only pushes don't deploy). It re-runs the <span class="inlinecode">ci.yml</span> validation as its first job; only when that is green does the deploy start. Watch the <b>Ship</b> and <b>Trigger gateway scan</b> steps.</div></div>
-        <div class="step"><div class="ix p">5</div><div class="tx"><b>Verify at localhost:8089 (or Designer).</b> The dev gateway shows your new height. From the host, <span class="inlinecode">ls gateways/dev/projects</span> shows the tree CI just shipped.</div></div>
+        <div class="step"><div class="ix p">5</div><div class="tx"><b>Verify at localhost:8089 (or Designer).</b> The test gateway shows your new height. From the host, <span class="inlinecode">ls gateways/test/projects</span> shows the tree CI just shipped.</div></div>
       </div>
       <div>
         <div class="code"><pre><span class="cm"># 1 (one-time, only after the deploy-by-hand): get sample onto main</span>
@@ -438,23 +438,23 @@ git push -u origin feature/tweak-view
     <div class="stage">File-based deploy · you do · part 4</div>
   </div>
   <div class="body">
-    <div class="sechead"><span class="num p" style="background:var(--peri)">PART 4</span><div><div class="title">Release to prod: <span class="mono" style="font-size:30px">main</span> + a tag</div><div class="lead">10 min. The GitHub Flow release: tag the commit on <span class="inlinecode">main</span> you want in prod. <b>The tag, not the merge, is what ships prod.</b></div></div></div>
+    <div class="sechead"><span class="num p" style="background:var(--peri)">PART 4</span><div><div class="title">Release to production: <span class="mono" style="font-size:30px">main</span> + a tag</div><div class="lead">10 min. The GitHub Flow release: tag the commit on <span class="inlinecode">main</span> you want in production. <b>The tag, not the merge, is what ships production.</b></div></div></div>
     <div class="cols2">
       <div class="steps">
-        <div class="step"><div class="ix p">6</div><div class="tx">The change is already on <span class="inlinecode">main</span> from the dev deploy, now tag it.</div></div>
-        <div class="step"><div class="ix p">7</div><div class="tx"><b>Observe: the tag is what ships prod.</b> The merge already shipped dev, but only a <span class="inlinecode">v*</span> tag reaches prod.</div></div>
-        <div class="step"><div class="ix p">8</div><div class="tx">Tag <span class="inlinecode">v0.1.0</span> and push the tag. <span class="inlinecode">release.yml</span> fires: same five steps, different environment, prod container. Tag already exists in your fork (inherited at fork time)? Take the next free number, <span class="inlinecode">git tag -l</span> shows what's taken.</div></div>
-        <div class="step"><div class="ix p">9</div><div class="tx"><b>Verify at localhost:8090 (or Designer).</b> Prod now shows the change you merged into <span class="inlinecode">main</span> and just released. Host-side check: <span class="inlinecode">ls gateways/prod/projects</span>.</div></div>
+        <div class="step"><div class="ix p">6</div><div class="tx">The change is already on <span class="inlinecode">main</span> from the test deploy, now tag it.</div></div>
+        <div class="step"><div class="ix p">7</div><div class="tx"><b>Observe: the tag is what ships production.</b> The merge already shipped test, but only a <span class="inlinecode">v*</span> tag reaches production.</div></div>
+        <div class="step"><div class="ix p">8</div><div class="tx">Tag <span class="inlinecode">v0.1.0</span> and push the tag. <span class="inlinecode">release.yml</span> fires: same five steps, different environment, production container. Tag already exists in your fork (inherited at fork time)? Take the next free number, <span class="inlinecode">git tag -l</span> shows what's taken.</div></div>
+        <div class="step"><div class="ix p">9</div><div class="tx"><b>Verify at localhost:8090 (or Designer).</b> Production now shows the change you merged into <span class="inlinecode">main</span> and just released. Host-side check: <span class="inlinecode">ls gateways/production/projects</span>.</div></div>
       </div>
       <div>
-        <div class="code"><pre><span class="cm"># on main, the change is already there from the dev deploy</span>
+        <div class="code"><pre><span class="cm"># on main, the change is already there from the test deploy</span>
 git checkout main &amp;&amp; git pull
 
 git tag v0.1.0
 git push origin v0.1.0        <span class="cm"># ← release.yml fires</span></pre></div>
         <div class="goal good-g" style="margin-top:18px">
           <span class="badge">Why tags</span>
-          <p>Prod always runs a <b>named, re-deployable version</b>. That's also your rollback button: <span class="inlinecode">release.yml</span>'s <b>workflow_dispatch</b> takes a tag input, so re-deploying <span class="inlinecode">v0.1.0</span> is two clicks, no git surgery.</p>
+          <p>Production always runs a <b>named, re-deployable version</b>. That's also your rollback button: <span class="inlinecode">release.yml</span>'s <b>workflow_dispatch</b> takes a tag input, so re-deploying <span class="inlinecode">v0.1.0</span> is two clicks, no git surgery.</p>
         </div>
       </div>
     </div>
@@ -472,15 +472,15 @@ git push origin v0.1.0        <span class="cm"># ← release.yml fires</span></p
     <div class="sechead"><span class="num p" style="background:var(--peri)">PART 5</span><div><div class="title">Break a deploy on purpose</div><div class="lead">~5 min, optional but strongly encouraged, because reading the failure is half the lesson. Pick one.</div></div></div>
     <div class="cols2">
       <div class="steps">
-        <div class="step"><div class="ix p">A</div><div class="tx"><b>Wrong API key.</b> Set garbage in <span class="inlinecode">lab-gateway-dev</span>'s secret, re-run the deploy. The <b>Ship step succeeds</b> (docker cp doesn't care about keys) but the <b>scan 403s</b>. Files are in the container; the gateway never reloaded. <i>What's your recovery story?</i></div></div>
-        <div class="step"><div class="ix p">B</div><div class="tx"><b>Stopped container.</b> <span class="inlinecode">docker compose stop ignition-dev</span>, then trigger a deploy. The <b>verify step fails fast</b>: "container is in state 'exited', expected 'running'", before any file moved. Much better than failing halfway.</div></div>
+        <div class="step"><div class="ix p">A</div><div class="tx"><b>Wrong API key.</b> Set garbage in <span class="inlinecode">lab-gateway-test</span>'s secret, re-run the deploy. The <b>Ship step succeeds</b> (docker cp doesn't care about keys) but the <b>scan 403s</b>. Files are in the container; the gateway never reloaded. <i>What's your recovery story?</i></div></div>
+        <div class="step"><div class="ix p">B</div><div class="tx"><b>Stopped container.</b> <span class="inlinecode">docker compose stop ignition-test</span>, then trigger a deploy. The <b>verify step fails fast</b>: "container is in state 'exited', expected 'running'", before any file moved. Much better than failing halfway.</div></div>
         <div class="step"><div class="ix p">C</div><div class="tx">Then <b>fix it and re-run</b> the workflow (manual <span class="inlinecode">workflow_dispatch</span> works too). The steps are idempotent, so the deploy converges.</div></div>
       </div>
       <div>
         <div class="code"><pre><span class="cm"># failure B: stop the target, watch verify fail fast</span>
-docker compose stop ignition-dev
+docker compose stop ignition-test
 <span class="cm"># … re-run deploy.yml from the Actions tab …</span>
-docker compose up -d ignition-dev  <span class="cm"># recovery</span></pre></div>
+docker compose up -d ignition-test  <span class="cm"># recovery</span></pre></div>
         <div class="goal" style="margin-top:18px">
           <span class="badge">Write it down</span>
           <p>For your chosen failure: <b>symptom → state of the gateway → recovery → which workflow step should have caught it earlier?</b> Bring the answer to the debrief.</p>
@@ -537,8 +537,8 @@ data/modules/*.modl
     <div class="eyebrow">Nicely done</div>
     <div class="title" style="color:#fff;max-width:24ch">You built a pipeline that ships Ignition.</div>
     <ul class="checks" style="max-width:960px;margin-top:22px">
-      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>Your runner is <b>online</b> · both environments hold an <b>API key</b> · a push to <span class="mono" style="color:#dbe4f0">main</span> deployed <b>dev</b> · a <span class="mono" style="color:#dbe4f0">v*</span> tag deployed <b>prod</b> · you broke one deploy and can explain its recovery.</span></li>
-      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>You can say, in five steps, what happens between "merge" and "gateway reloaded", and name the routing: <b>push to main → dev, tag on main → prod, local outside the flow</b>.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>Your runner is <b>online</b> · both environments hold an <b>API key</b> · a push to <span class="mono" style="color:#dbe4f0">main</span> deployed <b>test</b> · a <span class="mono" style="color:#dbe4f0">v*</span> tag deployed <b>production</b> · you broke one deploy and can explain its recovery.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>You can say, in five steps, what happens between "merge" and "gateway reloaded", and name the routing: <b>push to main → test, tag on main → production, local outside the flow</b>.</span></li>
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>Bring to the debrief: your Part 5 failure story, your rollback answer (revert on <span class="mono" style="color:#dbe4f0">main</span> vs re-deploy a tag), and <b>where a runner would sit at your customer's site</b>.</span></li>
     </ul>
     <div class="goal" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.14);border-left-color:var(--peri2)">

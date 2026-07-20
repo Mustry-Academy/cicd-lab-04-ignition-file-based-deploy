@@ -12,7 +12,7 @@
 #   - brings up the stack (three Ignition gateways + shared TimescaleDB)
 #   - waits for ALL THREE gateways to become RUNNING
 #   - triggers an initial projects + config scan against the LOCAL gateway.
-#     Dev and prod start empty by design — they get populated by the deploy
+#     Test and production start empty by design — they get populated by the deploy
 #     and release workflows.
 #
 # Re-run safely — every step is idempotent.
@@ -69,9 +69,9 @@ echo ""
 echo "This script initializes the development environment:"
 echo "  - three Ignition 8.3 gateways:"
 echo "      local  http://localhost:8088   (your working gateway, bind-mounted from the repo)"
-echo "      dev    http://localhost:8089   (populated by deploy.yml on push to main)"
-echo "      prod   http://localhost:8090   (populated by release.yml on tag push)"
-echo "  - one TimescaleDB on localhost:5432 hosting ignition_loc / ignition_dev / ignition_prd"
+echo "      test    http://localhost:8089   (populated by deploy.yml on push to main)"
+echo "      production   http://localhost:8090   (populated by release.yml on tag push)"
+echo "  - one TimescaleDB on localhost:5432 hosting ignition_local_development / ignition_test / ignition_production"
 echo ""
 
 
@@ -146,10 +146,10 @@ runner_pat_reminder() {
 
 runner_pat_reminder
 
-# ---- Dev/prod gateway state dirs + per-gateway API keys --------------------
-# dev and prod bind-mount ./gateways/<gw>/{projects,config} (see
+# ---- Test/production gateway state dirs + per-gateway API keys --------------------
+# test and production bind-mount ./gateways/<gw>/{projects,config} (see
 # docker-compose.yaml) so you can verify a deploy landed straight from the
-# host: `ls gateways/dev/projects`. Create the dirs before compose up, then
+# host: `ls gateways/test/projects`. Create the dirs before compose up, then
 # generate each gateway's OWN API key into .env and write the matching
 # hash-only api-token resource into its config tree BEFORE first boot: the
 # scan API only accepts tokens the gateway has LOADED, and the deploy
@@ -159,7 +159,7 @@ runner_pat_reminder
 # commissioning's permission reset causes is repaired further down.
 seed_gateway_state() {
     local gw
-    for gw in dev prod; do
+    for gw in test production; do
         mkdir -p "$PROJECT_ROOT/gateways/$gw/projects" "$PROJECT_ROOT/gateways/$gw/config"
     done
     "$SCRIPT_DIR/generate-api-keys.sh"
@@ -170,7 +170,7 @@ seed_gateway_state
 # ---- Stale-volume detection (identity/volume desync) -----------------------
 # A gateway's internal identity (user-source/default, identity-provider/
 # default) lives in its CONFIG TREE — bind mounts: local -> services/config,
-# dev/prod -> gateways/<gw>/config — but the "already commissioned" marker
+# test/production -> gateways/<gw>/config — but the "already commissioned" marker
 # lives in its data VOLUME. Docker Compose reuses volumes by project (folder)
 # name, so a fresh clone sitting next to volumes from an earlier stack boots
 # gateways that skip commissioning yet have no identity on disk: the web UI
@@ -213,7 +213,7 @@ reset_desynced_gateways
 # identity, then rewrites security-properties to point at it — permanent git
 # noise AND an auth profile no other gateway has. If it finds NO
 # security-properties, it creates the `default` user source + identity
-# provider, exactly like dev/prod do. So: move the committed file aside for
+# provider, exactly like test/production do. So: move the committed file aside for
 # the first boot, then put it back (it names systemAuthProfile=default, which
 # now exists, and carries the APIToken scan permissions) and restart local.
 SECPROPS_DIR="$PROJECT_ROOT/services/config/resources/core/ignition/security-properties"
@@ -346,7 +346,7 @@ repair_api_perms() {
 repair_api_perms
 
 # ---- Initial scan (local only) -------------------------------------------
-# Local has projects on disk from the bind mount; dev/prod start empty by
+# Local has projects on disk from the bind mount; test/production start empty by
 # design (workflows will populate them).
 initial_scan() {
     if [ ! -x "$SCRIPT_DIR/scan.sh" ]; then
@@ -376,10 +376,10 @@ initial_scan
 # Pull the actual values from .env so the output matches reality.
 ACTUAL_LOCAL_USER="$(env_value GATEWAY_ADMIN_USERNAME_LOCAL)"
 ACTUAL_LOCAL_PASS="$(env_value GATEWAY_ADMIN_PASSWORD_LOCAL)"
-ACTUAL_DEV_USER="$(env_value GATEWAY_ADMIN_USERNAME_DEV)"
-ACTUAL_DEV_PASS="$(env_value GATEWAY_ADMIN_PASSWORD_DEV)"
-ACTUAL_PROD_USER="$(env_value GATEWAY_ADMIN_USERNAME_PROD)"
-ACTUAL_PROD_PASS="$(env_value GATEWAY_ADMIN_PASSWORD_PROD)"
+ACTUAL_TEST_USER="$(env_value GATEWAY_ADMIN_USERNAME_TEST)"
+ACTUAL_TEST_PASS="$(env_value GATEWAY_ADMIN_PASSWORD_TEST)"
+ACTUAL_PRODUCTION_USER="$(env_value GATEWAY_ADMIN_USERNAME_PRODUCTION)"
+ACTUAL_PRODUCTION_PASS="$(env_value GATEWAY_ADMIN_PASSWORD_PRODUCTION)"
 ACTUAL_PG_USER="$(env_value POSTGRES_USER)"
 ACTUAL_PG_PASS="$(env_value POSTGRES_PASSWORD)"
 
@@ -388,24 +388,24 @@ echo -e "${GREEN}Setup complete!${NC}"
 echo ""
 printf "Gateways:\n"
 printf "  %-8s  %-23s  user=%s  pass=%s\n" "local"  "http://localhost:8088"  "${ACTUAL_LOCAL_USER:-admin}"  "${ACTUAL_LOCAL_PASS:-(see .env)}"
-printf "  %-8s  %-23s  user=%s  pass=%s\n" "dev"    "http://localhost:8089"  "${ACTUAL_DEV_USER:-admin}"    "${ACTUAL_DEV_PASS:-(see .env)}"
-printf "  %-8s  %-23s  user=%s  pass=%s\n" "prod"   "http://localhost:8090"  "${ACTUAL_PROD_USER:-admin}"   "${ACTUAL_PROD_PASS:-(see .env)}"
+printf "  %-8s  %-23s  user=%s  pass=%s\n" "test"    "http://localhost:8089"  "${ACTUAL_TEST_USER:-admin}"    "${ACTUAL_TEST_PASS:-(see .env)}"
+printf "  %-8s  %-23s  user=%s  pass=%s\n" "production"   "http://localhost:8090"  "${ACTUAL_PRODUCTION_USER:-admin}"   "${ACTUAL_PRODUCTION_PASS:-(see .env)}"
 echo ""
 echo "TimescaleDB:"
 echo "  Host: localhost  Port: 5432"
-echo "  Databases: ignition_loc, ignition_dev, ignition_prd"
+echo "  Databases: ignition_local_development, ignition_test, ignition_production"
 echo "  Username: ${ACTUAL_PG_USER:-ignition}  Password: ${ACTUAL_PG_PASS:-(see .env)}"
 echo ""
 echo "API keys (unique to this clone, generated into .env — never committed):"
-echo "  IGNITION_API_KEY_LOCAL / _DEV / _PROD — one per gateway; scripts/scan.sh"
-echo "  picks the right one via --gateway. For CI, copy the _DEV and _PROD"
+echo "  IGNITION_API_KEY_LOCAL / _TEST / _PRODUCTION — one per gateway; scripts/scan.sh"
+echo "  picks the right one via --gateway. For CI, copy the _TEST and _PRODUCTION"
 echo "  values from .env into the IGNITION_API_KEY secret on the"
-echo "  lab-gateway-dev / lab-gateway-prod GitHub environments."
+echo "  lab-gateway-test / lab-gateway-production GitHub environments."
 echo ""
 echo "Useful commands:"
 echo "  docker compose ps                          # check container state"
 echo "  docker logs -f lab04-ignition-local        # tail local gateway logs"
 echo "  scripts/scan.sh both               # rescan local (default)"
-echo "  scripts/scan.sh both --gateway dev # rescan dev"
+echo "  scripts/scan.sh both --gateway test # rescan test"
 echo "  scripts/teardown.sh                        # stop the stack"
 echo "  scripts/teardown.sh --volumes              # stop and wipe persistent data"

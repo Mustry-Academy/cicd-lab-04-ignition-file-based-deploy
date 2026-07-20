@@ -3,7 +3,7 @@
 #
 # GitHub Flow has one long-lived branch, so we validate PRs into it:
 #   main  ← feature/* branches merge here via PR. A push to main then ships to
-#           the dev gateway (deploy.yml); a tag on main ships to prod (release.yml).
+#           the test gateway (deploy.yml); a tag on main ships to production (release.yml).
 #
 # Purpose: catch the cheap stuff before a deploy gets near it. We DON'T spin
 # up Ignition here; that's left to the deploy workflow on its self-hosted
@@ -31,11 +31,11 @@ permissions:
   contents: read
 
 jobs:
-  # Job ids double as the status-check names branch protection matches on.
+  # Job ids double as the status-check names branch protection matches on
+  # (Lab 03: a job's check name is its id unless you override it with `name:`).
   # Keep them stable — renaming silently orphans required checks configured on
   # main.
   lint:
-    name: Lint
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -69,7 +69,6 @@ jobs:
         run: docker compose config -q
 
   validate:
-    name: Validate
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

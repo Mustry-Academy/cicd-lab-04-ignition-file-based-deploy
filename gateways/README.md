@@ -1,14 +1,14 @@
-# gateways/ — dev and prod gateway state
+# gateways/ — test and production gateway state
 
-This folder holds the **dev** and **prod** gateways' `projects/` and `config/`
+This folder holds the **test** and **production** gateways' `projects/` and `config/`
 directories, bind-mounted into their containers (see `docker-compose.yaml`):
 
 ```
 gateways/
-├── dev/
+├── test/
 │   ├── projects/   ← what deploy.yml shipped (push to main)
 │   └── config/     ← gateway config, incl. what the deploy copied
-└── prod/
+└── production/
     ├── projects/   ← what release.yml shipped (tag push v*)
     └── config/
 ```
@@ -21,8 +21,8 @@ Why bind mounts instead of named volumes: you can verify a deploy landed
 without touching Docker at all:
 
 ```bash
-ls gateways/dev/projects            # what did the last dev deploy ship?
-ls gateways/prod/projects           # and the last release?
+ls gateways/test/projects            # what did the last test deploy ship?
+ls gateways/production/projects           # and the last release?
 ```
 
 Treat these directories as **read-only**: they are fed by CI (`docker cp` +

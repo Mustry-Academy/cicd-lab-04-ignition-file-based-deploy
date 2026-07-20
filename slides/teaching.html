@@ -270,7 +270,7 @@ body{
     </div>
     <ul class="checks" style="max-width:960px">
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>You already have:</b> git fluency, branching &amp; PRs done right, validation as a safety net, workflows/jobs/steps, a self-hosted runner, and Ignition under version control from Lab 02. Every one of those comes back today.</span></li>
-      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>New today:</b> the Ignition 8.3 <span class="inlinecode">data/</span> directory decoded file by file, <span class="inlinecode">.deployignore</span>, and a local → dev → prod promotion driven by GitHub Flow. The scan API returns in anger: per-gateway API keys, scoped permissions, and CI calling it instead of you.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>New today:</b> the Ignition 8.3 <span class="inlinecode">data/</span> directory decoded file by file, <span class="inlinecode">.deployignore</span>, and a local → test → production promotion driven by GitHub Flow. The scan API returns in anger: per-gateway API keys, scoped permissions, and CI calling it instead of you.</span></li>
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Not today:</b> image-based deploys and multi-gateway coordination. That's Day 3 (Labs 05 and 06). Today is a deep dive: decode the file tree, then master the deploy pattern built directly on it.</span></li>
     </ul>
     <div class="callout">
@@ -354,7 +354,7 @@ body{
       <span class="num">03</span>
       <div>
         <div class="title">Gateway config &amp; <em>deployment modes</em></div>
-        <div class="lead">Those <span class="mono">core / loc / dev / prd</span> scopes are Ignition 8.3's <b>deployment modes</b> feature: one config set holds every environment, and the gateway picks a mode at boot. <span class="inlinecode">config/resources/&lt;scope&gt;/&lt;module&gt;/&lt;type&gt;/&lt;name&gt;/{config.json, resource.json}</span>, scope first, then module-namespaced. The modes form an <b>inheritance chain</b> on top of <span class="mono">core</span>.</div>
+        <div class="lead">Those <span class="mono">core / local-development / test / production</span> scopes are Ignition 8.3's <b>deployment modes</b> feature: one config set holds every environment, and the gateway picks a mode at boot. <span class="inlinecode">config/resources/&lt;scope&gt;/&lt;module&gt;/&lt;type&gt;/&lt;name&gt;/{config.json, resource.json}</span>, scope first, then module-namespaced. The modes form an <b>inheritance chain</b> on top of <span class="mono">core</span>.</div>
       </div>
     </div>
     <div class="scopes">
@@ -364,7 +364,7 @@ body{
       </div>
       <span class="scarr">→</span>
       <div class="scope" style="border-left:5px solid var(--teal)">
-        <div class="nm">loc / dev / prd</div>
+        <div class="nm">local-development / test / production</div>
         <p>Per-environment overrides. Selected at boot with <span class="mono">-Dignition.config.mode=&lt;scope&gt;</span>, exactly how the lab's three gateways differ.</p>
       </div>
       <div class="scope instance" style="margin-left:16px">
@@ -376,21 +376,21 @@ body{
       <div class="code"><pre><span class="cm"># the override in action (services/config/resources/)</span>
 core/ignition/database-connection/TimescaleDB/config.json
   <span class="cmd2">"connectURL": "jdbc:postgresql://timescaledb:5432/ignition"</span>
-loc/ignition/database-connection/TimescaleDB/config.json
-  <span class="cmd2">…/ignition_loc</span>   <span class="cm"># same name, per-env override</span>
-dev/… → <span class="cmd2">…/ignition_dev</span>   ·   prd/… → <span class="cmd2">…/ignition_prd</span>
-loc/config-mode.json   <span class="cm"># scope descriptor {parent: "core"}</span>
+local-development/ignition/database-connection/TimescaleDB/config.json
+  <span class="cmd2">…/ignition_local_development</span>   <span class="cm"># same name, per-env override</span>
+test/… → <span class="cmd2">…/ignition_test</span>   ·   production/… → <span class="cmd2">…/ignition_production</span>
+local-development/config-mode.json   <span class="cm"># scope descriptor {parent: "core"}</span>
 
 <span class="cm"># how a gateway picks its mode: a JVM arg at boot (docker-compose.yaml)</span>
--Dignition.config.mode=<span class="cmd2">loc</span>   <span class="cm"># dev/prd gateways boot with dev / prd</span></pre></div>
+-Dignition.config.mode=<span class="cmd2">local-development</span>   <span class="cm"># test/production gateways boot with test / production</span></pre></div>
       <div class="callout" style="margin-top:6px">
         <div class="lab" style="color:var(--blue)">The mental model: same name, different reality</div>
-        <p>In this repo, <b>loc / dev / prd each hold exactly one override</b>: the <code>TimescaleDB</code> connection's <code>connectURL</code>. A view queries "TimescaleDB", and <b>which database</b> that hits depends on the boot mode. The real-plant version: a device named <code>PLC-01</code> is a <b>simulator in dev</b> and the <b>real PLC in prod</b>, same name, so your project never changes. One config set, one gateway backup, every environment.</p>
+        <p>In this repo, <b>local-development / test / production each hold exactly one override</b>: the <code>TimescaleDB</code> connection's <code>connectURL</code>. A view queries "TimescaleDB", and <b>which database</b> that hits depends on the boot mode. The real-plant version: a device named <code>PLC-01</code> is a <b>simulator in test</b> and the <b>real PLC in production</b>, same name, so your project never changes. One config set, one gateway backup, every environment.</p>
       </div>
     </div>
   </div>
 
-  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>core = ship it · loc/dev/prd = per-env · local = the box's own</span></div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>core = ship it · local-development/test/production = per-env · local = the box's own</span></div>
 </section>
 
 <!-- 8 · WHAT NEVER GOES IN GIT -->
@@ -493,7 +493,7 @@ scripts/clean-ignition-resource-churn.sh --apply  <span class="cm"># restore fro
     </table>
     <div class="callout">
       <div class="lab" style="color:var(--blue)">Remember this line</div>
-      <p><b>Scan owns everything that changes daily</b> (views, scripts, connections). When a scan isn't enough, the pipeline needs an <b>extra, disruptive step</b>: <code>docker compose restart ignition-dev</code> in this lab, <code>systemctl restart</code> on a real host. You'll hit the <code>modules.json</code> case yourself in the deploy stretch.</p>
+      <p><b>Scan owns everything that changes daily</b> (views, scripts, connections). When a scan isn't enough, the pipeline needs an <b>extra, disruptive step</b>: <code>docker compose restart ignition-test</code> in this lab, <code>systemctl restart</code> on a real host. You'll hit the <code>modules.json</code> case yourself in the deploy stretch.</p>
     </div>
   </div>
 
@@ -661,7 +661,7 @@ docker-compose.yaml <span class="cm"># ← unless you want it to run there with 
       <span class="num">09</span>
       <div>
         <div class="title">Ship = wipe, then copy</div>
-        <div class="lead">The runner is a container, so it reaches <b>inside</b> the gateway with <span class="inlinecode">docker exec</span> + <span class="inlinecode">docker cp</span> through the docker socket. dev and prod bind-mount <span class="inlinecode">projects/</span> + <span class="inlinecode">config/</span> to <span class="inlinecode">./gateways/&lt;gw&gt;/</span> on the host, so you can <b>watch a deploy land</b>: <span class="inlinecode">ls gateways/dev/projects</span>.</div>
+        <div class="lead">The runner is a container, so it reaches <b>inside</b> the gateway with <span class="inlinecode">docker exec</span> + <span class="inlinecode">docker cp</span> through the docker socket. test and production bind-mount <span class="inlinecode">projects/</span> + <span class="inlinecode">config/</span> to <span class="inlinecode">./gateways/&lt;gw&gt;/</span> on the host, so you can <b>watch a deploy land</b>: <span class="inlinecode">ls gateways/test/projects</span>.</div>
       </div>
     </div>
     <div class="cols2">
@@ -733,12 +733,12 @@ curl -X POST \
   http://localhost:8088/data/api/v1/scan/config
 
 <span class="cm"># the lab wrapper picks key + URL per gateway from .env</span>
-scripts/scan.sh both --gateway dev</pre></div>
+scripts/scan.sh both --gateway test</pre></div>
       <div>
         <ul class="checks">
-          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Keys are per-gateway, not per-URL.</b> Generate each in <i>that gateway's</i> UI (Config → Security → API Keys). The dev key will never authenticate against prod.</span></li>
+          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Keys are per-gateway, not per-URL.</b> Generate each in <i>that gateway's</i> UI (Config → Security → API Keys). The test key will never authenticate against production.</span></li>
           <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Least privilege:</b> scope the deploy key to <b>Project Scan + Config Scan</b> only. The deploy runner has no business taking backups or writing tags.</span></li>
-          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>In CI the key lives as an <b>environment-scoped GitHub secret</b> (<span class="inlinecode">lab-gateway-dev</span> / <span class="inlinecode">lab-gateway-prod</span>): per-target secrets and deploy history for free, exactly like Lab 03 taught.</span></li>
+          <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span>In CI the key lives as an <b>environment-scoped GitHub secret</b> (<span class="inlinecode">lab-gateway-test</span> / <span class="inlinecode">lab-gateway-production</span>): per-target secrets and deploy history for free, exactly like Lab 03 taught.</span></li>
         </ul>
         <div class="callout" style="margin-top:16px">
           <div class="lab" style="color:var(--blue)">Symptom dictionary</div>
@@ -813,11 +813,11 @@ scripts/scan.sh both --gateway dev</pre></div>
       </div>
     </div>
     <table class="tbl" style="max-width:1080px">
-      <tr><th></th><th>deploy.yml → dev</th><th>release.yml → prod</th></tr>
+      <tr><th></th><th>deploy.yml → test</th><th>release.yml → production</th></tr>
       <tr><td><b>Trigger</b></td><td>Push to <code>main</code>, gated by a <code>paths:</code> filter (<code>projects/**</code>, <code>services/config/**</code>, …). Docs-only pushes don't deploy.</td><td>Tag <code>v*</code> · manual <code>workflow_dispatch</code> with a <b>tag input</b>: the rollback button.</td></tr>
       <tr><td><b>Checks out</b></td><td>The merged commit</td><td>The tag: <code>ref: inputs.tag || github.ref</code>, so re-deploying <code>v0.1.0</code> ships that exact tree again.</td></tr>
-      <tr><td><b>Environment</b></td><td><code>lab-gateway-dev</code> · secret <code>IGNITION_API_KEY</code></td><td><code>lab-gateway-prod</code>: add <b>required reviewers</b> here for an approval gate, zero workflow changes.</td></tr>
-      <tr><td><b>Target defaults</b></td><td><code>http://ignition-dev:8088</code> · <code>lab04-ignition-dev</code></td><td><code>http://ignition-prod:8088</code> · <code>lab04-ignition-prod</code></td></tr>
+      <tr><td><b>Environment</b></td><td><code>lab-gateway-test</code> · secret <code>IGNITION_API_KEY</code></td><td><code>lab-gateway-production</code>: add <b>required reviewers</b> here for an approval gate, zero workflow changes.</td></tr>
+      <tr><td><b>Target defaults</b></td><td><code>http://ignition-test:8088</code> · <code>lab04-ignition-test</code></td><td><code>http://ignition-production:8088</code> · <code>lab04-ignition-production</code></td></tr>
       <tr><td><b>Concurrency</b></td><td colspan="2">One group per gateway, <code>cancel-in-progress: false</code>: new runs <b>queue</b>; an in-flight copy is never killed.</td></tr>
     </table>
     <div class="callout">
@@ -838,11 +838,11 @@ scripts/scan.sh both --gateway dev</pre></div>
 
   <div class="body">
     <div class="eyebrow">Now we make it real</div>
-    <div class="title" style="max-width:24ch;color:#fff">Next: watch a change ride from your editor to a <em style="font-style:normal;color:var(--peri2)">prod</em> gateway.</div>
+    <div class="title" style="max-width:24ch;color:#fff">Next: watch a change ride from your editor to a <em style="font-style:normal;color:var(--peri2)">production</em> gateway.</div>
     <ul class="checks" style="max-width:940px;margin-top:22px">
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>We-do (part 1).</b> Live tour of <span class="mono" style="color:#dbe4f0">data/</span> from inside the container, plus the marker trick: touch a marker, click in the UI, <span class="mono" style="color:#dbe4f0">find -newer</span> the file it wrote.</span></li>
-      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>We-do (part 2).</b> A view created on disk by hand, scanned into the local gateway, then shipped to dev with the exact <span class="mono" style="color:#dbe4f0">docker cp</span> commands the workflow automates.</span></li>
-      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>You-do (breakout rooms).</b> Part 1: classify real UI changes into buckets. Part 2: wire your fork's runner, merge a PR into <span class="mono" style="color:#dbe4f0">main</span> → <b>dev</b>, tag <span class="mono" style="color:#dbe4f0">v0.1.0</span> → <b>prod</b>. Then break a deploy on purpose.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>We-do (part 2).</b> A view created on disk by hand, scanned into the local gateway, then shipped to test with the exact <span class="mono" style="color:#dbe4f0">docker cp</span> commands the workflow automates.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>You-do (breakout rooms).</b> Part 1: classify real UI changes into buckets. Part 2: wire your fork's runner, merge a PR into <span class="mono" style="color:#dbe4f0">main</span> → <b>test</b>, tag <span class="mono" style="color:#dbe4f0">v0.1.0</span> → <b>production</b>. Then break a deploy on purpose.</span></li>
     </ul>
     <p class="lead" style="font-size:13.5px;color:#8fa0b6;margin-top:22px">Day 3 teaser: everything a scan <i>can't</i> apply (modules, the gateway baseline) gets baked into images. Lab 05.</p>
   </div>
@@ -972,8 +972,8 @@ function bindControls(slideEl,ctrl){
   const repo   = box(260,340,360,190,'your fork','projects/\nservices/config/', 'var(--teal)');
   const local  = box(1200,120,380,140,'ignition-local  :8088','bind mount · your scratchpad', teal);
   const runner = box(700,520,360,150,'lab04-runner','self-hosted · lab04\nshares /var/run/docker.sock', peri);
-  const dev    = box(1200,380,380,140,'ignition-dev  :8089','./gateways/dev · fed by CI', peri);
-  const prod   = box(1200,610,380,140,'ignition-prod  :8090','./gateways/prod · fed by tags', amber);
+  const test    = box(1200,380,380,140,'ignition-test  :8089','./gateways/test · fed by CI', peri);
+  const production   = box(1200,610,380,140,'ignition-production  :8090','./gateways/production · fed by tags', amber);
 
   const fBind = flow(440,270,1005,140,'bind mount · edit → scan',teal);
   const fPushD= flow(440,400,517,485,'merge PR into main',peri);
@@ -985,11 +985,11 @@ function bindControls(slideEl,ctrl){
   const steps=[
     {on:[repo,local,fBind],t:'<b>local</b> is your scratchpad: it bind-mounts <b>projects/</b> and <b>services/config/</b> straight from the repo. Edit a file, hit scan, see it at :8088, no CI involved.'},
     {on:[runner],t:'The <b>bundled runner</b> registers against <i>your fork</i> and polls GitHub for jobs. It shares the host\'s Docker socket, which is how it reaches inside the other containers. Lab convenience, not a production pattern.'},
-    {on:[dev,fPushD,fShipD],t:'Merge a feature PR into <b>main</b> → <b>deploy.yml</b> runs on the runner → wipe + docker cp + scan → the change is live on <b>dev</b> (:8089). Many small merges a day.'},
-    {on:[prod,fTag,fShipP],t:'Merging to <b>main</b> ships <i>dev</i>, not prod. Push a tag <b>vX.Y.Z</b> on main → <b>release.yml</b> ships that exact commit to <b>prod</b> (:8090). Prod always runs a named, re-deployable version.'},
-    {on:[],t:'The pipelines hold the routing: <b>deploy.yml → dev</b> · <b>release.yml → prod</b> · <b>local outside the flow entirely</b>. Your merge or tag just triggers them, and no human picks a target by hand.'}
+    {on:[test,fPushD,fShipD],t:'Merge a feature PR into <b>main</b> → <b>deploy.yml</b> runs on the runner → wipe + docker cp + scan → the change is live on <b>test</b> (:8089). Many small merges a day.'},
+    {on:[production,fTag,fShipP],t:'Merging to <b>main</b> ships <i>test</i>, not production. Push a tag <b>vX.Y.Z</b> on main → <b>release.yml</b> ships that exact commit to <b>production</b> (:8090). Production always runs a named, re-deployable version.'},
+    {on:[],t:'The pipelines hold the routing: <b>deploy.yml → test</b> · <b>release.yml → production</b> · <b>local outside the flow entirely</b>. Your merge or tag just triggers them, and no human picks a target by hand.'}
   ];
-  const all=[repo,local,runner,dev,prod,fBind,fPushD,fShipD,fTag,fShipP];
+  const all=[repo,local,runner,test,production,fBind,fPushD,fShipD,fTag,fShipP];
   controllers.promo={max:steps.length-1,render(s){
     const onset=new Set(); for(let i=0;i<=s;i++)steps[i].on.forEach(g=>onset.add(g));
     all.forEach(g=>reveal(g,onset.has(g)));

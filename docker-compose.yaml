@@ -4,23 +4,23 @@
 #   ignition-local   http://localhost:8088   bind-mounts ./projects + ./services/config
 #                                            (working gateway — edits show
 #                                             up immediately on disk)
-#   ignition-dev     http://localhost:8089   projects/ + config/ bind-mounted from
-#                                            ./gateways/dev, populated by deploy.yml
+#   ignition-test     http://localhost:8089   projects/ + config/ bind-mounted from
+#                                            ./gateways/test, populated by deploy.yml
 #                                            (push to main)
-#   ignition-prod    http://localhost:8090   projects/ + config/ bind-mounted from
-#                                            ./gateways/prod, populated by release.yml
+#   ignition-production    http://localhost:8090   projects/ + config/ bind-mounted from
+#                                            ./gateways/production, populated by release.yml
 #                                            (tag push v*)
 #
-#   timescaledb      localhost:5432          databases: ignition_loc, ignition_dev,
-#                                                       ignition_prd (one per env)
+#   timescaledb      localhost:5432          databases: ignition_local_development, ignition_test,
+#                                                       ignition_production (one per env)
 #
 # Run it:
 #   cp .env.example .env
 #   scripts/setup.sh           # or:  docker compose up -d
 # Then:
 #   open http://localhost:8088   (local)
-#   open http://localhost:8089   (dev — empty until first push to main)
-#   open http://localhost:8090   (prod — empty until first tag push)
+#   open http://localhost:8089   (test — empty until first push to main)
+#   open http://localhost:8090   (production — empty until first tag push)
 
 ---
 # YAML anchors for the bits that don't differ across the three gateways. Each
@@ -121,7 +121,7 @@ services:
       wrapper.java.initmemory=256
       -Dignition.allowunsignedmodules=true
       -Dignition.gateway.externalModulesFolder=/third-party-modules
-      -Dignition.config.mode=loc
+      -Dignition.config.mode=local-development
     healthcheck: *ignition-healthcheck
     <<: *ignition-resources
     networks:
@@ -130,11 +130,11 @@ services:
       timescaledb:
         condition: service_healthy
 
-  # --- dev gateway: populated by deploy.yml (push to main) -------------------
-  ignition-dev:
+  # --- test gateway: populated by deploy.yml (push to main) -------------------
+  ignition-test:
     image: inductiveautomation/ignition:8.3.6
-    container_name: lab04-ignition-dev
-    hostname: lab04-ignition-dev
+    container_name: lab04-ignition-test
+    hostname: lab04-ignition-test
     # Keep the image's own identity (uid 2003, gid 0): its data/ tree is
     # owned 2003:0 mode 775, so any OTHER primary gid loses write access and
     # the gateway fails to boot ("gateway.xml exists, but isnt readable or
@@ -151,27 +151,27 @@ services:
       - "8089:8088"
       - "8061:8060"
     volumes:
-      - ignition-dev-data:/usr/local/bin/ignition/data
-      # projects/ and config/ are bind-mounted from ./gateways/dev (gitignored,
+      - ignition-test-data:/usr/local/bin/ignition/data
+      # projects/ and config/ are bind-mounted from ./gateways/test (gitignored,
       # created by setup.sh) so you can SEE what a deploy shipped straight from
-      # your laptop: `ls gateways/dev/projects`. The rest of data/ (internal db,
+      # your laptop: `ls gateways/test/projects`. The rest of data/ (internal db,
       # var/, certificates/) stays in the named volume above.
-      - ./gateways/dev/projects:/usr/local/bin/ignition/data/projects
-      - ./gateways/dev/config:/usr/local/bin/ignition/data/config
+      - ./gateways/test/projects:/usr/local/bin/ignition/data/projects
+      - ./gateways/test/config:/usr/local/bin/ignition/data/config
       - ./services/modules.json:/usr/local/bin/ignition/data/modules.json
       - ./third-party-modules:/third-party-modules
     environment:
       <<: *ignition-env
-      GATEWAY_ADMIN_USERNAME: "${GATEWAY_ADMIN_USERNAME_DEV:-admin}"
-      GATEWAY_ADMIN_PASSWORD: "${GATEWAY_ADMIN_PASSWORD_DEV:-password}"
+      GATEWAY_ADMIN_USERNAME: "${GATEWAY_ADMIN_USERNAME_TEST:-admin}"
+      GATEWAY_ADMIN_PASSWORD: "${GATEWAY_ADMIN_PASSWORD_TEST:-password}"
     command: >
-      -n lab04-dev
+      -n lab04-test
       -m 1024
       --
       wrapper.java.initmemory=256
       -Dignition.allowunsignedmodules=true
       -Dignition.gateway.externalModulesFolder=/third-party-modules
-      -Dignition.config.mode=dev
+      -Dignition.config.mode=test
     healthcheck: *ignition-healthcheck
     <<: *ignition-resources
     networks:
@@ -180,11 +180,11 @@ services:
       timescaledb:
         condition: service_healthy
 
-  # --- prod gateway: populated by release.yml (tag push v*) ------------------
-  ignition-prod:
+  # --- production gateway: populated by release.yml (tag push v*) ------------------
+  ignition-production:
     image: inductiveautomation/ignition:8.3.6
-    container_name: lab04-ignition-prod
-    hostname: lab04-ignition-prod
+    container_name: lab04-ignition-production
+    hostname: lab04-ignition-production
     # Keep the image's own identity (uid 2003, gid 0): its data/ tree is
     # owned 2003:0 mode 775, so any OTHER primary gid loses write access and
     # the gateway fails to boot ("gateway.xml exists, but isnt readable or
@@ -201,25 +201,25 @@ services:
       - "8090:8088"
       - "8062:8060"
     volumes:
-      - ignition-prod-data:/usr/local/bin/ignition/data
-      # Same pattern as dev: deployed files are visible on the host under
-      # ./gateways/prod (gitignored, created by setup.sh).
-      - ./gateways/prod/projects:/usr/local/bin/ignition/data/projects
-      - ./gateways/prod/config:/usr/local/bin/ignition/data/config
+      - ignition-production-data:/usr/local/bin/ignition/data
+      # Same pattern as test: deployed files are visible on the host under
+      # ./gateways/production (gitignored, created by setup.sh).
+      - ./gateways/production/projects:/usr/local/bin/ignition/data/projects
+      - ./gateways/production/config:/usr/local/bin/ignition/data/config
       - ./services/modules.json:/usr/local/bin/ignition/data/modules.json
       - ./third-party-modules:/third-party-modules
     environment:
       <<: *ignition-env
-      GATEWAY_ADMIN_USERNAME: "${GATEWAY_ADMIN_USERNAME_PROD:-admin}"
-      GATEWAY_ADMIN_PASSWORD: "${GATEWAY_ADMIN_PASSWORD_PROD:-password}"
+      GATEWAY_ADMIN_USERNAME: "${GATEWAY_ADMIN_USERNAME_PRODUCTION:-admin}"
+      GATEWAY_ADMIN_PASSWORD: "${GATEWAY_ADMIN_PASSWORD_PRODUCTION:-password}"
     command: >
-      -n lab04-prod
+      -n lab04-production
       -m 1024
       --
       wrapper.java.initmemory=256
       -Dignition.allowunsignedmodules=true
       -Dignition.gateway.externalModulesFolder=/third-party-modules
-      -Dignition.config.mode=prd
+      -Dignition.config.mode=production
     healthcheck: *ignition-healthcheck
     <<: *ignition-resources
     networks:
@@ -249,7 +249,7 @@ services:
     environment:
       POSTGRES_USER: "${POSTGRES_USER:-ignition}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-ignition}"
-      POSTGRES_DB: ignition_loc
+      POSTGRES_DB: ignition_local_development
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ignition}"]
       interval: 5s
@@ -266,11 +266,11 @@ services:
   # PAT; Labs 05 and 06 reuse the same token.
   #
   # The runner sits on the lab's compose network, so it reaches the gateways by
-  # service name (ignition-local, ignition-dev, ignition-prod) — see the
+  # service name (ignition-local, ignition-test, ignition-production) — see the
   # IGNITION_URL defaults in .github/workflows/deploy.yml and release.yml.
   #
   # Why /var/run/docker.sock is mounted: deploy.yml and release.yml use
-  # `docker cp` and `docker exec` to push project files INTO the dev/prod
+  # `docker cp` and `docker exec` to push project files INTO the test/production
   # gateway containers. That requires the runner to talk to the host's
   # Docker daemon. Lab convenience, NOT a production pattern.
   github-runner:
@@ -295,6 +295,6 @@ services:
 
 volumes:
   ignition-local-data:
-  ignition-dev-data:
-  ignition-prod-data:
+  ignition-test-data:
+  ignition-production-data:
   timescaledb-data:

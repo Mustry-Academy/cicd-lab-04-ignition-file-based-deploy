@@ -41,7 +41,7 @@ services/config/resources/core/ignition/identity-provider/default/
 # This entry protects manual deploys run from a working tree, where the
 # local gateway's token sits under services/config.
 services/config/resources/core/ignition/api-token/
-# Dev/prod gateway state (bind mounts) — never part of a deploy payload
+# Test/production gateway state (bind mounts) — never part of a deploy payload
 gateways/
 
 # OS noise
@@ -53,6 +53,6 @@ Thumbs.db
 .idea/
 *.swp
 
-# Compose / dev-only files
+# Compose / development-only files
 docker-compose.yaml
 .env

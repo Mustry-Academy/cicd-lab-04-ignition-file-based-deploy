@@ -2,20 +2,15 @@
 # generate-api-keys.sh — provision one Ignition scan-API token PER GATEWAY,
 # without ever putting a secret in git.
 #
-# Earlier versions of this lab shipped a pre-provisioned token in the repo:
-# the hash was committed under services/config and the full key sat in
-# .env.example — working credentials in every clone's history. Exactly what a
-# CI/CD course should not do. Instead, every clone now generates its own keys.
-#
-# For each gateway (local / dev / prod) this script:
+# For each gateway (local / test / production) this script:
 #   1. ensures .env has a real IGNITION_API_KEY_<GW> — if the line is empty,
 #      missing, or a placeholder, it generates `cicd:<base64url(32 random
 #      bytes)>` and writes it into .env;
 #   2. writes the matching api-token resource — the gateway stores only the
 #      SHA-256 hash of the secret — into that gateway's config tree:
 #        local -> services/config/resources/core/ignition/api-token/cicd/
-#        dev   -> gateways/dev/config/resources/core/ignition/api-token/cicd/
-#        prod  -> gateways/prod/config/resources/core/ignition/api-token/cicd/
+#        test   -> gateways/test/config/resources/core/ignition/api-token/cicd/
+#        production  -> gateways/production/config/resources/core/ignition/api-token/cicd/
 #      All three paths are gitignored, so the token never enters a commit.
 #      A fresh core/ tree also gets the config-mode.json collection manifest
 #      (REQUIRED: a non-empty collection dir without it FAULTs first boot).
@@ -56,8 +51,8 @@ with open(env_path) as f:
 TOKEN_NAME = "cicd"
 GATEWAYS = {          # env-var suffix -> that gateway's config bind mount
     "LOCAL": "services/config",
-    "DEV":   "gateways/dev/config",
-    "PROD":  "gateways/prod/config",
+    "TEST":   "gateways/test/config",
+    "PRODUCTION":  "gateways/production/config",
 }
 MANIFEST_SRC = os.path.join(root, "services/config/resources/core/config-mode.json")
 

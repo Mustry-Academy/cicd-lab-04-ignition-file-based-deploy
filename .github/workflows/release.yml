@@ -1,33 +1,33 @@
-# Release to the prod gateway on tag push (GitHub Flow release).
+# Release to the production gateway on tag push (GitHub Flow release).
 #
 # GitHub Flow: `main` is always deployable. When you want to cut a release, tag a
 # commit on `main` `vX.Y.Z`. That tag fires this workflow. The tag pins the exact
-# commit prod ships — "release what you froze on main".
+# commit production ships — "release what you froze on main".
 #
 # Triggers on tags matching `v*` (e.g. v1.0.0, v2.3.1-rc1). Also supports
 # manual dispatch with a tag input — that's the rollback button: re-deploy any
-# already-released tag to prod without touching git.
+# already-released tag to production without touching git.
 #
-# Mechanics: file-based deploy via `docker cp` into the prod gateway's
+# Mechanics: file-based deploy via `docker cp` into the production gateway's
 # container, then trigger a scan. The gateway's projects/ and config/ are
-# bind-mounted from ./gateways/prod on the host for easy verification.
+# bind-mounted from ./gateways/production on the host for easy verification.
 # Identical to deploy.yml except for the environment, container name, and
 # default URL.
 #
-# Required setup on GitHub (Settings → Environments → "lab-gateway-prod"):
-#   Secret:    IGNITION_API_KEY    The IGNITION_API_KEY_PROD value from your
+# Required setup on GitHub (Settings → Environments → "lab-gateway-production"):
+#   Secret:    IGNITION_API_KEY    The IGNITION_API_KEY_PRODUCTION value from your
 #                                  .env (scripts/setup.sh generated it,
 #                                  unique to your clone).
 #   Variable:  IGNITION_URL        Optional. Defaults to
-#                                  http://ignition-prod:8088 — the in-compose
+#                                  http://ignition-production:8088 — the in-compose
 #                                  service name (the lab's bundled runner runs
 #                                  on the same docker network as the gateways).
 #                                  Override to http://localhost:8090 if your
 #                                  runner is on the host instead.
-#   Variable:  IGNITION_CONTAINER  Optional. Defaults to lab04-ignition-prod.
+#   Variable:  IGNITION_CONTAINER  Optional. Defaults to lab04-ignition-production.
 #
-# Add required reviewers on the lab-gateway-prod environment if you want a
-# manual approval gate before prod releases — common pattern, doesn't need
+# Add required reviewers on the lab-gateway-production environment if you want a
+# manual approval gate before production releases — common pattern, doesn't need
 # any workflow change.
 
 name: Release
@@ -43,7 +43,7 @@ on:
         type: string
 
 concurrency:
-  group: release-lab-gateway-prod
+  group: release-lab-gateway-production
   cancel-in-progress: false
 
 permissions:
@@ -51,20 +51,19 @@ permissions:
 
 jobs:
   # Same gate as deploy.yml: the tagged commit must pass the full CI suite
-  # before it is allowed anywhere near prod. Tags never go through a PR, so
+  # before it is allowed anywhere near production. Tags never go through a PR, so
   # without this a bad tag would ship unvalidated.
   validate:
-    name: Validate
     uses: ./.github/workflows/ci.yml
 
   release:
-    name: Release to prod gateway
+    name: Release to production gateway
     needs: validate
     runs-on: [self-hosted, lab04]
-    environment: lab-gateway-prod
+    environment: lab-gateway-production
     env:
-      IGNITION_URL: ${{ vars.IGNITION_URL || 'http://ignition-prod:8088' }}
-      IGNITION_CONTAINER: ${{ vars.IGNITION_CONTAINER || 'lab04-ignition-prod' }}
+      IGNITION_URL: ${{ vars.IGNITION_URL || 'http://ignition-production:8088' }}
+      IGNITION_CONTAINER: ${{ vars.IGNITION_CONTAINER || 'lab04-ignition-production' }}
       IGNITION_API_KEY: ${{ secrets.IGNITION_API_KEY }}
       GATEWAY_DATA_PATH: /usr/local/bin/ignition/data
 

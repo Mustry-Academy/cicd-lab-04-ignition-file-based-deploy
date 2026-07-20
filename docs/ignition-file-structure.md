@@ -48,7 +48,7 @@ payload (`view.json`, etc.). That manifest is what the gateway reads to track th
 the gateway rewrites it on every interaction (timestamps, signatures), this repo ships a normalized
 diff driver plus `scripts/clean-ignition-resource-churn.sh` to undo the volatile-only rewrites.
 
-This is the bread and butter of CI/CD for Ignition. The whole `projects/<name>/` directory is what the `deploy.yml` workflow ships onto the **dev** gateway (on push to `main`) and what `release.yml` ships onto **prod** (on tag push from `main`) in the deploy part. On the **local** gateway it just sits there via bind mount — edit-and-scan, no copy step. This is what the deploy part of the lab builds.
+This is the bread and butter of CI/CD for Ignition. The whole `projects/<name>/` directory is what the `deploy.yml` workflow ships onto the **test** gateway (on push to `main`) and what `release.yml` ships onto **production** (on tag push from `main`) in the deploy part. On the **local** gateway it just sits there via bind mount — edit-and-scan, no copy step. This is what the deploy part of the lab builds.
 
 ### `config/`
 
@@ -62,7 +62,7 @@ The **scopes** (in this repo, under [`services/config/resources/`](../services/c
 |---|---|
 | `external` | Built-in Ignition defaults (the base everything inherits from). |
 | `core` | The locally-managed, **portable** config you version and ship (DB connections, tag providers, system properties). Inherits `external`. |
-| `loc` / `dev` / `prd` | Per-environment overrides, selected at boot via `-Dignition.config.mode=<scope>`. Inherits `core`. |
+| `local-development` / `test` / `production` | Per-environment overrides, selected at boot via `-Dignition.config.mode=<scope>`. Inherits `core`. |
 | `local` | **Per-instance, instance-bound** state — see the `local/` note below. |
 
 Real examples from `core/` in this repo:
@@ -104,16 +104,16 @@ it so the key survives deploys.
 
 ### Deployment modes (this is the 8.3 feature behind those scopes)
 
-The `core` / `loc` / `dev` / `prd` scopes above are not a lab invention. They are Ignition 8.3's
+The `core` / `local-development` / `test` / `production` scopes above are not a lab invention. They are Ignition 8.3's
 **deployment modes** feature. A deployment mode lets you keep **one** configuration set that
 contains the settings for *every* environment, and have the gateway pick the right variant at boot.
 You define any modes you like (development, staging, production, or custom); the common case is just
-dev and prod.
+test and production.
 
 The mental model that makes it click: **the same resource name resolves to different settings per
 mode.** A device named `PLC-01` can be a **simulator** in development and the **real Modbus device**
 in production, under the same name, so your projects never change. A database connection keeps its
-name but points at the dev database in `dev` and the prod database in `prd`. Because it is all one
+name but points at the test database in `test` and the production database in `production`. Because it is all one
 config set, one gateway backup carries every environment's settings, and you stop tracking a pile of
 per-gateway differences by hand.
 
@@ -123,20 +123,20 @@ On disk that is exactly what you see in this repo:
 config/resources/
 ├── core/                                   ← shared baseline, inherited by every mode
 │   └── ignition/database-connection/TimescaleDB/config.json
-├── loc/  ignition/database-connection/TimescaleDB/config.json   ← local override
-├── dev/  ignition/database-connection/TimescaleDB/config.json   ← dev override
-└── prd/  ignition/database-connection/TimescaleDB/config.json   ← prod override
+├── local-development/  ignition/database-connection/TimescaleDB/config.json   ← local override
+├── test/  ignition/database-connection/TimescaleDB/config.json   ← test override
+└── production/  ignition/database-connection/TimescaleDB/config.json   ← production override
 ```
 
 The **same** `database-connection/TimescaleDB` resource carries a **different `config.json` under
 each mode**, all inheriting `core`. Each scope has a `config-mode.json` descriptor declaring its
-parent (so `loc`/`dev`/`prd` inherit `core`, which inherits `external`). The gateway selects the
+parent (so `local-development`/`test`/`production` inherit `core`, which inherits `external`). The gateway selects the
 active mode at boot with `-Dignition.config.mode=<scope>`. A good way to *see* it: diff the local
-and prod copies of the same connection.
+and production copies of the same connection.
 
 ```bash
-diff services/config/resources/loc/ignition/database-connection/TimescaleDB/config.json \
-     services/config/resources/prd/ignition/database-connection/TimescaleDB/config.json
+diff services/config/resources/local-development/ignition/database-connection/TimescaleDB/config.json \
+     services/config/resources/production/ignition/database-connection/TimescaleDB/config.json
 ```
 
 Everything one mode does *not* override falls through to `core`. This is a platform feature, not
@@ -249,7 +249,7 @@ Some changes require **only** a scan; others require a **restart**.
 | Change gateway memory (`-m` arg) | ✗ — needs restart |
 | Change Java args | ✗ — needs restart |
 
-The shipped `scripts/scan.sh` only handles the scan-able cases. For the restart cases, the deploy needs an extra step (`docker compose restart ignition-local` / `-dev` / `-prod` in the lab; `Restart-Service` or `systemctl restart` on a real host).
+The shipped `scripts/scan.sh` only handles the scan-able cases. For the restart cases, the deploy needs an extra step (`docker compose restart ignition-local` / `-test` / `-production` in the lab; `Restart-Service` or `systemctl restart` on a real host).
 
 ## Further reading
 

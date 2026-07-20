@@ -1,28 +1,28 @@
-# Deploy to the dev gateway on push to main.
+# Deploy to the test gateway on push to main.
 #
 # GitHub Flow: `main` is the single long-lived branch. Feature branches merge into
-# it via PR, and every push here ships the working tree to the DEV gateway.
-# Releases to prod happen separately (tag on main → release.yml).
+# it via PR, and every push here ships the working tree to the TEST gateway.
+# Releases to production happen separately (tag on main → release.yml).
 #
 # File-based deploy via `docker cp` — the runner is a container without the
-# host's paths, so it ships files INTO the dev gateway's container and then
+# host's paths, so it ships files INTO the test gateway's container and then
 # asks the gateway to scan. The gateway's projects/ and config/ are
-# bind-mounted from ./gateways/dev on the host, so you can verify what a
-# deploy shipped with `ls gateways/dev/projects`. Runs on a self-hosted
+# bind-mounted from ./gateways/test on the host, so you can verify what a
+# deploy shipped with `ls gateways/test/projects`. Runs on a self-hosted
 # runner with the `lab04` label that has access to the same Docker daemon
-# as the dev gateway container.
+# as the test gateway container.
 #
-# Required setup on GitHub (Settings → Environments → "lab-gateway-dev"):
-#   Secret:    IGNITION_API_KEY    The IGNITION_API_KEY_DEV value from your
+# Required setup on GitHub (Settings → Environments → "lab-gateway-test"):
+#   Secret:    IGNITION_API_KEY    The IGNITION_API_KEY_TEST value from your
 #                                  .env (scripts/setup.sh generated it,
 #                                  unique to your clone).
 #   Variable:  IGNITION_URL        Optional. Defaults to
-#                                  http://ignition-dev:8088 — the in-compose
+#                                  http://ignition-test:8088 — the in-compose
 #                                  service name (the lab's bundled runner runs
 #                                  on the same docker network as the gateways).
 #                                  Override to http://localhost:8089 if your
 #                                  runner is on the host instead.
-#   Variable:  IGNITION_CONTAINER  Optional. Defaults to lab04-ignition-dev.
+#   Variable:  IGNITION_CONTAINER  Optional. Defaults to lab04-ignition-test.
 
 name: Deploy
 
@@ -39,7 +39,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: deploy-lab-gateway-dev
+  group: deploy-lab-gateway-test
   cancel-in-progress: false
 
 permissions:
@@ -50,17 +50,16 @@ jobs:
   # touches the gateway. PRs already ran it, but this also covers direct
   # pushes to main — the deploy job below only starts if validation is green.
   validate:
-    name: Validate
     uses: ./.github/workflows/ci.yml
 
   deploy:
-    name: Deploy to dev gateway
+    name: Deploy to test gateway
     needs: validate
     runs-on: [self-hosted, lab04]
-    environment: lab-gateway-dev
+    environment: lab-gateway-test
     env:
-      IGNITION_URL: ${{ vars.IGNITION_URL || 'http://ignition-dev:8088' }}
-      IGNITION_CONTAINER: ${{ vars.IGNITION_CONTAINER || 'lab04-ignition-dev' }}
+      IGNITION_URL: ${{ vars.IGNITION_URL || 'http://ignition-test:8088' }}
+      IGNITION_CONTAINER: ${{ vars.IGNITION_CONTAINER || 'lab04-ignition-test' }}
       IGNITION_API_KEY: ${{ secrets.IGNITION_API_KEY }}
       GATEWAY_DATA_PATH: /usr/local/bin/ignition/data
 
