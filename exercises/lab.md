@@ -304,6 +304,8 @@ git tag v0.1.0
 git push origin v0.1.0        # ← release.yml fires
 ```
 
+> **`fatal: tag 'v0.1.0' already exists`?** Your fork copied every tag the upstream repo had at fork time. `git tag -l` shows what's taken — either take the next free number (`v0.1.1` works exactly the same), or delete the stale tag first: `git tag -d v0.1.0 && git push origin :refs/tags/v0.1.0`.
+
 [`release.yml`](../.github/workflows/release.yml) fires on the tag. It starts with the same validation gate as `deploy.yml` (tags never go through a PR), then releases. Watch it run, then check http://localhost:8090 — the change you merged into main and just released should be visible on prod. Host-side check works here too: `ls gateways/prod/projects`. The push to `main` deployed to dev on its own; the **tag** is what promotes to prod, so prod always runs a named, re-deployable version. That's also your rollback button: `release.yml`'s `workflow_dispatch` takes a tag input.
 
 ### Part 2.5 — Break a deploy on purpose (optional, ~5 min)

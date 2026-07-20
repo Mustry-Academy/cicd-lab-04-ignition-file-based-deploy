@@ -441,7 +441,7 @@ git push -u origin feature/tweak-view
       <div class="steps">
         <div class="step"><div class="ix p">6</div><div class="tx">The change is already on <span class="inlinecode">main</span> from the dev deploy, now tag it.</div></div>
         <div class="step"><div class="ix p">7</div><div class="tx"><b>Observe: the tag is what ships prod.</b> The merge already shipped dev, but only a <span class="inlinecode">v*</span> tag reaches prod.</div></div>
-        <div class="step"><div class="ix p">8</div><div class="tx">Tag <span class="inlinecode">v0.1.0</span> and push the tag. <span class="inlinecode">release.yml</span> fires: same five steps, different environment, prod container.</div></div>
+        <div class="step"><div class="ix p">8</div><div class="tx">Tag <span class="inlinecode">v0.1.0</span> and push the tag. <span class="inlinecode">release.yml</span> fires: same five steps, different environment, prod container. Tag already exists in your fork (inherited at fork time)? Take the next free number, <span class="inlinecode">git tag -l</span> shows what's taken.</div></div>
         <div class="step"><div class="ix p">9</div><div class="tx"><b>Verify at localhost:8090 (or Designer).</b> Prod now shows the change you merged into <span class="inlinecode">main</span> and just released. Host-side check: <span class="inlinecode">ls gateways/prod/projects</span>.</div></div>
       </div>
       <div>
