@@ -15,6 +15,14 @@ This is the **first lab that opens up the Ignition gateway itself**. Labs 02–0
 - _Optional but recommended:_ pass [`cicd-preflight`](https://github.com/mustry-academy/cicd-preflight) so unrelated env issues don't bite you mid-lab
 - _Background reading:_ [Lab 03](https://github.com/mustry-academy/cicd-lab-03-github-actions) covers the GitHub Actions fundamentals this lab builds on, but this lab stands alone — the self-hosted runner ships in `docker-compose.yaml`, no manual `docker run` of `myoung34/github-runner` required
 
+
+> **WSL2 (Windows): keep the clone in your Linux home (`~/…`), never `/mnt/c/…`.**
+> On the Windows filesystem your Windows user, your WSL user and the gateway's
+> container user are three different identities, so file ownership breaks in ways
+> `chown` cannot fix and you end up reaching for `sudo` (which makes it worse).
+> `scripts/setup.sh` refuses to run from there, and never needs `sudo`.
+> See [`docs/wsl-setup.md`](./docs/wsl-setup.md).
+
 ## Quick start
 
 ```bash

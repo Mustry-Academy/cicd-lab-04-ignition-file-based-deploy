@@ -16,15 +16,24 @@
 # Re-run safely — every step is idempotent.
 #
 # Env knobs:
-#   CI=1                            run non-interactively (no WSL prompt)
-#   APPLY_WSL_PERMISSIONS=false     skip the WSL block entirely
+#   CI=1                            run non-interactively (never prompt/sudo)
+#   LAB_SKIP_PREFLIGHT=1            skip the host permission checks entirely
+#   LAB_ALLOW_DRVFS=1               allow running from /mnt/c (not recommended)
+#   LAB_ASSUME_YES=1                auto-answer preflight prompts with yes
 #   NO_COLOR=1                      disable ANSI colors
 
 set -euo pipefail
 
 # shellcheck source=lib.sh
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"
+# shellcheck source=preflight.sh
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/preflight.sh"
 cd "$PROJECT_ROOT"
+
+# ---- Host preflight (WSL/permissions) ------------------------------------
+# Verifies the repo is not on /mnt/c, refuses a sudo'd run, reclaims any
+# root-owned leftovers, and exports LAB_GID for docker-compose.yaml.
+lab_preflight
 
 # ---- prerequisites --------------------------------------------------------
 
@@ -63,54 +72,6 @@ echo "      prod   http://localhost:8090   (populated by release.yml on tag push
 echo "  - one TimescaleDB on localhost:5432 hosting ignition_loc / ignition_dev / ignition_prd"
 echo ""
 
-# ---- WSL compatibility ---------------------------------------------------
-apply_wsl_permissions() {
-    if [ "${APPLY_WSL_PERMISSIONS:-true}" != "true" ]; then
-        return 0
-    fi
-
-    if ! grep -qi microsoft /proc/version 2>/dev/null; then
-        return 0
-    fi
-
-    echo -e "${YELLOW}WSL detected: configuring for WSL compatibility.${NC}"
-
-    git config core.fileMode false
-
-    if ! grep -q "metadata" /etc/wsl.conf 2>/dev/null; then
-        echo ""
-        echo -e "${YELLOW}Warning: Your /etc/wsl.conf does not have metadata mount options.${NC}"
-        echo -e "${YELLOW}This can cause file permission issues in VS Code.${NC}"
-        echo ""
-        if [ "${CI:-}" = "1" ] || [ ! -t 0 ]; then
-            echo "Skipping interactive prompt (CI or non-interactive shell)."
-            echo "Add the following to /etc/wsl.conf manually if you hit perms issues:"
-            echo "  [automount]"
-            echo "  enabled = true"
-            echo '  options = "metadata,umask=022,fmask=011"'
-            return 0
-        fi
-        read -p "Would you like to configure it now? (Y/n): " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-            sudo tee /etc/wsl.conf > /dev/null <<'WSLCONF'
-[automount]
-enabled = true
-options = "metadata,umask=022,fmask=011"
-WSLCONF
-            echo -e "${GREEN}wsl.conf updated. Run 'wsl --shutdown' from PowerShell and restart WSL for changes to take effect.${NC}"
-        else
-            echo "Skipping. You can manually add the following to /etc/wsl.conf:"
-            echo ""
-            echo "  [automount]"
-            echo "  enabled = true"
-            echo '  options = "metadata,umask=022,fmask=011"'
-            echo ""
-        fi
-    fi
-}
-
-apply_wsl_permissions
 
 # ---- Git hooks ------------------------------------------------------------
 install_git_hooks() {
@@ -156,6 +117,9 @@ ensure_env_file() {
 }
 
 ensure_env_file
+# Record LAB_GID in the fresh .env so a later manual `docker compose up -d`
+# (fresh terminal, no export) keeps the gateway in your group. See preflight.sh.
+pf_persist_lab_gid
 
 # ---- Runner PAT check (registers the bundled github-runner) ----------------
 # The github-runner container auto-registers against your fork using the

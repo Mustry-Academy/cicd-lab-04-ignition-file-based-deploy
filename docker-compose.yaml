@@ -87,7 +87,17 @@ services:
     image: inductiveautomation/ignition:8.3.6
     container_name: lab04-ignition-local
     hostname: lab04-ignition-local
-    user: root
+    # Keep the image's own identity (uid 2003, gid 0): its data/ tree is
+    # owned 2003:0 mode 775, so any OTHER primary gid loses write access and
+    # the gateway fails to boot ("gateway.xml exists, but isnt readable or
+    # writable"). Instead we ADD the student's group, which -- together with
+    # the group-write + setgid bits scripts/setup.sh applies to the
+    # bind-mounted dirs -- makes everything the gateway writes editable by
+    # the student. No root-owned files, so no sudo.
+    # LAB_GID is exported by scripts/preflight.sh.
+    user: "2003:0"
+    group_add:
+      - "${LAB_GID:-0}"
     restart: unless-stopped
     ports:
       - "8088:8088"
@@ -123,7 +133,17 @@ services:
     image: inductiveautomation/ignition:8.3.6
     container_name: lab04-ignition-dev
     hostname: lab04-ignition-dev
-    user: root
+    # Keep the image's own identity (uid 2003, gid 0): its data/ tree is
+    # owned 2003:0 mode 775, so any OTHER primary gid loses write access and
+    # the gateway fails to boot ("gateway.xml exists, but isnt readable or
+    # writable"). Instead we ADD the student's group, which -- together with
+    # the group-write + setgid bits scripts/setup.sh applies to the
+    # bind-mounted dirs -- makes everything the gateway writes editable by
+    # the student. No root-owned files, so no sudo.
+    # LAB_GID is exported by scripts/preflight.sh.
+    user: "2003:0"
+    group_add:
+      - "${LAB_GID:-0}"
     restart: unless-stopped
     ports:
       - "8089:8088"
@@ -163,7 +183,17 @@ services:
     image: inductiveautomation/ignition:8.3.6
     container_name: lab04-ignition-prod
     hostname: lab04-ignition-prod
-    user: root
+    # Keep the image's own identity (uid 2003, gid 0): its data/ tree is
+    # owned 2003:0 mode 775, so any OTHER primary gid loses write access and
+    # the gateway fails to boot ("gateway.xml exists, but isnt readable or
+    # writable"). Instead we ADD the student's group, which -- together with
+    # the group-write + setgid bits scripts/setup.sh applies to the
+    # bind-mounted dirs -- makes everything the gateway writes editable by
+    # the student. No root-owned files, so no sudo.
+    # LAB_GID is exported by scripts/preflight.sh.
+    user: "2003:0"
+    group_add:
+      - "${LAB_GID:-0}"
     restart: unless-stopped
     ports:
       - "8090:8088"
