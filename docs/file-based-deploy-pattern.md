@@ -82,7 +82,7 @@ Each gateway has its own API key. At minimum each one needs:
 
 You'll see other scopes in the API Keys UI (Backup, Gateway Network, Tag Read/Write, …) — *don't grant them*. The deploy runner shouldn't be able to back up the gateway or write tags. Principle of least privilege.
 
-In the lab the keys live in `.env` (for manual scripts) as `IGNITION_API_KEY_LOCAL/_DEV/_PROD`, and as environment-scoped GitHub secrets named `IGNITION_API_KEY` on the `lab-gateway-dev` / `lab-gateway-prod` environments (for CI). If the same runner ever needs more capability (e.g. take a backup before deploy), generate a separate key for that — don't reuse.
+In the lab the keys live in `.env` (for manual scripts) as `IGNITION_API_KEY_LOCAL/_DEV/_PROD` — generated per clone by `scripts/setup.sh`, never committed — and as environment-scoped GitHub secrets named `IGNITION_API_KEY` on the `lab-gateway-dev` / `lab-gateway-prod` environments (for CI). A key belongs in exactly two places: the secret store that uses it and the gateway that checks its hash — never in git, where it would be a working credential in every clone and every fork, forever (history doesn't forget). If the same runner ever needs more capability (e.g. take a backup before deploy), generate a separate key for that — don't reuse.
 
 ## Rollback
 

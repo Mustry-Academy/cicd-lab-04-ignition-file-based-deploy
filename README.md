@@ -86,6 +86,7 @@ cicd-lab-04-ignition-file-based-deploy/
 ├── scripts/
 │   ├── setup.sh                        ← bootstraps the whole stack
 │   ├── teardown.sh                     ← stop the stack (with --volumes to wipe)
+│   ├── generate-api-keys.sh            ← per-gateway scan-API keys into .env + token resources (never committed; run by setup.sh)
 │   ├── scan.sh                         ← curl the scan API (any gateway via --gateway)
 │   ├── lib.sh                          ← shared helpers
 │   ├── clean-ignition-resource-churn.sh ← undo volatile-only resource.json rewrites (dry-run / --apply)
@@ -150,7 +151,7 @@ Both deploy workflows need:
 
 | Scope | Name | Type | Purpose |
 |---|---|---|---|
-| Environment `lab-gateway-dev` (deploy.yml) | `IGNITION_API_KEY` | Secret | Token from the dev gateway with Project Scan + Config Scan permission |
+| Environment `lab-gateway-dev` (deploy.yml) | `IGNITION_API_KEY` | Secret | The `IGNITION_API_KEY_DEV` value from your `.env` — `setup.sh` generates a unique key per gateway (nothing key-related is committed) |
 | Environment `lab-gateway-dev` | `IGNITION_URL` | Variable (optional) | Defaults to `http://ignition-dev:8088` (bundled-runner case). Override to `http://localhost:8089` if your runner is on the host. |
 | Environment `lab-gateway-dev` | `IGNITION_CONTAINER` | Variable (optional) | Defaults to `lab04-ignition-dev` |
 | Environment `lab-gateway-prod` (release.yml) | (same three) | | Defaults: URL `http://ignition-prod:8088`, container `lab04-ignition-prod` |

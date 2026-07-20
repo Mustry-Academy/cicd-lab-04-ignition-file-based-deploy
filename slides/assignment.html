@@ -237,7 +237,7 @@ body{
     </div>
     <div class="goal">
       <span class="badge">Why this order</span>
-      <p>The deploy part automates <b>exactly</b> what you do by hand in the file-structure we-do. Start the deploy prerequisites early: <b>fork with Actions enabled, <span class="inlinecode">gh</span> authenticated, an API key per gateway</b>. The #1 "nothing deploys" cause is forgetting to enable Actions on the fork.</p>
+      <p>The deploy part automates <b>exactly</b> what you do by hand in the file-structure we-do. Start the deploy prerequisites early: <b>fork with Actions enabled, <span class="inlinecode">gh</span> authenticated, the generated API keys in <span class="inlinecode">.env</span></b>. The #1 "nothing deploys" cause is forgetting to enable Actions on the fork.</p>
     </div>
   </div>
   <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>File structure before deploy</span></div>
@@ -257,7 +257,7 @@ body{
         <div class="step"><div class="ix t">2</div><div class="tx"><b>Fork &amp; clone.</b> <span class="inlinecode">gh repo fork … --clone</span> forks the lab to <i>your</i> account and clones your fork in one go. Prefer the website? Press <b>Fork</b> on github.com, then <span class="inlinecode">git clone</span> your fork.</div></div>
         <div class="step"><div class="ix t">3</div><div class="tx"><b>Enable Actions.</b> Open your fork's <b>Actions</b> tab and click "<i>I understand my workflows, enable them</i>". Skip this and no PR or tag will ever deploy. This is also where <span class="inlinecode">RUNNER_REPO_URL</span> in <span class="inlinecode">.env</span> must point — at <b>your fork</b>, not the course repo.</div></div>
         <div class="step"><div class="ix t">4</div><div class="tx"><b>Create a runner PAT</b> — the bundled runner needs it to register. At <span class="inlinecode">github.com/settings/tokens</span>: <b>Generate new token (classic)</b> → tick the <span class="inlinecode">repo</span> scope → <b>Generate</b> → copy the <span class="inlinecode">ghp_…</span> value. You make this <b>once</b>; Labs 05 and 06 reuse the same token, so keep it handy.</div></div>
-        <div class="step"><div class="ix t">5</div><div class="tx"><b>Copy the env file</b> with <span class="inlinecode">cp .env.example .env</span> and change <b>two lines</b>: point <span class="inlinecode">RUNNER_REPO_URL</span> at <b>your fork</b>, and paste your token into <span class="inlinecode">RUNNER_GITHUB_PAT</span>. Leave everything else as shipped: the admin logins and all three <span class="inlinecode">IGNITION_API_KEY_*</span> values are pre-provisioned to match the committed <span class="inlinecode">cicd</span> token, so editing them breaks the scan endpoints.</div></div>
+        <div class="step"><div class="ix t">5</div><div class="tx"><b>Copy the env file</b> with <span class="inlinecode">cp .env.example .env</span> and change <b>two lines</b>: point <span class="inlinecode">RUNNER_REPO_URL</span> at <b>your fork</b>, and paste your token into <span class="inlinecode">RUNNER_GITHUB_PAT</span>. Leave everything else as shipped: the admin logins stay as-is, and the three <span class="inlinecode">IGNITION_API_KEY_*</span> lines stay <b>empty</b> — <span class="inlinecode">setup.sh</span> generates a unique key per gateway into <span class="inlinecode">.env</span> in the next step. No key ever lives in the repo.</div></div>
         <div class="step"><div class="ix t">6</div><div class="tx"><b>Check the remotes:</b> <span class="inlinecode">git remote -v</span> — <span class="inlinecode">origin</span> must show <b>your username</b>. Then <span class="inlinecode">code .</span> to open VS Code, and <span class="inlinecode">scripts/setup.sh</span> brings up the stack (three gateways + TimescaleDB + the runner).</div></div>
       </div>
       <div>
@@ -280,7 +280,7 @@ git remote -v
 cp .env.example .env
 <span class="cm">#    RUNNER_REPO_URL=https://github.com/<span class="cmd2">&lt;you&gt;</span>/cicd-lab-04-…</span>
 <span class="cm">#    RUNNER_GITHUB_PAT=<span class="cmd2">ghp_your_token</span></span>
-<span class="cm">#    leave the logins + API keys as shipped</span>
+<span class="cm">#    leave the logins as-is; setup.sh fills the API keys in</span>
 
 <span class="cm"># 6: open VS Code, then bring the stack up</span>
 code .
@@ -367,13 +367,13 @@ docker cp ./projects/. \
     <div class="stage">File-based deploy · you do · parts 1-2</div>
   </div>
   <div class="body">
-    <div class="sechead"><span class="num p" style="background:var(--peri)">PARTS 1-2</span><div><div class="title">Runner online + GitHub environments &amp; secrets</div><div class="lead">15 min. The plumbing between your fork and your gateways. Steps 1, 3 and 4 happen <b>on github.com, in your fork's Settings</b>; only the API keys come from the gateway UIs.</div></div></div>
+    <div class="sechead"><span class="num p" style="background:var(--peri)">PARTS 1-2</span><div><div class="title">Runner online + GitHub environments &amp; secrets</div><div class="lead">15 min. The plumbing between your fork and your gateways. Steps 1, 3 and 4 happen <b>on github.com, in your fork's Settings</b>; the API key values come from your <span class="inlinecode">.env</span> (setup.sh generated them).</div></div></div>
     <div class="cols2">
       <div class="steps">
         <div class="step"><div class="ix p">1</div><div class="tx"><b>Verify the runner</b> (it's part of the compose stack). Then check your fork: <i>Settings → Actions → Runners</i> must show it <b>online</b> with labels <span class="inlinecode">self-hosted, lab04</span>.</div></div>
         <div class="step"><div class="ix p">2</div><div class="tx">Not there? Three checks: <span class="inlinecode">RUNNER_REPO_URL</span> points at <b>your fork</b> · <span class="inlinecode">RUNNER_GITHUB_PAT</span> is a real <span class="inlinecode">repo</span>-scope PAT, not the placeholder (a bad one shows a <b>401</b> in <span class="inlinecode">docker compose logs github-runner</span>) · <span class="inlinecode">docker compose up -d --force-recreate github-runner</span>.</div></div>
-        <div class="step"><div class="ix p">3</div><div class="tx"><b>Create environment</b> <span class="inlinecode">lab-gateway-dev</span> <b>in your fork on GitHub</b> (<i>Settings → Environments → New environment</i>) with secret <span class="inlinecode">IGNITION_API_KEY</span> = the key you generated <b>on the dev gateway</b> (:8089).</div></div>
-        <div class="step"><div class="ix p">4</div><div class="tx">Repeat on GitHub: environment <span class="inlinecode">lab-gateway-prod</span> with the key from the <b>prod gateway</b> (:8090). Other GitHub environment parameters (<span class="inlinecode">IGNITION_URL</span> / <span class="inlinecode">IGNITION_CONTAINER</span>) can be left as is.</div></div>
+        <div class="step"><div class="ix p">3</div><div class="tx"><b>Create environment</b> <span class="inlinecode">lab-gateway-dev</span> <b>in your fork on GitHub</b> (<i>Settings → Environments → New environment</i>) with secret <span class="inlinecode">IGNITION_API_KEY</span> = the <span class="inlinecode">IGNITION_API_KEY_DEV</span> value from your <span class="inlinecode">.env</span> — the <b>dev gateway's</b> own key (:8089).</div></div>
+        <div class="step"><div class="ix p">4</div><div class="tx">Repeat on GitHub: environment <span class="inlinecode">lab-gateway-prod</span> with <span class="inlinecode">IGNITION_API_KEY_PROD</span> from <span class="inlinecode">.env</span> — the <b>prod gateway's</b> key (:8090). Other GitHub environment parameters (<span class="inlinecode">IGNITION_URL</span> / <span class="inlinecode">IGNITION_CONTAINER</span>) can be left as is.</div></div>
       </div>
       <div>
         <div class="code"><pre><span class="cm"># part 1: is the runner alive?</span>

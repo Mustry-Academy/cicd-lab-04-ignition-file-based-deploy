@@ -47,6 +47,12 @@ venv/
 **/config/local
 **/config/resources/local
 
+# Scan-API tokens are generated per clone by scripts/generate-api-keys.sh
+# (full keys in .env, hash-only resources in each gateway's config tree).
+# Never commit them: a committed token is a working credential in every
+# fork's history.
+**/config/resources/core/ignition/api-token/
+
 # The gateway-owned INTERNAL identity: the default user source (users.json
 # holds the admin password hash!), its identity provider, and the OPC-UA
 # module's user source belong to ONE gateway. Committing them ships your

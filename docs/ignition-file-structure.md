@@ -97,7 +97,10 @@ identity provider — those hold no password data (the users live in the externa
 tracked and deployed like any other resource. `security-properties/` is tracked and deployed too:
 it is permission policy (APIToken scan grants, designer/config permissions), and the committed
 `systemAuthProfile=default` matches every gateway because commissioning creates the `default` user
-source on all of them.
+source on all of them. The scan-API token (`api-token/`) is the other deliberately untracked
+resource: `setup.sh` generates a unique key per gateway into `.env` and writes only the hash to
+disk — a committed token would be a working credential in every clone — and the deploy wipe spares
+it so the key survives deploys.
 
 ### Deployment modes (this is the 8.3 feature behind those scopes)
 
