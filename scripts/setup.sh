@@ -157,48 +157,28 @@ ensure_env_file() {
 
 ensure_env_file
 
-# ---- Runner registration token (no PAT — minted via gh, like Lab 03) ------
-# The bundled github-runner registers with a short-lived registration token
-# rather than a Personal Access Token. We mint that token here with the GitHub
-# CLI, export it, and let `docker compose up` hand it to the runner container.
-# gh is optional: without it the gateways still come up, only the runner stays
-# unregistered until you install gh and re-run setup.
-ensure_runner_token() {
-    local repo_url owner_repo
+# ---- Runner PAT check (registers the bundled github-runner) ----------------
+# The github-runner container auto-registers against your fork using the
+# GitHub Personal Access Token in RUNNER_GITHUB_PAT (see .env). If it's still
+# the placeholder, the runner container will restart-loop with a 401 in its
+# logs — the gateways still come up fine, so this is only a heads-up. This is
+# the lab where you create the PAT; Labs 05 and 06 reuse the same token.
+runner_pat_reminder() {
+    local pat repo_url
+    pat="$(env_value RUNNER_GITHUB_PAT)"
     repo_url="$(env_value RUNNER_REPO_URL)"
-    if [ -z "$repo_url" ] || printf '%s' "$repo_url" | grep -q '<your-github-user>'; then
-        echo -e "${YELLOW}RUNNER_REPO_URL is not pointed at your fork in .env — skipping runner registration.${NC}"
-        echo "  Set RUNNER_REPO_URL=https://github.com/<you>/cicd-lab-04-ignition-file-based-deploy in .env,"
-        echo "  then re-run scripts/setup.sh to register the runner."
-        return 0
-    fi
-    if ! command -v gh > /dev/null 2>&1; then
-        echo -e "${YELLOW}GitHub CLI (gh) not installed — skipping runner registration.${NC}"
-        echo "  Install gh (https://cli.github.com), run 'gh auth login', then re-run setup."
-        return 0
-    fi
-    if ! gh auth status > /dev/null 2>&1; then
-        echo -e "${YELLOW}gh is not authenticated — skipping runner registration.${NC}"
-        echo "  Run 'gh auth login', then re-run scripts/setup.sh."
-        return 0
-    fi
-    # https://github.com/<owner>/<repo>(.git) -> <owner>/<repo>
-    owner_repo="${repo_url#https://github.com/}"
-    owner_repo="${owner_repo#git@github.com:}"
-    owner_repo="${owner_repo%.git}"
-    owner_repo="${owner_repo%/}"
-    echo -e "${GREEN}Minting a runner registration token via gh for ${owner_repo}...${NC}"
-    if RUNNER_TOKEN="$(gh api -X POST "repos/${owner_repo}/actions/runners/registration-token" --jq .token 2> /dev/null)" \
-        && [ -n "$RUNNER_TOKEN" ]; then
-        export RUNNER_TOKEN
-        echo -e "${GREEN}  runner token ready.${NC}"
-    else
-        echo -e "${YELLOW}  couldn't mint a token — is ${owner_repo} your fork, and do you have access?${NC}"
-        echo "  The stack will still come up; fix access and re-run setup to register the runner."
+    if [ -z "$pat" ] || printf '%s' "$pat" | grep -q 'replace-me' \
+        || [ -z "$repo_url" ] || printf '%s' "$repo_url" | grep -q '<your-github-user>'; then
+        echo -e "${YELLOW}Runner not configured yet — the lab04-runner container will restart-loop until you:${NC}"
+        echo "  1. Point RUNNER_REPO_URL in .env at your fork."
+        echo "  2. Set RUNNER_GITHUB_PAT in .env to a repo-scope PAT"
+        echo "     (github.com/settings/tokens → Generate new token (classic) → tick 'repo')."
+        echo "  Then re-run scripts/setup.sh. The gateways work without this; only CI needs the runner."
+        echo ""
     fi
 }
 
-ensure_runner_token
+runner_pat_reminder
 
 # ---- Dev/prod gateway state dirs + API-token pre-seed ----------------------
 # dev and prod bind-mount ./gateways/<gw>/{projects,config} (see
@@ -318,16 +298,7 @@ if [ -n "$existing_id" ]; then
     echo -e "${YELLOW}Stack already running — 'docker compose up -d' will be a no-op or apply changes.${NC}"
 fi
 echo -e "${GREEN}Starting the stack...${NC}"
-if [ -n "${RUNNER_TOKEN:-}" ]; then
-    docker compose up -d
-else
-    # Without a registration token the runner container would just
-    # restart-loop on "Invalid configuration provided for token", so don't
-    # start it at all. Fix RUNNER_REPO_URL in .env (and gh auth), then
-    # re-run scripts/setup.sh to mint a token and bring the runner up.
-    echo -e "${YELLOW}No runner registration token — starting the stack WITHOUT the github-runner service.${NC}"
-    docker compose up -d --scale github-runner=0
-fi
+docker compose up -d
 echo ""
 docker compose ps
 echo ""

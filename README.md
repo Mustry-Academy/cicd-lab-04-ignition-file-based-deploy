@@ -9,7 +9,8 @@ This is the **first lab that opens up the Ignition gateway itself**. Labs 02–0
 ## Prerequisites
 
 - A fork of this repo (the self-hosted runner registers against your fork, not the upstream)
-- The [GitHub CLI](https://cli.github.com/) (`gh`), authenticated (`gh auth status`) — `setup.sh` uses it to mint the runner's short-lived registration token; no Personal Access Token to create or store (same as Lab 03)
+- A GitHub Personal Access Token with `repo` scope — the bundled runner uses it to auto-register against your fork. Create it at [github.com/settings/tokens](https://github.com/settings/tokens) (Generate new token → classic → tick `repo`) and put it in `.env` as `RUNNER_GITHUB_PAT`. You make it once here; **Labs 05 and 06 reuse the same token**. It never leaves `.env`.
+- The [GitHub CLI](https://cli.github.com/) (`gh`), authenticated (`gh auth status`) — used to fork and clone the repo
 - **≥ 8 GB free RAM for Docker** — three Ignition gateways each cap at 1 GB, plus TimescaleDB, the runner, and the usual Docker Desktop overhead
 - _Optional but recommended:_ pass [`cicd-preflight`](https://github.com/mustry-academy/cicd-preflight) so unrelated env issues don't bite you mid-lab
 - _Background reading:_ [Lab 03](https://github.com/mustry-academy/cicd-lab-03-github-actions) covers the GitHub Actions fundamentals this lab builds on, but this lab stands alone — the self-hosted runner ships in `docker-compose.yaml`, no manual `docker run` of `myoung34/github-runner` required
@@ -136,7 +137,7 @@ Three workflows under [`.github/workflows/`](./.github/workflows/):
 
 Both deploy workflows need:
 
-- The bundled self-hosted runner (`github-runner` service in `docker-compose.yaml`) registered against your fork with the `lab04` label. It auto-registers using a short-lived registration token that `setup.sh` mints with `gh`, and shares the host's Docker daemon (mounted `/var/run/docker.sock`) so the workflows can `docker cp` files into the dev/prod gateway containers. If you'd rather use your own runner instead, set `runner.labels` to include `lab04` and skip the bundled service.
+- The bundled self-hosted runner (`github-runner` service in `docker-compose.yaml`) registered against your fork with the `lab04` label. It auto-registers using the `repo`-scope PAT in `RUNNER_GITHUB_PAT` (see `.env`), and shares the host's Docker daemon (mounted `/var/run/docker.sock`) so the workflows can `docker cp` files into the dev/prod gateway containers. If you'd rather use your own runner instead, set `runner.labels` to include `lab04` and skip the bundled service.
 - A GitHub **environment** per workflow with the right secret + variables:
 
 | Scope | Name | Type | Purpose |

@@ -52,17 +52,12 @@ git update-index --no-skip-worktree <path>
 
 - Container up? `docker compose ps github-runner` and `docker logs lab04-runner` (look for
   *"Listening for Jobs"*).
-- **Runner missing entirely?** `setup.sh` deliberately starts the stack without the runner when it
-  couldn't mint a registration token (placeholder `RUNNER_REPO_URL`, or `gh` missing /
-  unauthenticated). Fix the cause below, then **re-run `scripts/setup.sh`** — a plain
-  `docker compose up` / `restart` won't help, because only `setup.sh` mints the token.
-- **Restart loop with *"Invalid configuration provided for token"* in the logs?** Same cause: the
-  runner started without a (valid) registration token. Registration tokens also expire after
-  **1 hour**, so a stale one from an earlier `setup.sh` run fails the same way. Re-run
-  `scripts/setup.sh` to mint a fresh one.
+- **Restart loop with a *401* in the logs?** The runner authenticates with the `repo`-scope PAT in
+  `RUNNER_GITHUB_PAT` (`.env`) — a 401 means it's still the placeholder or an invalid/expired token.
+  Fix it, then `docker compose up -d --force-recreate github-runner`.
 - `RUNNER_REPO_URL` in `.env` must point at **your fork**, not the upstream.
-- `gh` must be installed and authenticated (`gh auth status`) so `setup.sh` can mint the
-  registration token.
+- `RUNNER_GITHUB_PAT` in `.env` must be a real GitHub Personal Access Token with `repo` scope
+  (make one at github.com/settings/tokens → classic → tick `repo`; keep it — Labs 05 and 06 reuse it).
 - In your fork: *Settings → Actions → Runners* should list it online with the `self-hosted, lab04`
   labels.
 - Don't add `EPHEMERAL` to the runner's environment in `docker-compose.yaml` — the image treats

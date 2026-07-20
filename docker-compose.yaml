@@ -227,12 +227,11 @@ services:
       - default
 
   # --- self-hosted GitHub Actions runner -------------------------------------
-  # Registers against the repo set in RUNNER_REPO_URL using a short-lived
-  # registration token (RUNNER_TOKEN). scripts/setup.sh mints that token for you
-  # with the GitHub CLI (`gh api ... /actions/runners/registration-token`) — the
-  # same no-PAT method Lab 03 uses — so you never create or store a Personal
-  # Access Token. The token is only needed for the initial registration; the
-  # runner keeps its credential across restarts.
+  # Auto-registers against the repo set in RUNNER_REPO_URL using a GitHub
+  # Personal Access Token (RUNNER_GITHUB_PAT, must have `repo` scope). The
+  # image uses that PAT to fetch its own short-lived registration token, so
+  # you never mint one by hand. This is the first lab where you create the
+  # PAT; Labs 05 and 06 reuse the same token.
   #
   # The runner sits on the lab's compose network, so it reaches the gateways by
   # service name (ignition-local, ignition-dev, ignition-prod) — see the
@@ -249,7 +248,7 @@ services:
     restart: unless-stopped
     environment:
       REPO_URL: "${RUNNER_REPO_URL}"
-      RUNNER_TOKEN: "${RUNNER_TOKEN:-}"
+      ACCESS_TOKEN: "${RUNNER_GITHUB_PAT}"
       RUNNER_NAME: "${RUNNER_NAME:-lab04-runner}"
       RUNNER_SCOPE: repo
       LABELS: "self-hosted,lab04"

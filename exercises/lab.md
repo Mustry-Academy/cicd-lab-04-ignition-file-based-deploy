@@ -32,7 +32,11 @@ Open <http://localhost:8088> (the `local` gateway) in your browser. Login: `admi
 Before you start the deploy part, get these in place (they take a few minutes and the #1 "nothing deploys" cause is forgetting to enable Actions on the fork — or a push that only touched docs, which the `paths:` filter skips):
 
 - **A fork of this repo on GitHub, with Actions enabled.** The bundled runner registers against your fork, not the upstream. Forks ship with workflows **disabled** — open your fork's *Actions* tab and click "I understand my workflows, go ahead and enable them."
-- **The GitHub CLI (`gh`), installed and authenticated** (`gh auth login`), with `RUNNER_REPO_URL` in `.env` pointed at **your fork**. `setup.sh` mints the runner's short-lived registration token with `gh` and hands it to the bundled `github-runner` container — no Personal Access Token to create or store (same as Lab 03).
+- **A GitHub Personal Access Token (PAT) with `repo` scope**, plus `RUNNER_REPO_URL` in `.env` pointed at **your fork**. The bundled `github-runner` container uses the PAT to auto-register against your fork. You create this token once here; **Labs 05 and 06 reuse the same one**, so keep it somewhere safe. To create it:
+  1. Go to **github.com/settings/tokens** → **Generate new token** → **Generate new token (classic)**.
+  2. Give it a name (e.g. `cicd-course-runner`) and tick the **`repo`** scope.
+  3. Click **Generate token** and copy the `ghp_...` value (you can't read it back later).
+  4. Paste it into `.env` as `RUNNER_GITHUB_PAT=ghp_...`. It stays in `.env` and is never committed.
 - **An Ignition API key per gateway you want to scan.** Generate each in the gateway UI: *Config → Security → API Keys → New*, scoped to `Project Scan` and `Config Scan`. Copy the value once — you can't read it back. Drop them into `.env` as `IGNITION_API_KEY_LOCAL` / `_DEV` / `_PROD`.
 - **GitHub Environments** for the deploy workflows: `lab-gateway-dev` for `deploy.yml`, `lab-gateway-prod` for `release.yml`. Each needs a secret `IGNITION_API_KEY` (the value from the matching gateway).
 
@@ -253,7 +257,7 @@ docker compose logs --tail 50 github-runner   # look for "Listening for Jobs"
 In your fork on GitHub, *Settings → Actions → Runners* should show the runner online with the `self-hosted, lab04` labels. If it's not there:
 
 - `RUNNER_REPO_URL` in `.env` must point at your fork (not the upstream).
-- `gh` must be installed and authenticated (`gh auth status`) so `setup.sh` could mint the registration token — re-run `scripts/setup.sh` after fixing it.
+- `RUNNER_GITHUB_PAT` in `.env` must be a real `repo`-scope PAT, not the placeholder — a bad token shows up as a **401** in `docker compose logs github-runner`. Fix it, then `docker compose up -d --force-recreate github-runner`.
 - Restart it: `docker compose restart github-runner`.
 
 ### Part 2.2 — GitHub environments + secrets (10 min)
