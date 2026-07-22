@@ -1,27 +1,27 @@
 #!/usr/bin/env bash
-# Trigger one or both gateway scan endpoints — /data/api/v1/scan/projects and
+# Trigger both gateway scan endpoints — /data/api/v1/scan/projects and
 # /data/api/v1/scan/config. Hitting these tells the gateway to pick up new
 # content on disk under data/projects/ and data/config/ without a restart.
+# Both scans always run (fired in parallel): after changing files you want
+# the gateway to see the full tree, projects and config alike.
 #
-# When the target is "both", the two POSTs are fired in parallel. The script
-# then waits SCAN_WAIT_SECONDS (see below) to give the gateway time to
-# complete the scan(s), and finally reports each response: HTTP code +
+# The script waits SCAN_WAIT_SECONDS (see below) to give the gateway time to
+# complete the scans, and finally reports each response: HTTP code +
 # pretty-printed body. Numeric *timestamp fields (e.g. lastScanTimestamp) are
 # rewritten to local human-readable time when jq is available.
 #
 # Usage:
-#   scripts/scan.sh                          # both, against local
-#   scripts/scan.sh projects                 # projects only
-#   scripts/scan.sh both --gateway test       # both, against test gateway
-#   scripts/scan.sh --gateway production config    # config only, against production
+#   scripts/scan.sh               # local gateway (default)
+#   scripts/scan.sh test          # test gateway
+#   scripts/scan.sh production    # production gateway
 #
 # Gateways:
-#   local   http://localhost:8088   (default — student's bind-mounted gateway)
-#   test     http://localhost:8089   (deploy.yml target)
-#   production    http://localhost:8090   (release.yml target)
+#   local        http://localhost:8088   (default — student's bind-mounted gateway)
+#   test         http://localhost:8089   (deploy.yml target)
+#   production   http://localhost:8090   (release.yml target)
 #
 # Env (override the gateway defaults when needed):
-#   IGNITION_URL          full URL; if set, wins over --gateway preset
+#   IGNITION_URL          full URL; if set, wins over the gateway preset
 #   IGNITION_API_KEY      API key. If unset, looked up from .env as
 #                         IGNITION_API_KEY_<GATEWAY> first, then plain
 #                         IGNITION_API_KEY.
@@ -40,52 +40,26 @@ CURL_MAX_TIME=30   # seconds; protects against a hung gateway
 
 # ---- arg parsing ---------------------------------------------------------
 
-target="both"
 gateway="local"
 
 while [ $# -gt 0 ]; do
   case "$1" in
-    --gateway=*)
-      gateway="${1#*=}"
-      shift
-      ;;
-    --gateway)
-      [ $# -ge 2 ] || { echo "ERROR: --gateway requires a value" >&2; exit 2; }
-      gateway="$2"
-      shift 2
-      ;;
     -h|--help)
       sed -n '2,29p' "$0" | sed 's/^# \{0,1\}//'
       exit 0
       ;;
-    -*)
-      echo "ERROR: unknown flag: $1" >&2
-      exit 2
-      ;;
-    projects|config|both)
-      target="$1"
+    local|test|production)
+      gateway="$1"
       shift
       ;;
     *)
-      echo "ERROR: unknown target: $1 (expected: projects | config | both)" >&2
+      echo "ERROR: unknown environment: $1 (expected: local | test | production)" >&2
       exit 2
       ;;
   esac
 done
 
-case "$gateway" in
-  local|test|production) ;;
-  *)
-    echo "ERROR: unknown gateway: $gateway (expected: local | test | production)" >&2
-    exit 2
-    ;;
-esac
-
-case "$target" in
-  projects) TARGETS=("projects") ;;
-  config)   TARGETS=("config") ;;
-  both)     TARGETS=("projects" "config") ;;
-esac
+TARGETS=("projects" "config")
 
 # ---- resolve gateway URL --------------------------------------------------
 

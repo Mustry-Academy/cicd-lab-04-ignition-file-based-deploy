@@ -87,7 +87,7 @@ cicd-lab-04-ignition-file-based-deploy/
 │   ├── setup.sh                        ← bootstraps the whole stack
 │   ├── teardown.sh                     ← stop the stack (with --volumes to wipe)
 │   ├── generate-api-keys.sh            ← per-gateway scan-API keys into .env + token resources (never committed; run by setup.sh)
-│   ├── scan.sh                         ← curl the scan API (any gateway via --gateway)
+│   ├── scan.sh                         ← curl the scan API (local | test | production)
 │   ├── lib.sh                          ← shared helpers
 │   ├── clean-ignition-resource-churn.sh ← undo volatile-only resource.json rewrites (dry-run / --apply)
 │   ├── git-diff/                       ← textconv normalizer that hides volatile metadata in diffs
@@ -108,7 +108,7 @@ cicd-lab-04-ignition-file-based-deploy/
 
 Three Ignition 8.3 gateways + one TimescaleDB. The three gateways simulate the classic local → test → production promotion:
 
-- **`ignition-local`** bind-mounts `./projects/` and `./services/config/` from the host. Anything you write into those paths on your laptop is *immediately on disk* inside the local gateway. Hit `scripts/scan.sh both` to make the gateway notice. That's the tight inner feedback loop.
+- **`ignition-local`** bind-mounts `./projects/` and `./services/config/` from the host. Anything you write into those paths on your laptop is *immediately on disk* inside the local gateway. Hit `scripts/scan.sh` to make the gateway notice. That's the tight inner feedback loop.
 - **`ignition-test`** bind-mounts its `projects/` and `config/` from `./gateways/test/` (gitignored — this is the *gateway's* state, not the repo's). It starts empty; the deploy workflow (`deploy.yml`) `docker cp`s the working tree into the container and triggers a scan. Because the target dirs are bind mounts, you can verify a deploy landed straight from your laptop: `ls gateways/test/projects`. Mirrors how a real shared test environment gets fed by CI.
 - **`ignition-production`** is the same shape as test, populated by the release workflow (`release.yml`) when you push a tag.
 

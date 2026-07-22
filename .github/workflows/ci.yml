@@ -1,5 +1,6 @@
-# Validation — runs on every pull request into main, AND as the gate job
-# inside deploy.yml / release.yml (via workflow_call).
+# Validation — runs on every pull request into main. That PR run is THE gate:
+# once a commit merges, deploy.yml (push to main) and release.yml (tag) ship
+# it without re-validating — the same commit already passed here.
 #
 # GitHub Flow has one long-lived branch, so we validate PRs into it:
 #   main  ← feature/* branches merge here via PR. A push to main then ships to
@@ -16,10 +17,6 @@ name: CI
 on:
   pull_request:
     branches: [main]
-  # Lets deploy.yml and release.yml reuse this whole workflow as their first
-  # job, so nothing reaches a gateway without passing the exact same checks a
-  # PR gets — including direct pushes to main, which never see a PR.
-  workflow_call:
 
 # Cancel any in-flight CI run for this PR when a new commit lands.
 concurrency:

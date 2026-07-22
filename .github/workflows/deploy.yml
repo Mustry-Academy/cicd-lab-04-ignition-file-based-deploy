@@ -46,15 +46,12 @@ permissions:
   contents: read
 
 jobs:
-  # Re-run the full CI suite (ci.yml as a reusable workflow) before anything
-  # touches the gateway. PRs already ran it, but this also covers direct
-  # pushes to main — the deploy job below only starts if validation is green.
-  validate:
-    uses: ./.github/workflows/ci.yml
-
+  # No validation job here: ci.yml already ran on the PR that put this commit
+  # on main — that PR run is the gate, so re-running it before every deploy
+  # would validate the same commit twice. The trade-off: a direct push to
+  # main skips validation, which is why main only moves via PRs.
   deploy:
     name: Deploy to test gateway
-    needs: validate
     runs-on: [self-hosted, lab04]
     environment: lab-gateway-test
     env:

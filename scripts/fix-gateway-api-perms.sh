@@ -97,7 +97,7 @@ for gw in "$@"; do
   echo -e "${GREEN}[$gw]${NC} restarting $container (the gateway only reads this at boot)..."
   docker restart "$container" >/dev/null
   if wait_running "$url"; then
-    echo -e "${GREEN}[$gw]${NC} gateway RUNNING — verify with: scripts/scan.sh config --gateway $gw"
+    echo -e "${GREEN}[$gw]${NC} gateway RUNNING — verify with: scripts/scan.sh $gw"
   else
     echo -e "${YELLOW}[$gw]${NC} gateway not RUNNING yet; check: docker logs -f $container"
   fi

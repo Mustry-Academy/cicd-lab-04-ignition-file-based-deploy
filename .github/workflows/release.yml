@@ -50,15 +50,12 @@ permissions:
   contents: read
 
 jobs:
-  # Same gate as deploy.yml: the tagged commit must pass the full CI suite
-  # before it is allowed anywhere near production. Tags never go through a PR, so
-  # without this a bad tag would ship unvalidated.
-  validate:
-    uses: ./.github/workflows/ci.yml
-
+  # No validation job here: you tag a commit that is already on main, and it
+  # passed ci.yml on the PR that merged it — re-validating the same commit on
+  # the tag would run the suite twice. The tag chooses which validated commit
+  # ships; only tag commits that came through a PR.
   release:
     name: Release to production gateway
-    needs: validate
     runs-on: [self-hosted, lab04]
     environment: lab-gateway-production
     env:

@@ -186,13 +186,13 @@ Edit a view in the shipped `example-project` and ship it to test by hand — thi
 1. Change `projects/example-project/com.inductiveautomation.perspective/views/pages/overview/view.json` (e.g., `props.defaultSize.height`: `920` → `700`).
 2. Scan the **local** gateway — local sees the change via bind mount immediately; the scan tells it to notice:
    ```bash
-   scripts/scan.sh both --gateway local
+   scripts/scan.sh
    ```
    Verify in http://localhost:8088 — the view's height should match.
 3. Copy the same change to **test** manually. Test started empty, so there is nothing to wipe — just copy the project over and scan:
    ```bash
    docker cp ./projects/. lab04-ignition-test:/usr/local/bin/ignition/data/projects/
-   scripts/scan.sh projects --gateway test
+   scripts/scan.sh test
    ```
    Verify in http://localhost:8089 — the same view should appear, the same height.
 
@@ -251,33 +251,34 @@ You **don't** need to set `IGNITION_URL` or `IGNITION_CONTAINER` variables unles
 
 ### Part 2.3 — Ship to test via `main` (15 min)
 
-1. Create a **new project** on the local gateway, the way you always do in Ignition: Designer → New Project (or the gateway UI, Config → Projects). Give it a recognizable name and a simple view. Because local bind-mounts `./projects/`, the project lands in your working tree the moment the gateway saves it — `git status` shows it as an untracked `projects/<name>/` folder. That folder is your deployable: no export, no file editing.
-2. Branch off `main` and commit it — together with the still-uncommitted height tweak from the deploy-by-hand, so the repo matches what's already on the local gateway:
+1. Create a **new project named `sample-project`** on the local gateway, the way you always do in Ignition: Designer → New Project (or the gateway UI, Config → Projects). Because local bind-mounts `./projects/`, the project lands in your working tree the moment the gateway saves it — `git status` shows it as an untracked `projects/sample-project/` folder. That folder is your deployable: no export, no file editing.
+2. Create **one simple view** in that project in the Designer (any name — e.g. a label with your name on it) and save. That gives you something visible to recognize on the test gateway after the deploy.
+3. Branch off `main` and commit it — together with the still-uncommitted height tweak from the deploy-by-hand, so the repo matches what's already on the local gateway:
    ```bash
-   git checkout main && git checkout -b feature/add-my-project
+   git switch main && git switch -c feature/add-sample-project
    git add projects/
-   git commit -m "Add my new project"
-   git push -u origin feature/add-my-project
+   git commit -m "Add sample-project"
+   git push -u origin feature/add-sample-project
    ```
-3. Open a PR **into `main`**. Watch [`ci.yml`](../.github/workflows/ci.yml) run on `ubuntu-latest` (free): it validates JSON, `.deployignore`, and the workflow files themselves.
-4. Merge the PR into `main`. [`deploy.yml`](../.github/workflows/deploy.yml) fires because of the `paths:` filter (and only on `main`). Its first job re-runs the whole `ci.yml` suite as a gate (that also covers direct pushes to `main`, which never see a PR) — the deploy job only starts once validation is green.
-5. Watch the workflow run. The interesting steps are **Ship projects and config into gateway container** (the `docker cp` half) and **Trigger gateway scan** (`POST /data/api/v1/scan/{projects,config}`). On a fresh gateway the scan step self-heals: a 401/403 makes it restart the gateway once (the token Ship just copied loads at boot) and retry — first deploy green, every later deploy hot-scans.
-6. Verify in http://localhost:8089 — Config → Projects lists **your new project**, and its view opens (the deploy-by-hand's height tweak is there too, now via the pipeline). Then verify from the **host**: `ls gateways/test/projects` shows the deployed tree (test's `projects/` and `config/` bind-mount to `./gateways/test/`), so you can `cat` the exact files CI just shipped.
-7. **Multi-project check.** The deploy step copies `./projects/.` (the whole directory), so your single merge deployed `example-project`, `packaging-site` **and** your new project at once. The unit of deploy is the `projects/` tree, not a single project.
+4. On GitHub, open a PR **into `main`**. Watch [`ci.yml`](../.github/workflows/ci.yml) run on `ubuntu-latest` (free): it validates JSON, `.deployignore`, and the workflow files themselves.
+5. Merge the PR into `main`. [`deploy.yml`](../.github/workflows/deploy.yml) fires because of the `paths:` filter (and only on `main`). Validation already ran on the PR — that's the gate — so the deploy goes straight to shipping.
+6. Watch the workflow run. The interesting steps are **Ship projects and config into gateway container** (the `docker cp` half) and **Trigger gateway scan** (`POST /data/api/v1/scan/{projects,config}`). On a fresh gateway the scan step self-heals: a 401/403 makes it restart the gateway once (the token Ship just copied loads at boot) and retry — first deploy green, every later deploy hot-scans.
+7. Verify in http://localhost:8089 — Config → Projects lists **`sample-project`**, and its view opens (the deploy-by-hand's height tweak is there too, now via the pipeline). Then verify from the **host**: `ls gateways/test/projects` shows the deployed tree (test's `projects/` and `config/` bind-mount to `./gateways/test/`), so you can `cat` the exact files CI just shipped.
+8. **Multi-project check.** The deploy step copies `./projects/.` (the whole directory), so your single merge deployed `example-project`, `packaging-site` **and** `sample-project` at once. The unit of deploy is the `projects/` tree, not a single project.
 
 ### Part 2.4 — Release to production via `main` + tag (10 min)
 
 Cut a release the GitHub Flow way: tag the commit on `main` you want in production. The change is already on `main` (that's what deployed it to test), so there's nothing to merge — you just tag. The **tag** — not the push to `main` — is what ships to production.
 
 ```bash
-git checkout main && git pull
+git switch main && git pull
 git tag v0.1.0
 git push origin v0.1.0        # ← release.yml fires
 ```
 
 > **`fatal: tag 'v0.1.0' already exists`?** Your fork copied every tag the upstream repo had at fork time. `git tag -l` shows what's taken — either take the next free number (`v0.1.1` works exactly the same), or delete the stale tag first: `git tag -d v0.1.0 && git push origin :refs/tags/v0.1.0`.
 
-[`release.yml`](../.github/workflows/release.yml) fires on the tag. It starts with the same validation gate as `deploy.yml` (tags never go through a PR), then releases. Watch it run, then check http://localhost:8090 — the change you merged into main and just released should be visible on production. Host-side check works here too: `ls gateways/production/projects`. The push to `main` deployed to test on its own; the **tag** is what promotes to production, so production always runs a named, re-deployable version. That's also your rollback button: `release.yml`'s `workflow_dispatch` takes a tag input.
+[`release.yml`](../.github/workflows/release.yml) fires on the tag. You only ever tag a commit that is already on `main` — it passed CI on its PR — so the release goes straight to shipping. Watch it run, then check http://localhost:8090 — the change you merged into main and just released should be visible on production. Host-side check works here too: `ls gateways/production/projects`. The push to `main` deployed to test on its own; the **tag** is what promotes to production, so production always runs a named, re-deployable version. That's also your rollback button: `release.yml`'s `workflow_dispatch` takes a tag input.
 
 ### Part 2.5 — Break a deploy on purpose (optional, ~5 min)
 

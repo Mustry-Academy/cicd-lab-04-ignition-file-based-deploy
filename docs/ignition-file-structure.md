@@ -233,7 +233,7 @@ cat > "projects/sample/com.inductiveautomation.perspective/views/Hello/resource.
 EOF
 ```
 
-After triggering a project scan against the local gateway (`scripts/scan.sh projects --gateway local`), the `sample` project shows up in the gateway. It won't look like much — that's the point. (Note: `scope` `G` = gateway/global; the manifest is what makes the resource visible to the scan.)
+After triggering a scan against the local gateway (`scripts/scan.sh`), the `sample` project shows up in the gateway. It won't look like much — that's the point. (Note: `scope` `G` = gateway/global; the manifest is what makes the resource visible to the scan.)
 
 ## What changes when
 

@@ -733,7 +733,7 @@ curl -X POST \
   http://localhost:8088/data/api/v1/scan/config
 
 <span class="cm"># the lab wrapper picks key + URL per gateway from .env</span>
-scripts/scan.sh both --gateway test</pre></div>
+scripts/scan.sh test</pre></div>
       <div>
         <ul class="checks">
           <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Keys are per-gateway, not per-URL.</b> Generate each in <i>that gateway's</i> UI (Config → Security → API Keys). The test key will never authenticate against production.</span></li>
@@ -809,7 +809,7 @@ scripts/scan.sh both --gateway test</pre></div>
       <span class="num">12</span>
       <div>
         <div class="title">Two workflows, one pattern</div>
-        <div class="lead"><span class="inlinecode">deploy.yml</span> and <span class="inlinecode">release.yml</span> both start by re-running the <span class="inlinecode">ci.yml</span> validation as a gate, then run the <b>same five deploy steps</b>: checkout → prune → ship → scan → verify. Diff them and the only differences are <b>the trigger and the target</b>. That's the whole deployment policy.</div>
+        <div class="lead"><span class="inlinecode">deploy.yml</span> and <span class="inlinecode">release.yml</span> run the <b>same five deploy steps</b>: checkout → prune → ship → scan → verify. Validation already happened on the PR (<span class="inlinecode">ci.yml</span>), so they go straight to shipping. Diff them and the only differences are <b>the trigger and the target</b>. That's the whole deployment policy.</div>
       </div>
     </div>
     <table class="tbl" style="max-width:1080px">
