@@ -181,49 +181,25 @@ The five steps:
 
 ## The deploy, by hand, once (guided, ~20 min)
 
-```bash
-# Add a tiny project on disk (simulating what a developer commit would produce).
-# Because `local` bind-mounts ./projects/, these files are already on the local
-# gateway's disk before we do anything else. Note the 8.3 module-namespaced path
-# and the required resource.json manifest.
-VIEW="projects/sample/com.inductiveautomation.perspective/views/Hello"
-mkdir -p "$VIEW"
-cat > projects/sample/project.json <<'EOF'
-{"title":"Sample","description":"Demo project","enabled":true,"inheritable":false,"parent":""}
-EOF
-cat > "$VIEW/view.json" <<'EOF'
-{"custom":{},"params":{},"props":{"defaultSize":{"height":600,"width":800}},
- "root":{"type":"ia.container.coord","version":0}}
-EOF
-cat > "$VIEW/resource.json" <<'EOF'
-{"scope":"G","version":1,"restricted":false,"overridable":true,"files":["view.json"],"attributes":{}}
-EOF
+Edit a view in the shipped `example-project` and ship it to test by hand — this is exactly what `deploy.yml` automates. Because `local` bind-mounts `./projects/`, editing a file in your working tree *is* editing the local gateway's disk:
 
-# Trigger a project scan on the local gateway:
-scripts/scan.sh projects --gateway local
-```
-
-In the local gateway UI (http://localhost:8088), the `sample` project should now appear (Config → Projects, or the Perspective project launcher).
-
-Now edit a view and ship it to test by hand — this is exactly what `deploy.yml` automates:
-
-1. Change `projects/sample/com.inductiveautomation.perspective/views/Hello/view.json` (e.g., `width: 800` → `width: 1200`).
+1. Change `projects/example-project/com.inductiveautomation.perspective/views/pages/overview/view.json` (e.g., `props.defaultSize.height`: `920` → `700`).
 2. Scan the **local** gateway — local sees the change via bind mount immediately; the scan tells it to notice:
    ```bash
    scripts/scan.sh both --gateway local
    ```
-   Verify in http://localhost:8088 — the view's width should match.
+   Verify in http://localhost:8088 — the view's height should match.
 3. Copy the same change to **test** manually. Test started empty, so there is nothing to wipe — just copy the project over and scan:
    ```bash
    docker cp ./projects/. lab04-ignition-test:/usr/local/bin/ignition/data/projects/
    scripts/scan.sh projects --gateway test
    ```
-   Verify in http://localhost:8089 — the same view should appear, the same width.
+   Verify in http://localhost:8089 — the same view should appear, the same height.
 
    `deploy.yml` does one more thing before copying: it **wipes** `projects/` and `config/` on the target (sparing the entries `.deployignore` protects — `config/local/`, `config/resources/local/`, and the gateway-owned internal identity by name: `user-source/default/`, `user-source/opcua-module/`, `identity-provider/default/`), so a resource deleted in the repo disappears from the gateway too. You'll read that step line by line in the workflow anatomy below.
 4. Inspect `.deployignore`. Notice it excludes `README.md`, `LICENSE`, the `.github/` directory, `docs/`, `scripts/`, the per-instance `services/config/resources/local/`, and the gateway-owned **internal** identity by name: `user-source/default/`, `user-source/opcua-module/`, `identity-provider/default/` (deploying those would overwrite the target's admin user — instant lockout). Identity resources you add yourself (database or AD user sources, SAML/OIDC providers) hold no password data and deploy normally, as does `security-properties` (permission policy — tracked and shipped). For each pattern, say **why the gateway shouldn't have that file**.
 
-> **No sample project?** Use any view under the shipped `projects/example-project/` instead — the flow is identical.
+> **Leave the edit uncommitted for now.** Part 2.3 commits it together with the project you'll create there — that's the moment the repo catches up with what you hand-deployed.
 
 The runner topology:
 
@@ -275,26 +251,19 @@ You **don't** need to set `IGNITION_URL` or `IGNITION_CONTAINER` variables unles
 
 ### Part 2.3 — Ship to test via `main` (15 min)
 
-> **One-time, only if you did the guided deploy-by-hand:** the `sample` project you created there by hand is still *untracked*. Commit it to `main` first so your repo matches what is already on your gateways:
-> ```bash
-> git add projects/sample && git commit -m "Add sample project"
-> git push origin main
-> ```
-> Skipped the guided part or don't have `sample`? Fine — the steps below use the **shipped** `example-project`, which every clone has.
-
-1. Branch a feature off `main` and change a view. Use the shipped `overview` view (any view under `projects/` works, including the guided part's `Hello` if you committed it):
+1. Create a **new project** on the local gateway, the way you always do in Ignition: Designer → New Project (or the gateway UI, Config → Projects). Give it a recognizable name and a simple view. Because local bind-mounts `./projects/`, the project lands in your working tree the moment the gateway saves it — `git status` shows it as an untracked `projects/<name>/` folder. That folder is your deployable: no export, no file editing.
+2. Branch off `main` and commit it — together with the still-uncommitted height tweak from the deploy-by-hand, so the repo matches what's already on the local gateway:
    ```bash
-   git checkout main && git checkout -b feature/tweak-view
-   # edit projects/example-project/com.inductiveautomation.perspective/views/pages/overview/view.json
-   #   — change props.defaultSize.height (920 → e.g. 700)
-   git commit -am "Tweak overview view height"
-   git push -u origin feature/tweak-view
+   git checkout main && git checkout -b feature/add-my-project
+   git add projects/
+   git commit -m "Add my new project"
+   git push -u origin feature/add-my-project
    ```
-2. Open a PR **into `main`**. Watch [`ci.yml`](../.github/workflows/ci.yml) run on `ubuntu-latest` (free): it validates JSON, `.deployignore`, and the workflow files themselves.
-3. Merge the PR into `main`. [`deploy.yml`](../.github/workflows/deploy.yml) fires because of the `paths:` filter (and only on `main`). Its first job re-runs the whole `ci.yml` suite as a gate (that also covers direct pushes to `main`, which never see a PR) — the deploy job only starts once validation is green.
-4. Watch the workflow run. The interesting steps are **Ship projects and config into gateway container** (the `docker cp` half) and **Trigger gateway scan** (`POST /data/api/v1/scan/{projects,config}`). On a fresh gateway the scan step self-heals: a 401/403 makes it restart the gateway once (the token Ship just copied loads at boot) and retry — first deploy green, every later deploy hot-scans.
-5. Verify in http://localhost:8089 — the view's height should match what you pushed. Then verify from the **host**: `ls gateways/test/projects` shows the deployed tree (test's `projects/` and `config/` bind-mount to `./gateways/test/`), so you can `cat` the exact `view.json` CI just shipped.
-6. **Multi-project check.** The deploy step copies `./projects/.` (the whole directory), so a single merge deploys **both** `example-project` and `packaging-site` at once. Confirm the test gateway (Config → Projects) lists **both**, even though your PR only touched a view in one. The unit of deploy is the `projects/` tree, not a single project.
+3. Open a PR **into `main`**. Watch [`ci.yml`](../.github/workflows/ci.yml) run on `ubuntu-latest` (free): it validates JSON, `.deployignore`, and the workflow files themselves.
+4. Merge the PR into `main`. [`deploy.yml`](../.github/workflows/deploy.yml) fires because of the `paths:` filter (and only on `main`). Its first job re-runs the whole `ci.yml` suite as a gate (that also covers direct pushes to `main`, which never see a PR) — the deploy job only starts once validation is green.
+5. Watch the workflow run. The interesting steps are **Ship projects and config into gateway container** (the `docker cp` half) and **Trigger gateway scan** (`POST /data/api/v1/scan/{projects,config}`). On a fresh gateway the scan step self-heals: a 401/403 makes it restart the gateway once (the token Ship just copied loads at boot) and retry — first deploy green, every later deploy hot-scans.
+6. Verify in http://localhost:8089 — Config → Projects lists **your new project**, and its view opens (the deploy-by-hand's height tweak is there too, now via the pipeline). Then verify from the **host**: `ls gateways/test/projects` shows the deployed tree (test's `projects/` and `config/` bind-mount to `./gateways/test/`), so you can `cat` the exact files CI just shipped.
+7. **Multi-project check.** The deploy step copies `./projects/.` (the whole directory), so your single merge deployed `example-project`, `packaging-site` **and** your new project at once. The unit of deploy is the `projects/` tree, not a single project.
 
 ### Part 2.4 — Release to production via `main` + tag (10 min)
 
@@ -325,8 +294,8 @@ For your chosen failure, write down: **symptom → state of the gateway → reco
 
 - [ ] The bundled runner shows **online** in your fork (`self-hosted, lab04`).
 - [ ] Both GitHub environments (`lab-gateway-test`, `lab-gateway-production`) exist, each with an `IGNITION_API_KEY` secret.
-- [ ] A push to **`main`** (merged PR) triggered `deploy.yml` and the change is visible on the **test** gateway (:8089).
-- [ ] A `v*` tag on `main` triggered `release.yml` and the change is visible on the **production** gateway (:8090).
+- [ ] A push to **`main`** (merged PR) triggered `deploy.yml` and **the project you created** is on the **test** gateway (:8089).
+- [ ] A `v*` tag on `main` triggered `release.yml` and that project is on the **production** gateway (:8090).
 - [ ] You broke **one** deploy on purpose and can describe the failure mode and recovery.
 - [ ] You can name the GitHub Flow routing (push to `main` → test, tag on `main` → production) and explain, in five steps, what the runner does between "merge" and "gateway reloaded."
 
