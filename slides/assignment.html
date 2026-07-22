@@ -258,7 +258,7 @@ body{
         <div class="step"><div class="ix t">3</div><div class="tx"><b>Enable Actions.</b> Open your fork's <b>Actions</b> tab and click "<i>I understand my workflows, enable them</i>". Skip this and no PR or tag will ever deploy. This is also where <span class="inlinecode">RUNNER_REPO_URL</span> in <span class="inlinecode">.env</span> must point — at <b>your fork</b>, not the course repo.</div></div>
         <div class="step"><div class="ix t">4</div><div class="tx"><b>Create a runner PAT</b> — the bundled runner needs it to register. At <span class="inlinecode">github.com/settings/tokens</span>: <b>Generate new token (classic)</b> → tick the <span class="inlinecode">repo</span> scope → <b>Generate</b> → copy the <span class="inlinecode">ghp_…</span> value. You make this <b>once</b>; Labs 05 and 06 reuse the same token, so keep it handy.</div></div>
         <div class="step"><div class="ix t">5</div><div class="tx"><b>Copy the env file</b> with <span class="inlinecode">cp .env.example .env</span> and change <b>two lines</b>: point <span class="inlinecode">RUNNER_REPO_URL</span> at <b>your fork</b>, and paste your token into <span class="inlinecode">RUNNER_GITHUB_PAT</span>. Leave everything else as shipped: the admin logins stay as-is, and the three <span class="inlinecode">IGNITION_API_KEY_*</span> lines stay <b>empty</b> — <span class="inlinecode">setup.sh</span> generates a unique key per gateway into <span class="inlinecode">.env</span> in the next step. No key ever lives in the repo.</div></div>
-        <div class="step"><div class="ix t">6</div><div class="tx"><b>Check the remotes:</b> <span class="inlinecode">git remote -v</span> — <span class="inlinecode">origin</span> must show <b>your username</b>. Then <span class="inlinecode">code .</span> to open VS Code, and <span class="inlinecode">scripts/setup.sh</span> brings up the stack (three gateways + TimescaleDB + the runner).</div></div>
+        <div class="step"><div class="ix t">6</div><div class="tx"><b>Check the remotes and set the default:</b> <span class="inlinecode">git remote -v</span> — <span class="inlinecode">origin</span> must show <b>your username</b> — then <span class="inlinecode">gh repo set-default <span class="cmd2">&lt;you&gt;</span>/cicd-lab-04-…</span> so <span class="inlinecode">gh</span> targets <b>your fork</b>, not the course repo (per clone, same as Lab 03). Then <span class="inlinecode">code .</span> to open VS Code, and <span class="inlinecode">scripts/setup.sh</span> brings up the stack (three gateways + TimescaleDB + the runner).</div></div>
       </div>
       <div>
         <div class="code"><pre><span class="cm"># 1: the parent folder, all labs side by side</span>
@@ -270,8 +270,9 @@ gh repo fork mustry-academy/cicd-lab-04-ignition-file-based-deploy --clone
 git clone git@github.com:&lt;your-username&gt;/cicd-lab-04-ignition-file-based-deploy.git
 cd cicd-lab-04-ignition-file-based-deploy
 
-<span class="cm"># 3: origin → YOUR username? good.</span>
+<span class="cm"># 3: origin → YOUR username? good. Then make gh target YOUR fork:</span>
 git remote -v
+gh repo set-default <span class="cmd2">&lt;you&gt;</span>/cicd-lab-04-ignition-file-based-deploy
 
 <span class="cm"># 4: make a repo-scope PAT (github.com/settings/tokens)</span>
 <span class="cm">#    Generate new token (classic) → tick "repo" → copy ghp_…</span>
