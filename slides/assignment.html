@@ -339,13 +339,18 @@ git diff services/config</pre></div>
     <div class="sechead"><span class="num warm">PART 2 · WE DO</span><div><div class="title">The deploy, by hand, once</div><div class="lead">Everything <span class="inlinecode">deploy.yml</span> automates, done manually so the workflow holds no mysteries.</div></div></div>
     <div class="cols2">
       <div class="steps">
-        <div class="step"><div class="ix t">1</div><div class="tx">Edit a view's <span class="inlinecode">view.json</span> (e.g. <span class="inlinecode">width: 800 → 1200</span>). It's <b>already on the local gateway's disk</b> via the bind mount.</div></div>
-        <div class="step"><div class="ix t">2</div><div class="tx">Run scan.sh, verify at <span class="inlinecode">localhost:8088 (or Designer)</span>. The scan makes the gateway <i>notice</i> what's on disk.</div></div>
+        <div class="step"><div class="ix t">1</div><div class="tx"><b>Create a tiny <span class="inlinecode">sample</span> project on disk</b> — paste the block from the exercise: <span class="inlinecode">mkdir</span> + three files (<span class="inlinecode">project.json</span>, a view's <span class="inlinecode">view.json</span> + <span class="inlinecode">resource.json</span>). This simulates what a developer commit drops into the repo. Local bind-mounts <span class="inlinecode">./projects/</span>, so the files are on its disk the moment you save; the scan makes the project appear (Config → Projects).</div></div>
+        <div class="step"><div class="ix t">2</div><div class="tx">Edit the view's <span class="inlinecode">view.json</span> (e.g. <span class="inlinecode">width: 800 → 1200</span>), scan again, verify at <span class="inlinecode">localhost:8088 (or Designer)</span>. The scan makes the gateway <i>notice</i> what's on disk.</div></div>
         <div class="step"><div class="ix t">3</div><div class="tx"><b>Ship to test by hand</b>: <span class="inlinecode">docker cp</span> the project, scan. Test starts <b>empty</b>, so nothing to wipe. Verify at <span class="inlinecode">localhost:8089 (or Designer)</span>: same view, same width. Bonus check from the host: <span class="inlinecode">ls gateways/test/projects</span> shows what just landed.</div></div>
         <div class="step"><div class="ix t">4</div><div class="tx">Open <span class="inlinecode">.deployignore</span>. For each pattern, say <b>why the gateway shouldn't have that file</b>.</div></div>
       </div>
       <div>
-        <div class="code"><pre><span class="cm"># 2 (local): files already there, just scan</span>
+        <div class="code"><pre><span class="cm"># 1 (create): paste the sample-project block from the exercise</span>
+<span class="cm">#   (mkdir + project.json + view.json + resource.json), then:</span>
+scripts/scan.sh projects --gateway local
+
+<span class="cm"># 2 (local): edit the view, then just scan — the bind mount</span>
+<span class="cm">#   already put your change on the local gateway's disk</span>
 scripts/scan.sh both --gateway local
 
 <span class="cm"># 3 (test): copy the project over, scan</span>
@@ -401,7 +406,7 @@ docker compose logs --tail 50 github-runner
     <div class="sechead"><span class="num p" style="background:var(--peri)">PART 3</span><div><div class="title">Ship to the development environment via the <span class="mono" style="font-size:30px">main</span> branch</div><div class="lead">15 min. A real PR rides the pipeline: feature branch → PR → CI → merge → deploy.yml → test gateway.</div></div></div>
     <div class="cols2">
       <div class="steps">
-        <div class="step"><div class="ix p">1</div><div class="tx"><b>One-time, only if you did the deploy-by-hand:</b> commit the <span class="inlinecode">sample</span> project it created (still untracked) straight to <span class="inlinecode">main</span>. That push is also your first automated deploy.</div></div>
+        <div class="step"><div class="ix p">1</div><div class="tx"><b>One-time, only if you did the deploy-by-hand:</b> commit the <span class="inlinecode">sample</span> project you created there by hand (still untracked) straight to <span class="inlinecode">main</span>. That push is also your first automated deploy.</div></div>
         <div class="step"><div class="ix p">2</div><div class="tx">Branch <span class="inlinecode">feature/tweak-view</span> off <span class="inlinecode">main</span> and change the <b>height</b> of the shipped <span class="inlinecode">overview</span> view (in <span class="inlinecode">example-project</span>, every clone has it), then push the change.</div></div>
         <div class="step"><div class="ix p">3</div><div class="tx">Open a PR <b>into <span class="inlinecode">main</span></b>. Watch <span class="inlinecode">ci.yml</span> run on <span class="inlinecode">ubuntu-latest</span> (free): JSON, <span class="inlinecode">.deployignore</span> and workflow validation.</div></div>
         <div class="step"><div class="ix p">4</div><div class="tx"><b>Merge.</b> <span class="inlinecode">deploy.yml</span> fires (note the <span class="inlinecode">paths:</span> filter, since docs-only pushes don't deploy). It re-runs the <span class="inlinecode">ci.yml</span> validation as its first job; only when that is green does the deploy start. Watch the <b>Ship</b> and <b>Trigger gateway scan</b> steps.</div></div>

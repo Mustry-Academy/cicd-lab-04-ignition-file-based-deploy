@@ -275,7 +275,7 @@ You **don't** need to set `IGNITION_URL` or `IGNITION_CONTAINER` variables unles
 
 ### Part 2.3 — Ship to test via `main` (15 min)
 
-> **One-time, only if you did the guided deploy-by-hand:** the `sample` project it created is still *untracked*. Commit it to `main` first so your repo matches what is already on your gateways:
+> **One-time, only if you did the guided deploy-by-hand:** the `sample` project you created there by hand is still *untracked*. Commit it to `main` first so your repo matches what is already on your gateways:
 > ```bash
 > git add projects/sample && git commit -m "Add sample project"
 > git push origin main
