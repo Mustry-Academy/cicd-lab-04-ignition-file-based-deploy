@@ -96,7 +96,7 @@ The marker trick: set a timestamp marker, make the change in the UI, then ask `f
    docker exec lab04-ignition-local find /usr/local/bin/ignition/data/config -newer /tmp/marker -type f 2>/dev/null
    ```
 5. Open that file with `docker exec lab04-ignition-local cat <path>`. Notice what's in there — it'll be a `config.json` (plus the gateway rewriting a sibling `resource.json`).
-6. In the gateway UI, **Config → Databases → Connections → New**. Add a Postgres datasource. In 8.3.6 the create form takes a single **Connect URL**: `jdbc:postgresql://timescaledb:5432/ignition_local_development`, user/password from your `.env` (`POSTGRES_USER` / `POSTGRES_PASSWORD`, default `ignition` / `ignition`). Save. The hostname `timescaledb` is the compose service name — the local gateway resolves it on the lab's docker network.
+6. In the gateway UI, **Config → Databases → Connections → New**. Add a Postgres datasource. In 8.3.8 the create form takes a single **Connect URL**: `jdbc:postgresql://timescaledb:5432/ignition_local_development`, user/password from your `.env` (`POSTGRES_USER` / `POSTGRES_PASSWORD`, default `ignition` / `ignition`). Save. The hostname `timescaledb` is the compose service name — the local gateway resolves it on the lab's docker network.
 7. Repeat step 4 (re-touch the marker first) — find the new files. The connection lands at `config/resources/<scope>/ignition/database-connection/<name>/config.json`. Gateway-level or project-level? Because `local` bind-mounts `./services/config/`, it also just appeared **in your repo on the host** — run `git status`.
 
 ## "Everything is a file in git" (guided)

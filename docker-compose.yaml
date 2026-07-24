@@ -86,7 +86,7 @@ x-ignition-healthcheck: &ignition-healthcheck
 services:
   # --- local gateway: edits on the host show up here immediately --------------
   ignition-local:
-    image: inductiveautomation/ignition:8.3.6
+    image: inductiveautomation/ignition:8.3.8
     container_name: lab04-ignition-local
     hostname: lab04-ignition-local
     # Keep the image's own identity (uid 2003, gid 0): its data/ tree is
@@ -132,7 +132,7 @@ services:
 
   # --- test gateway: populated by deploy.yml (push to main) -------------------
   ignition-test:
-    image: inductiveautomation/ignition:8.3.6
+    image: inductiveautomation/ignition:8.3.8
     container_name: lab04-ignition-test
     hostname: lab04-ignition-test
     # Keep the image's own identity (uid 2003, gid 0): its data/ tree is
@@ -182,7 +182,7 @@ services:
 
   # --- production gateway: populated by release.yml (tag push v*) ------------------
   ignition-production:
-    image: inductiveautomation/ignition:8.3.6
+    image: inductiveautomation/ignition:8.3.8
     container_name: lab04-ignition-production
     hostname: lab04-ignition-production
     # Keep the image's own identity (uid 2003, gid 0): its data/ tree is
