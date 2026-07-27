@@ -163,6 +163,13 @@ seed_gateway_state() {
         mkdir -p "$PROJECT_ROOT/gateways/$gw/projects" "$PROJECT_ROOT/gateways/$gw/config"
     done
     "$SCRIPT_DIR/generate-api-keys.sh"
+    # Everything created above is born AFTER lab_preflight's chmod pass, which
+    # "only touches dirs that exist" — so on a fresh clone these trees get the
+    # student's umask (typically 022: no group write) and the test/production
+    # gateways (uid 2003, writing via the student's group) FAULT on first boot
+    # with AccessDeniedException. Re-apply the bind-mount permissions now that
+    # the trees exist.
+    pf_prepare_bind_mounts
 }
 
 seed_gateway_state
