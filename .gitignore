@@ -62,6 +62,11 @@ venv/
 **/config/resources/core/ignition/user-source/default/
 **/config/resources/core/ignition/user-source/opcua-module/
 **/config/resources/core/ignition/identity-provider/default/
+# ...and the temp_N identity commissioning invents when it runs with identity
+# files that outlived their data volume (scripts/setup.sh repairs that). Same
+# admin hash, same lockout, so it is never committed either.
+**/config/resources/core/ignition/user-source/temp*/
+**/config/resources/core/ignition/identity-provider/temp*/
 
 # Test/production gateway state (bind mounts written by the gateways + CI deploys,
 # see docker-compose.yaml). The README stays so the folder is visible in

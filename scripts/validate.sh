@@ -5,7 +5,8 @@
 # without waiting for a runner:
 #   1. Every *.json under projects/ and services/ parses.
 #   2. .deployignore patterns are relative (no leading /).
-#   3. actionlint passes on .github/workflows/ (only if actionlint is installed).
+#   3. security-properties doesn't name a throwaway temp_N identity.
+#   4. actionlint passes on .github/workflows/ (only if actionlint is installed).
 #
 # Exits non-zero if any check fails. No Ignition or Docker needed.
 
@@ -55,7 +56,36 @@ else
   echo "  (no .deployignore — skipped)"
 fi
 
-# 3. actionlint (optional) -----------------------------------------------------
+# 3. identity policy -----------------------------------------------------------
+# security-properties is tracked, so whatever it names has to exist on every
+# gateway that reads it. Commissioning rewrites it to a throwaway `temp_N`
+# profile when it runs with identity files that outlived their data volume
+# (scripts/setup.sh heals that) — and a temp profile exists on exactly one
+# gateway. Cheap check, because the failure mode is a locked-out gateway.
+echo "→ identity policy (security-properties names a deployable profile)"
+secprops="services/config/resources/core/ignition/security-properties/config.json"
+if [ -f "$secprops" ]; then
+  bad_profile="$(python3 -c 'import json,sys
+try: d=json.load(open(sys.argv[1]))
+except Exception: sys.exit(0)
+print(" ".join(sorted({v for k,v in d.items()
+                       if k in ("systemAuthProfile","systemIdentityProvider")
+                       and str(v).startswith("temp")})))' "$secprops" 2>/dev/null || true)"
+  if [ -n "$bad_profile" ]; then
+    echo -e "  ${RED}security-properties points at a throwaway identity:${NC} $bad_profile"
+    echo "  A commissioning run rewrote it. Restore it and drop the temp identity:"
+    echo "    git checkout -- $secprops"
+    echo "    rm -rf services/config/resources/core/ignition/{user-source,identity-provider}/temp*"
+    echo "  (or just re-run scripts/setup.sh, which now repairs this)"
+    rc=1
+  else
+    echo -e "  ${GREEN}ok${NC} — no throwaway identity in the deploy payload"
+  fi
+else
+  echo -e "  ${YELLOW}skipped${NC} — $secprops not found"
+fi
+
+# 4. actionlint (optional) -----------------------------------------------------
 echo "→ actionlint (.github/workflows/)"
 if command -v actionlint > /dev/null 2>&1; then
   if actionlint -color; then
