@@ -6,6 +6,9 @@ Day 2 (afternoon) of the [CI/CD for Ignition Masterclass](https://github.com/mus
 
 This is the **first lab that opens up the Ignition gateway itself**. Labs 02–03 already worked with a real Ignition project — a Perspective HMI and a couple of Python script libraries running on a gateway you spin up — but kept the gateway's *administrative* side (config, modules, databases, deploys) deliberately abstracted away: the repo tracked only project files, and the gateway generated its own config into a volume you never touched. This lab pulls that curtain back — the `data/` file structure, gateway-level config, and how to deploy it — and points it at three real gateways that simulate a local → test → production promotion flow.
 
+
+> **How resource.json stays clean:** Ignition restamps these manifests constantly. [`docs/resource-json-hygiene.html`](./docs/resource-json-hygiene.html) explains what the junk is, the two tools that deal with it, and why an empty `git diff` does not mean a clean file.
+
 ## Prerequisites
 
 - A fork of this repo (the self-hosted runner registers against your fork, not the upstream)
@@ -91,7 +94,7 @@ cicd-lab-04-ignition-file-based-deploy/
 │   ├── lib.sh                          ← shared helpers
 │   ├── clean-ignition-resource-churn.sh ← undo volatile-only resource.json rewrites (dry-run / --apply)
 │   ├── git-diff/                       ← textconv normalizer that hides volatile metadata in diffs
-│   └── git-hooks/                      ← skip-worktree hooks for the machine-local config file
+│   └── git-hooks/                      ← post-checkout hook: skip-worktree for the machine-local config file
 ├── projects/                           ← project content (bind-mounted into `local` only)
 │   ├── example-project/                ← a real Perspective project (views, templates)
 │   └── packaging-site/                 ← a second project; proves one deploy ships every project under projects/

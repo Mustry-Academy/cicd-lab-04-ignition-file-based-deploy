@@ -35,17 +35,19 @@ scripts/clean-ignition-resource-churn.sh          # dry run: lists volatile-only
 scripts/clean-ignition-resource-churn.sh --apply  # restores them from HEAD
 ```
 
-Files with real content changes (and anything staged) are never touched by the script.
+Junk-only rewrites are reverted whether or not you already staged them. Files with real content
+changes are never touched by the script.
 `git diff` already hides the volatile metadata: `scripts/setup.sh` wires a textconv driver
 (`scripts/git-diff/normalize-ignition-resource-json.py`) via `.gitattributes`. If diffs still
 show timestamp/signature noise, re-run `scripts/setup.sh`.
 
 The one exception is the machine-local `local-system-properties/config.json` (system UID, trial
-state — it belongs to this specific box). The hooks installed by `scripts/setup.sh` keep it
-`skip-worktree` so it never dirties the tree. To intentionally change that seed file and commit it:
+state — it belongs to this specific box). `scripts/setup.sh` and the post-checkout hook it installs
+keep it `skip-worktree` so it never dirties the tree. To intentionally change that seed file and
+commit it:
 ```bash
 git update-index --no-skip-worktree <path>
-# edit, commit, push — the next pull re-applies skip-worktree
+# edit, commit, push — re-run scripts/setup.sh to re-apply skip-worktree
 ```
 
 ## The self-hosted runner is offline / jobs queue forever
@@ -143,3 +145,8 @@ scripts/validate.sh    # JSON parse + .deployignore syntax + actionlint — mirr
 
 Still stuck? The instructor answer key ([lab-key.md](../instructor-notes/lab-key.md)) has a
 deeper failure-mode walkthrough.
+
+
+## Why resource.json keeps changing on its own
+
+See [`resource-json-hygiene.html`](./resource-json-hygiene.html) for the full picture: what the junk fields are, the difference between hiding them and reverting them, and why an empty `git diff` does not mean the file on disk is clean.
